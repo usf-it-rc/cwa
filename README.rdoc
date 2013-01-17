@@ -2,7 +2,10 @@
 
 This plugin will provide a means for new users, after Single-Sign-On auth, to
 
-# Agree to terms-of-service (configurable via wiki)
-# Agree to system access agreement (configurable via wiki)
-# Grab Single-Sign-On password to generate JSON-RPC request to create a new IPA user
-# Provide for account "deletion" with terms-of-discontinuation-of-service (wiki)
+1. Agree to terms-of-service (configurable via wiki)
+
+2. Agree to system access agreement (configurable via wiki)
+
+3. Grab Single-Sign-On password to generate JSON-RPC request to create a new IPA user
+
+4. Provide for account "deletion" with terms-of-discontinuation-of-service (wiki)
