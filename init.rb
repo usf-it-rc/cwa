@@ -5,7 +5,7 @@ Redmine::Plugin.register :cwa_as do
   version '0.0.1'
   url 'http://example.com/path/to/plugin'
   author_url 'http://example.com/about'
-  menu :account_menu, :cwa_as, { :controller => 'cwa_as', :action => 'index' }, :caption => 'My Account'
+  menu :application_menu, :cwa_as, { :controller => 'cwa_as', :action => 'index' }, :caption => 'Create Account'
   settings :default => {
     :saa => "Service Access Agreement goes here",
     :tos => "Terms of Service go here" }, :partial => 'settings/cwaas_settings'

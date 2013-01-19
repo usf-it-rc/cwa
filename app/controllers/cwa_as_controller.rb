@@ -1,7 +1,6 @@
 class CwaAsController < ApplicationController
   unloadable
 
-
   def index
     @plugin = CwaAs.new
 
@@ -13,6 +12,11 @@ class CwaAsController < ApplicationController
   def success
   end
 
+  def create
+    flash[:notice] = 'Successfully registered'
+    redirect_to :action => 'index'
+  end
+
   def failure
     flash[:error] = 'Account registered'
     redirect_to :action => 'index'
@@ -21,7 +25,4 @@ class CwaAsController < ApplicationController
   def delete
   end
 
-  def terms_of_service
-
-  end
 end

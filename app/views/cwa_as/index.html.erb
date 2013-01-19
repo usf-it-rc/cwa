@@ -1,19 +1,37 @@
 <h2>System Access Request</h2>
 
-<p>
-<%= textilizable @plugin.saa, :options => { } %>
-</p>
-
-<p>
-<%= textilizable @plugin.tos, :options => { } %>
-</p>
-
-<p>
-<%= textilizable @plugin.pwd_agreement, :options => { } %>
-</p>
-
-<p>
-  <label><%= l(:label_netid_password) %> :</label>
-  <%= password_field_tag 'netid_password' %>
-  <br />
-</p>
+<% if flash[:notice] %>
+ <div class="notice"><%= flash[:notice] %></div>
+ <meta http-equiv='refresh' content='5;url=/'>
+<% else %>
+<div style="width:800px">
+ <%= form_tag "/cwa_as/create" do %>
+ <div>
+  <div class="box">
+   <%= textilizable @plugin.saa, :options => { } %>
+   <%= check_box_tag :saa, 'yes', false, :class => 'accept_saa' %>
+   <%= label_tag :saa, "Accept System Access Agreement" %>
+  </div>
+  <div class="box">
+   <%= textilizable @plugin.tos, :options => { } %>
+   <%= check_box_tag :tos, 'yes', false, :class => 'accept_tos' %>
+   <%= label_tag :saa, "Accept Terms of Service" %>
+  </div>
+ </div>
+ <div class="box">
+  <center>
+  <%= textilizable @plugin.pwd_agreement, :options => { } %>
+  <p>
+   <%= label_tag :netid_password, "Enter your NetID password" %>:
+  </p>
+  <p>
+   <%= password_field_tag :netid_password %>
+  </p>
+  <p>
+   <%= submit_tag "Enable System Access", :disable_with => "Please wait..." %>
+  </p>
+  </center>
+ </div>
+<% end %>
+</div>
+<% end %>
