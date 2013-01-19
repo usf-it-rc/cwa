@@ -1,0 +1,19 @@
+<h2>System Access Request</h2>
+
+<p>
+<%= textilizable @plugin.saa, :options => { } %>
+</p>
+
+<p>
+<%= textilizable @plugin.tos, :options => { } %>
+</p>
+
+<p>
+<%= textilizable @plugin.pwd_agreement, :options => { } %>
+</p>
+
+<p>
+  <label><%= l(:label_netid_password) %> :</label>
+  <%= password_field_tag 'netid_password' %>
+  <br />
+</p>

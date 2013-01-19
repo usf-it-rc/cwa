@@ -1,0 +1,33 @@
+<fieldset>
+<legend>Settings</legend>
+<p>
+  <label><%= l(:label_tos) %><span class="required"> *</span> :</label>
+  <%= text_area_tag 'settings[tos]', @settings['tos'], :rows => 10, :cols => 50 %>
+  <br />
+</p>
+<p>
+  <label><%= l(:label_saa) %> :</label>
+  <%= text_area_tag 'settings[saa]', @settings['saa'], :rows => 10, :cols => 50 %>
+  <br />
+</p>
+<p>
+  <label><%= l(:label_pwd_agreement) %> :</label>
+  <%= text_area_tag 'settings[pwd_agreement]', @settings['pwd_agreement'], :rows => 10, :cols => 50 %>
+  <br />
+</p>
+<p>
+  <label><%= l(:label_ipa_server) %> :</label>
+  <%= text_field_tag 'settings[ipa_server]', @settings['ipa_server'] %>
+  <br />
+</p>
+<p>
+  <label><%= l(:label_ipa_account) %> :</label>
+  <%= text_field_tag 'settings[ipa_account]', @settings['ipa_account'] %>
+  <br />
+</p>
+<p>
+  <label><%= l(:label_ipa_password) %> :</label>
+  <%= password_field_tag 'settings[ipa_password]', @settings['ipa_password'] %>
+  <br />
+</p>
+</fieldset>

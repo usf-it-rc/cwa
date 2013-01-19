@@ -1,3 +1,9 @@
 # English strings go here for Rails i18n
 en:
-  my_label: "My label"
+  label_tos: "Terms of Service (What we provide and do not provide)"
+  label_saa: "System Access Agreement (User responsibilities)"
+  label_ipa_server: "FreeIPA Server Hostname"
+  label_ipa_account: "FreeIPA Service Account"
+  label_ipa_password: "FreeIPA Service Account Password"
+  label_pwd_agreement: "Password entering agreement"
+  label_netid_password: "Enter your USF NetID Password"
