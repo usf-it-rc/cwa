@@ -4,6 +4,7 @@
  <div class="notice"><%= flash[:notice] %></div>
  <meta http-equiv='refresh' content='5;url=/'>
 <% else %>
+<center>
 <div style="width:800px">
  <%= form_tag "/cwa_as/create" do %>
  <div>
@@ -34,4 +35,5 @@
  </div>
 <% end %>
 </div>
+</center>
 <% end %>

@@ -7,3 +7,5 @@ en:
   label_ipa_password: "FreeIPA Service Account Password"
   label_pwd_agreement: "Password entering agreement"
   label_netid_password: "Enter your USF NetID Password"
+  permission_view_account_signup: "View Sign-up Page"
+  permission_account_create: "Create account"
