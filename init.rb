@@ -8,5 +8,6 @@ Redmine::Plugin.register :cwa_as do
   settings :default => {
     :saa => "Service Access Agreement goes here",
     :tos => "Terms of Service go here" }, :partial => 'settings/cwaas_settings'
-  menu :application_menu, :cwa_as, { :controller => 'cwa_as', :action => 'index' }, :caption => 'Account Management'
+  permission :cwa_as, { :cwa_as => [:index] }, :public => true
+  menu :project_menu, :cwa_as, { :controller => 'cwa_as', :action => 'index' }, :caption => 'Account Management', :after => :activity
 end

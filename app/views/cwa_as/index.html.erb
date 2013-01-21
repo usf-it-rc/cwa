@@ -1,12 +1,11 @@
 <h2>System Access Request</h2>
 
 <% if flash[:notice] %>
- <div class="notice"><%= flash[:notice] %></div>
- <meta http-equiv='refresh' content='5;url=/'>
+ <meta http-equiv='refresh' content='5;url=/projects/<%= @cwa_as.project_id %>'>
 <% else %>
 <center>
 <div style="width:800px">
- <%= form_tag "/cwa_as/create" do %>
+ <%= form_tag :action => :create, :project_id => params[:project_id] do %>
  <div>
   <div class="box">
    <%= textilizable @cwa_as.saa, :options => { } %>

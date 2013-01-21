@@ -3,17 +3,31 @@ class CwaAsController < ApplicationController
 
   def index
     @cwa_as = CwaAs.new
+    @project = Project.find(@cwa_as.project_id)
+
+    logger.debug @project.to_s
+
     if (User.current.lastname.downcase == "anonymous")
       redirect_to :action => 'no_auth'
       return
     end
 
-    if (@cwa_as.ipa_exists(User.current.login.downcase))
-      if (flash[:notice] != nil)
-        redirect_to '/cwa_as/user_info', :flash => { :notice => flash[:notice] }
-      else
-        redirect_to :action => 'user_info'
+    begin
+      u = @cwa_as.ipa_exists(User.current.login.downcase)
+    rescue Exception => e
+      flash[:error] = e.message
+    end
+
+    logger.debug "index(): " + flash[:notice].to_s
+    if flash[:notice] != nil
+      s = flash[:notice]
+    end
+
+    if u
+      if s != nil
+        flash[:notice] = s.to_s
       end
+      redirect_to :action => :user_info
       return
     end
 
@@ -24,8 +38,10 @@ class CwaAsController < ApplicationController
 
   def user_shell
     @cwa_as = CwaAs.new
+    @project = Project.find(@cwa_as.project_id)
+
     if (User.current.lastname.downcase == "anonymous")
-      redirect_to :action => 'no_auth'
+      redirect_to :action => :no_auth
       return
     end
     if params[:loginshell]
@@ -35,7 +51,7 @@ class CwaAsController < ApplicationController
       login_shell = s[p.to_i]
       logger.debug "Setting user shell to #{login_shell} from param #{p}"
     else
-      redirect_to :action => 'user_info'
+      redirect_to :action => :user_info
       return
     end
 
@@ -47,11 +63,15 @@ class CwaAsController < ApplicationController
       flash[:notice] = "Options saved!"
     end
 
-    redirect_to :action => 'user_info'
+    redirect_to :action => :user_info
   end
 
   def user_info
     @cwa_as = CwaAs.new
+    @project = Project.find(@cwa_as.project_id)
+
+    logger.debug "user_info(): " + flash[:notice].to_s
+
     respond_to do |format|
       format.html
     end
@@ -77,14 +97,14 @@ class CwaAsController < ApplicationController
     end
 
     begin
-      _provision(User.current.login.downcase ,params[:netid_password])
+      _provision(User.current.login.downcase ,params[:netid_password], "user_add")
     rescue Exception => e
       flash[:error] = "Registration failed: " + e.message
     else
       logger.debug "Account #{User.current.login.downcase} provisioned in FreeIPA"
       flash[:notice] = 'You are now successfully registered!'
     end
-    redirect_to :action => 'index'
+    redirect_to :action => :index
   end
 
   def failure
@@ -93,15 +113,34 @@ class CwaAsController < ApplicationController
   end
 
   def delete
+    @cwa_as = CwaAs.new
+    
+    # some sanity checks
     if (User.current.lastname.downcase == "anonymous")
       redirect_to :action => 'no_auth'
       return
     end
+    if (User.current.login.downcase == "admin")
+      flash[:error] = "You cannot delete the admin user!"
+      redirect_to :action => :index
+      return
+    end
+
+    # Try the delete and catch errors
+    begin
+      _provision(User.current.login.downcase ,params[:netid_password], "user_del")
+    rescue Exception => e
+      flash[:error] = "Deactivation failed: " + e.message
+    else
+      logger.debug "Account #{User.current.login.downcase} de-provisioned in FreeIPA"
+      flash[:notice] = 'Your account has been deactivated!'
+    end
+    redirect_to :action => 'index'
   end
 
   private
     # Provision the account in the IPA server
-    def _provision(user, password)
+    def _provision(user, password, action)
       @cwa_as = CwaAs.new
       user = _query_validate(user,password)
 
@@ -113,7 +152,7 @@ class CwaAsController < ApplicationController
 
       json_string = <<EOF
 {
-  "method": "user_add",
+  "method": "#{action}",
   "params": [
     [],
     {

@@ -21,6 +21,9 @@ class CwaAs < ActiveRecord::Base
   def delete_saa 
     Setting.plugin_cwa_as[:delete_saa]
   end
+  def project_id
+    Setting.plugin_cwa_as[:project_id]
+  end
   def shells
      { "/bin/sh" => 0, "/bin/bash" => 1, "/bin/ash" => 2, "/bin/zsh" => 3,  "/bin/csh" => 4, "/bin/tcsh" => 5 }
   end
@@ -56,8 +59,8 @@ EOF
       logger.debug json_query
       begin
         r = json_helper(json_query)
-      rescue
-        nil
+      rescue Exception => e
+        raise e.message
       else
         @ipa_user = r['result']
       end
@@ -67,8 +70,13 @@ EOF
   end
 
   def ipa_exists(user)
-    r = ipa_query(user)       
-    logger.debug r.to_s
+    begin
+      r = ipa_query(user)       
+    rescue Exception => e
+      raise e.message 
+    end 
+
+    logger.debug "ipa_exists(): " + r.to_s
     if r != nil
       true
     else
@@ -77,7 +85,6 @@ EOF
   end
 
   def user_set(user,params)
-    logger.debug "user_set(): "
     json_query = <<EOF
 { "method": "user_mod", 
   "params":[
@@ -98,7 +105,7 @@ EOF
    ] 
 }
 EOF
-    logger.debug json_query
+    logger.debug "user_set(): " + json_query
     json_helper(json_query)
   end
 
@@ -123,9 +130,11 @@ EOF
     end
 
     h = JSON.parse(c.body_str).to_hash
-    logger.debug h.to_s
+    logger.debug "json_helper(): " + h.to_s
 
-    if h['error'] != nil
+    # If we get an error AND its not "user not found"
+    if h['error'] != nil and h['error']['code'] != 4001
+      logger.debug h['error'].to_s
       raise h['error']['message']
     else
       h
