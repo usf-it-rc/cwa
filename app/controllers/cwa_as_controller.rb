@@ -8,10 +8,10 @@ class CwaAsController < ApplicationController
       return
     end
 
-#    if (_ipa_exists(User.current.login.downcase))
-#      redirect_to :action => 'user_info'
-#      return
-#    end
+    if (_ipa_exists(User.current.login.downcase))
+      redirect_to :action => 'user_info'
+      return
+    end
 
     respond_to do |format|
       format.html
@@ -110,14 +110,20 @@ EOF
     end
 
     def _ipa_exists(user)
-      logger.debug _ipa_query(user) 
-      return true
+      r = _ipa_query(user) 
+      logger.debug r.to_s
+      if r['principal'] != nil
+        true
+      else
+        false
+      end
     end
 
     def _ipa_query(user)
       json_query = <<EOF
-{ "method": "user_find", "params":[[""],{}],"uid":"#{user}"}
+{ "method": "user_find", "params":[[""],{ "uid":"#{user}"}],"id":"#{user}"}
 EOF
+      logger.debug json_query
       _json_helper(json_query)
     end
 
@@ -143,6 +149,4 @@ EOF
 
       JSON.parse(c.body_str).to_hash
     end
-      
-
 end
