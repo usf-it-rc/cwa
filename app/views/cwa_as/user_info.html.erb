@@ -1,1 +1,22 @@
-<p>User info page</p>
+<h2>User Information</h2>
+
+<div class="box">
+<%= form_tag "/cwa_as/user_shell" do %>
+<p>Name: <b><%= @cwa_as.givenname %> <%= @cwa_as.sn %></b></p>
+<p>Username: <b><%= @cwa_as.uid %></b></p>
+<p>Home directory: <b><%= @cwa_as.homedirectory %></b></p>
+<% shell = @cwa_as.loginshell %>
+<% shell_id = @cwa_as.shells[shell] %>
+<p>Shell: <b> <%= select_tag 'loginshell', options_for_select(@cwa_as.shells, :selected => shell_id) %> </b></p>
+<p><%= submit_tag "Update Account Information", :disable_with => "Please wait..." %></p>
+<% end %>
+</div>
+<h2>Disable System Access</h2>
+<div class="box"
+<%= form_tag "/cwa_as/delete" do %>
+<p>
+<%= @cwa_as.delete_saa %>
+</p>
+<p><%= submit_tag "Deactivate System Access", :disable_with => "Please wait..." %></p>
+<% end %>
+</div>

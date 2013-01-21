@@ -21,4 +21,114 @@ class CwaAs < ActiveRecord::Base
   def delete_saa 
     Setting.plugin_cwa_as[:delete_saa]
   end
+  def shells
+     { "/bin/sh" => 0, "/bin/bash" => 1, "/bin/ash" => 2, "/bin/zsh" => 3,  "/bin/csh" => 4, "/bin/tcsh" => 5 }
+  end
+  def loginshell
+     ipa_query(User.current.login.downcase)['result']['loginshell'].to_a.join ','
+  end
+  def set_loginshell(shell)
+    user_set(User.current.login.downcase, { :loginshell => shell })
+  end
+  def givenname
+    ipa_query(User.current.login.downcase)['result']['givenname'].to_a.join ','
+  end
+  def sn
+    ipa_query(User.current.login.downcase)['result']['sn'].to_a.join ','
+  end
+  def uid
+    ipa_query(User.current.login.downcase)['result']['uid'].to_a.join ','
+  end
+  def homedirectory
+    ipa_query(User.current.login.downcase)['result']['homedirectory'].to_a.join ','
+  end
+
+  def ipa_query(user)
+    if @ipa_user == nil
+      json_query = <<EOF
+{ "method": "user_show", 
+  "params":[
+   [],
+   { "uid":"#{user}" }
+   ] 
+}
+EOF
+      logger.debug json_query
+      begin
+        r = json_helper(json_query)
+      rescue
+        nil
+      else
+        @ipa_user = r['result']
+      end
+    end
+    logger.debug "ipa_query(): " + @ipa_user.to_s
+    @ipa_user
+  end
+
+  def ipa_exists(user)
+    r = ipa_query(user)       
+    logger.debug r.to_s
+    if r != nil
+      true
+    else
+      false
+    end
+  end
+
+  def user_set(user,params)
+    logger.debug "user_set(): "
+    json_query = <<EOF
+{ "method": "user_mod", 
+  "params":[
+   [],
+    { 
+     "uid":"#{user}",
+EOF
+
+    p_keys = params.keys
+    last = p_keys.pop
+    params.keys.each do |k|
+      json_query += "     \"#{k.to_s}\":\"#{params[k]}\",\n" 
+    end
+
+    json_query += <<EOF 
+     "#{last.to_s}":"#{params[last]}"
+    }
+   ] 
+}
+EOF
+    logger.debug json_query
+    json_helper(json_query)
+  end
+
+  def json_helper(json_string)
+    url = "https://#{self.ipa_server}/ipa" 
+    begin
+      c = Curl::Easy.http_post(url + "/json", json_string) do |curl|
+        curl.cacert = 'ca.crt'
+        curl.http_auth_types = :basic
+        curl.username = self.ipa_account
+        curl.password = self.ipa_password
+        curl.ssl_verify_host = false
+        curl.ssl_verify_peer = false
+        curl.verbose = true
+        curl.headers['referer'] = url
+        curl.headers['Accept'] = 'application/json'
+        curl.headers['Content-Type'] = 'application/json'
+        curl.headers['Api-Version'] = '2.2'
+      end 
+    rescue
+      raise 'Could not connect to FreeIPA!'
+    end
+
+    h = JSON.parse(c.body_str).to_hash
+    logger.debug h.to_s
+
+    if h['error'] != nil
+      raise h['error']['message']
+    else
+      h
+    end
+  end
 end

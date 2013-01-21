@@ -9,19 +9,19 @@
  <%= form_tag "/cwa_as/create" do %>
  <div>
   <div class="box">
-   <%= textilizable @plugin.saa, :options => { } %>
+   <%= textilizable @cwa_as.saa, :options => { } %>
    <%= check_box_tag :saa, 'yes', false, :class => 'accept_saa' %>
    <%= label_tag :saa, "Accept System Access Agreement" %>
   </div>
   <div class="box">
-   <%= textilizable @plugin.tos, :options => { } %>
+   <%= textilizable @cwa_as.tos, :options => { } %>
    <%= check_box_tag :tos, 'yes', false, :class => 'accept_tos' %>
    <%= label_tag :saa, "Accept Terms of Service" %>
   </div>
  </div>
  <div class="box">
   <center>
-  <%= textilizable @plugin.pwd_agreement, :options => { } %>
+  <%= textilizable @cwa_as.pwd_agreement, :options => { } %>
   <p>
    <%= label_tag :netid_password, "Enter your NetID password" %>:
   </p>
