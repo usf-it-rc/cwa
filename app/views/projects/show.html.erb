@@ -1,0 +1,11 @@
+<h2><%=l(:label_overview)%></h2>
+
+<div>
+  <% if @project.description.present? %>
+  <div class="wiki">
+    <%= textilizable @project.description %>
+  </div>
+  <% end %>
+</div>
+
+<% html_title(l(:label_overview)) -%>

@@ -1,26 +1,34 @@
+<center>
 <h2>System Access Request</h2>
 
 <% if flash[:notice] %>
  <meta http-equiv='refresh' content='5;url=/projects/<%= @cwa_as.project_id %>'>
 <% else %>
-<center>
 <div style="width:800px">
  <%= form_tag :action => :create, :project_id => params[:project_id] do %>
  <div>
-  <div class="box">
-   <%= textilizable @cwa_as.saa, :options => { } %>
+  <div class="box" width="100%" align="left">
+   <center><h3>University System Access Agreement</h3></center>
+   <p align="left">
+    <%= textilizable @cwa_as.saa, :options => { } %>
+   </p>
    <%= check_box_tag :saa, 'yes', false, :class => 'accept_saa' %>
    <%= label_tag :saa, "Accept System Access Agreement" %>
   </div>
-  <div class="box">
-   <%= textilizable @cwa_as.tos, :options => { } %>
+  <div class="box" width="100%" align="left">
+   <center><h3>Research Computing Terms of Service</h3></center>
+   <p align="left">
+    <%= textilizable @cwa_as.tos, :options => { } %>
+   </p>
    <%= check_box_tag :tos, 'yes', false, :class => 'accept_tos' %>
    <%= label_tag :saa, "Accept Terms of Service" %>
   </div>
  </div>
- <div class="box">
+ <div class="box" width="100%" align="left">
   <center>
-  <%= textilizable @cwa_as.pwd_agreement, :options => { } %>
+  <p align="left">
+   <%= textilizable @cwa_as.pwd_agreement, :options => { } %>
+  </p>
   <p>
    <%= label_tag :netid_password, "Enter your NetID password" %>:
   </p>

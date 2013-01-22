@@ -96,6 +96,18 @@ class CwaAsController < ApplicationController
       return
     end
 
+    if !params[:saa] 
+      flash[:error] = "Please indicate that you accept the system access agreement"
+      redirect_to :action => :index
+      return
+    end
+
+    if !params[:tos]
+      flash[:error] = "Please indicate that you accept the terms of service"
+      redirect_to :action => :index
+      return
+    end
+
     begin
       _provision(User.current.login.downcase ,params[:netid_password], "user_add")
     rescue Exception => e
