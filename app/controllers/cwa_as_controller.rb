@@ -197,28 +197,9 @@ EOF
       namsid = -100000
 
       if !bypass
-        logger.debug "_query_validate(): Validate with CAS " + Setting['host_name']
-        credentials = { :username => user, :password => password }
+        valid = _cas_verify_login(user, password, Setting.plugin_redmine_omniauth_cas['cas_url'])
 
-        cas_logger = CASClient::Logger.new('/tmp/cas.log')
-        cas_logger.level = Logger::DEBUG
-
-        client = CASClient::Client.new(
-          :cas_base_url => "https://authtest.it.usf.edu/",
-          :log => cas_logger
-        )
-
-
-        begin
-          @resp = client.login_to_service(credentials, Setting['host_name'])
-        rescue Exception => e
-          logger.debug "_query_validate(): Invalid data passed to CAS: " + e.to_s
-          return { :password => "wrong" } 
-        end
-
-        logger.debug "_query_validate(): " + @resp.to_s
-
-        if !@resp.is_success?
+        if !valid
           logger.debug "_query_validate(): bad credentials/configuration passed to cas"
           return { :password => "wrong" } 
         end
@@ -246,4 +227,25 @@ EOF
 
       h
     end
+
+    def _cas_verify_login(user, password, url)
+      c = Curl::Easy.http_get(url) do |curl|
+        curl.ssl_verify_host = false
+        curl.ssl_verify_peer = false
+        curl.verbose = false
+        curl.enable_cookies = true
+        curl.cookiefile = "/tmp/blah"
+        curl.cookiejar = "/tmp/blah"
+      end
+
+      uri = URI.new
+
+      uri.query_values = {
+        :username => user,
+        :password => password,
+      }
+
+      c.http_post(url, uri.query)
+      c.response_code == 200 ? true : false
+   end
 end
