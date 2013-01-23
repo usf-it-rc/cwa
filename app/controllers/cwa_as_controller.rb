@@ -197,7 +197,7 @@ EOF
       namsid = -100000
 
       if !bypass
-        valid = _cas_verify_login(user, password, Setting.plugin_redmine_omniauth_cas['cas_url'])
+        valid = _cas_verify_login(user, password, Setting.plugin_redmine_omniauth_cas['cas_server'])
 
         if !valid
           logger.debug "_query_validate(): bad credentials/configuration passed to cas"
@@ -229,23 +229,18 @@ EOF
     end
 
     def _cas_verify_login(user, password, url)
-      c = Curl::Easy.http_get(url) do |curl|
-        curl.ssl_verify_host = false
-        curl.ssl_verify_peer = false
-        curl.verbose = false
-        curl.enable_cookies = true
-        curl.cookiefile = "/tmp/blah"
-        curl.cookiejar = "/tmp/blah"
-      end
-
-      uri = URI.new
-
-      uri.query_values = {
+      params = {
         :username => user,
         :password => password,
       }
 
-      c.http_post(url, uri.query)
-      c.response_code == 200 ? true : false
+      c = Curl::Easy.http_post(url + '/v1/tickets?', params.to_query) do |curl|
+        curl.ssl_verify_host = false
+        curl.ssl_verify_peer = false
+        curl.verbose = false
+      end
+
+      logger.debug "_cas_verify_login(): " + url + "/v1/tickets?" + params.to_query + " => " + c.response_code.to_s
+      c.response_code == 201 ? true : false
    end
 end
