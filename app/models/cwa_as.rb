@@ -56,7 +56,6 @@ class CwaAs < ActiveRecord::Base
    ] 
 }
 EOF
-      logger.debug json_query
       begin
         r = json_helper(json_query)
       rescue Exception => e
@@ -105,7 +104,6 @@ EOF
    ] 
 }
 EOF
-    logger.debug "user_set(): " + json_query
     json_helper(json_query)
   end
 
@@ -119,7 +117,7 @@ EOF
         curl.password = self.ipa_password
         curl.ssl_verify_host = false
         curl.ssl_verify_peer = false
-        curl.verbose = true
+        curl.verbose = false
         curl.headers['referer'] = url
         curl.headers['Accept'] = 'application/json'
         curl.headers['Content-Type'] = 'application/json'

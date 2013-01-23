@@ -5,8 +5,6 @@ class CwaAsController < ApplicationController
     @cwa_as = CwaAs.new
     @project = Project.find(@cwa_as.project_id)
 
-    logger.debug @project.to_s
-
     if (User.current.lastname.downcase == "anonymous")
       redirect_to :action => 'no_auth'
       return
@@ -18,7 +16,6 @@ class CwaAsController < ApplicationController
       flash[:error] = e.message
     end
 
-    logger.debug "index(): " + flash[:notice].to_s
     if flash[:notice] != nil
       s = flash[:notice]
     end
@@ -69,8 +66,6 @@ class CwaAsController < ApplicationController
   def user_info
     @cwa_as = CwaAs.new
     @project = Project.find(@cwa_as.project_id)
-
-    logger.debug "user_info(): " + flash[:notice].to_s
 
     respond_to do |format|
       format.html
@@ -140,8 +135,9 @@ class CwaAsController < ApplicationController
 
     # Try the delete and catch errors
     begin
-      _provision(User.current.login.downcase ,params[:netid_password], "user_del")
+      _provision(User.current.login.downcase, nil, "user_del")
     rescue Exception => e
+      logger.debug "Account #{User.current.login.downcase} failed to be de-provisioned in FreeIPA: " + e.message
       flash[:error] = "Deactivation failed: " + e.message
     else
       logger.debug "Account #{User.current.login.downcase} de-provisioned in FreeIPA"
@@ -154,13 +150,17 @@ class CwaAsController < ApplicationController
     # Provision the account in the IPA server
     def _provision(user, password, action)
       @cwa_as = CwaAs.new
-      user = _query_validate(user,password)
+
+      user = _query_validate user, password, action == "user_del"
+      logger.debug "_provision(): _query_validate() => " + user.to_s
 
       if (user == nil)
         raise 'This user was not found in the NetID system'
       elsif (user[:password] != "valid")
         raise 'You entered an incorrect password'
       end
+
+      logger.debug "provision(): " + user.to_s
 
       json_string = <<EOF
 {
@@ -179,8 +179,6 @@ class CwaAsController < ApplicationController
 }
 EOF
 
-      logger.debug json_string
-
       begin
         json_return = @cwa_as.json_helper(json_string)
       rescue Exception => e
@@ -194,7 +192,58 @@ EOF
     end
 
     # TODO: CAS Auth user and get some attributes
-    def _query_validate(user, password)
-      return { :netid => user, :password => "valid", :namsid => 100, :givenname => "Admin", :sn => "istrator" }
+    def _query_validate(user, password, bypass)
+      field_id = 0
+      namsid = -100000
+
+      if !bypass
+        logger.debug "_query_validate(): Validate with CAS " + Setting['host_name']
+        credentials = { :username => user, :password => password }
+
+        cas_logger = CASClient::Logger.new('/tmp/cas.log')
+        cas_logger.level = Logger::DEBUG
+
+        client = CASClient::Client.new(
+          :cas_base_url => "https://authtest.it.usf.edu/",
+          :log => cas_logger
+        )
+
+
+        begin
+          @resp = client.login_to_service(credentials, Setting['host_name'])
+        rescue Exception => e
+          logger.debug "_query_validate(): Invalid data passed to CAS: " + e.to_s
+          return { :password => "wrong" } 
+        end
+
+        logger.debug "_query_validate(): " + @resp.to_s
+
+        if !@resp.is_success?
+          logger.debug "_query_validate(): bad credentials/configuration passed to cas"
+          return { :password => "wrong" } 
+        end
+      end
+
+      User.current.available_custom_fields.each do |field|
+        if field.name == "namsid"
+          field_id = field.id
+          break
+        end
+      end
+
+      User.current.custom_values.each do |field|
+        if field.custom_field_id == field_id
+          namsid = field.value
+        end
+      end
+
+      h = { 
+        :netid => user, :password => "valid", :namsid => namsid,
+        :givenname => User.current.firstname, :sn => User.current.lastname 
+      }
+
+      logger.debug h.to_s
+
+      h
     end
 end
