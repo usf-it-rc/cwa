@@ -1,13 +1,23 @@
 class CwaAs < ActiveRecord::Base
   # This gets us all of our accessor methods for plugin settings
   # and ipa-based attributes
+  @@fields = nil
+  @@ipa_record = nil
+
   def method_missing(name, *args, &blk)
     if args.empty? && blk.nil? && Setting.plugin_cwa_as.has_key?(name)
       Setting.plugin_cwa_as[name]
     elsif args.empty? && blk.nil? 
-      ipa_record = ipa_query(User.current.login.downcase)['result'] 
-      if ipa_record.has_key?(name.to_s)
-        ipa_record[name.to_s].to_a.join
+      make_user_fields if @@fields == nil
+      if @@ipa_record == nil
+        @@ipa_record = ipa_query(User.current.login.downcase)['result'] 
+      end
+      # return if valid ipa record
+      if @@ipa_record.has_key?(name.to_s)
+        @@ipa_record[name.to_s].to_a.join
+      # return if valid custom_field
+      elsif @@fields.has_key?(name.to_sym)
+        @@fields[name.to_sym]
       else
         super
       end
@@ -92,5 +102,12 @@ EOF
       ipa_password,
       json_string
     )
+  end
+
+  def make_user_fields
+    @@fields = Hash.new
+    User.current.available_custom_fields.each do |field|
+      @@fields[field.name.to_sym] = User.current.custom_field_value(field.id)
+    end
   end
 end
