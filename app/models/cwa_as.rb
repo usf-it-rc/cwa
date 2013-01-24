@@ -1,51 +1,32 @@
 class CwaAs < ActiveRecord::Base
-  #attr_accessible :tos, :saa, :delete_saa
-  def saa
-    Setting.plugin_cwa_as[:saa]
+  # This gets us all of our accessor methods for plugin settings
+  # and ipa-based attributes
+  def method_missing(name, *args, &blk)
+    if args.empty? && blk.nil? && Setting.plugin_cwa_as.has_key?(name)
+      Setting.plugin_cwa_as[name]
+    elsif args.empty? && blk.nil? 
+      ipa_record = ipa_query(User.current.login.downcase)['result'] 
+      if ipa_record.has_key?(name.to_s)
+        ipa_record[name.to_s].to_a.join
+      else
+        super
+      end
+    else
+      super
+    end
   end
-  def tos 
-    Setting.plugin_cwa_as[:tos]
-  end
-  def pwd_agreement
-    Setting.plugin_cwa_as[:pwd_agreement]
-  end
-  def ipa_server
-    Setting.plugin_cwa_as[:ipa_server]
-  end
-  def ipa_account
-    Setting.plugin_cwa_as[:ipa_account]
-  end
-  def ipa_password
-    Setting.plugin_cwa_as[:ipa_password]
-  end
-  def delete_saa 
-    Setting.plugin_cwa_as[:delete_saa]
-  end
-  def project_id
-    Setting.plugin_cwa_as[:project_id]
-  end
+
+  # List of allowed shells
   def shells
      { "/bin/sh" => 0, "/bin/bash" => 1, "/bin/ash" => 2, "/bin/zsh" => 3,  "/bin/csh" => 4, "/bin/tcsh" => 5 }
   end
-  def loginshell
-     ipa_query(User.current.login.downcase)['result']['loginshell'].to_a.join ','
-  end
+
+  # Set user shell
   def set_loginshell(shell)
     user_set(User.current.login.downcase, { :loginshell => shell })
   end
-  def givenname
-    ipa_query(User.current.login.downcase)['result']['givenname'].to_a.join ','
-  end
-  def sn
-    ipa_query(User.current.login.downcase)['result']['sn'].to_a.join ','
-  end
-  def uid
-    ipa_query(User.current.login.downcase)['result']['uid'].to_a.join ','
-  end
-  def homedirectory
-    ipa_query(User.current.login.downcase)['result']['homedirectory'].to_a.join ','
-  end
 
+  # Get wonderful attributes from IPA server
   def ipa_query(user)
     if @ipa_user == nil
       json_query = <<EOF
@@ -64,25 +45,20 @@ EOF
         @ipa_user = r['result']
       end
     end
-    logger.debug "ipa_query(): " + @ipa_user.to_s
     @ipa_user
   end
 
+  # Wrap around ipa_query to give a true/false for whether the user exists
   def ipa_exists(user)
     begin
       r = ipa_query(user)       
     rescue Exception => e
       raise e.message 
     end 
-
-    logger.debug "ipa_exists(): " + r.to_s
-    if r != nil
-      true
-    else
-      false
-    end
+    r != nil ? true : false
   end
 
+  # update user parameters in IPA
   def user_set(user,params)
     json_query = <<EOF
 { "method": "user_mod", 
@@ -107,6 +83,7 @@ EOF
     json_helper(json_query)
   end
 
+  # Do the JSON-RPC call for us
   def json_helper(json_string)
     url = "https://#{self.ipa_server}/ipa" 
     begin

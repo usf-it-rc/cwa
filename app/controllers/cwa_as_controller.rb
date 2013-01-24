@@ -5,10 +5,7 @@ class CwaAsController < ApplicationController
     @cwa_as = CwaAs.new
     @project = Project.find(@cwa_as.project_id)
 
-    if (User.current.lastname.downcase == "anonymous")
-      redirect_to :action => 'no_auth'
-      return
-    end
+    _user_not_anonymous
 
     begin
       u = @cwa_as.ipa_exists(User.current.login.downcase)
@@ -37,10 +34,8 @@ class CwaAsController < ApplicationController
     @cwa_as = CwaAs.new
     @project = Project.find(@cwa_as.project_id)
 
-    if (User.current.lastname.downcase == "anonymous")
-      redirect_to :action => :no_auth
-      return
-    end
+    _user_not_anonymous
+
     if params[:loginshell]
       s = @cwa_as.shells.invert
       logger.debug s.to_s
@@ -67,6 +62,8 @@ class CwaAsController < ApplicationController
     @cwa_as = CwaAs.new
     @project = Project.find(@cwa_as.project_id)
 
+    _user_not_anonymous
+
     respond_to do |format|
       format.html
     end
@@ -85,11 +82,8 @@ class CwaAsController < ApplicationController
   # Create user by calling the private _provision method, handling errors
   # and returning to the index
   def create
+    _user_not_anonymous
     @cwa_as = CwaAs.new
-    if (User.current.lastname.downcase == "anonymous")
-      redirect_to :action => 'no_auth'
-      return
-    end
 
     if !params[:saa] 
       flash[:error] = "Please indicate that you accept the system access agreement"
@@ -108,25 +102,18 @@ class CwaAsController < ApplicationController
     rescue Exception => e
       flash[:error] = "Registration failed: " + e.message
     else
-      logger.debug "Account #{User.current.login.downcase} provisioned in FreeIPA"
+      logger.info "Account #{User.current.login.downcase} provisioned in FreeIPA"
       flash[:notice] = 'You are now successfully registered!'
     end
     redirect_to :action => :index
   end
 
-  def failure
-    flash[:error] = 'Account registered'
-    redirect_to :action => 'index'
-  end
-
   def delete
+    _user_not_anonymous
+
     @cwa_as = CwaAs.new
     
     # some sanity checks
-    if (User.current.lastname.downcase == "anonymous")
-      redirect_to :action => 'no_auth'
-      return
-    end
     if (User.current.login.downcase == "admin")
       flash[:error] = "You cannot delete the admin user!"
       redirect_to :action => :index
@@ -143,7 +130,7 @@ class CwaAsController < ApplicationController
       logger.debug "Account #{User.current.login.downcase} de-provisioned in FreeIPA"
       flash[:notice] = 'Your account has been deactivated!'
     end
-    redirect_to :action => 'index'
+    redirect_to :action => :index
   end
 
   private
@@ -242,5 +229,12 @@ EOF
 
       logger.debug "_cas_verify_login(): " + url + "/v1/tickets?" + params.to_query + " => " + c.response_code.to_s
       c.response_code == 201 ? true : false
+    end
+
+    def _user_not_anonymous
+      if (User.current.lastname.downcase == "anonymous")
+        redirect_to :action => 'no_auth'
+        return
+      end
    end
 end
