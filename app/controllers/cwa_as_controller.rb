@@ -163,7 +163,6 @@ class CwaAsController < ApplicationController
 }
 EOF
 
-      logger.debug @cwa_as.ipa_server + "/ipa/json"
       begin
         json_return = Redmine::CwaAs.simple_json_rpc(
           "https://" + @cwa_as.ipa_server + "/ipa/json", 
