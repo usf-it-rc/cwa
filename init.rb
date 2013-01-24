@@ -1,3 +1,7 @@
+require 'redmine'
+require 'simple_json_rpc'
+require 'simple_cas_validator'
+
 Redmine::Plugin.register :cwa_as do
   name 'CWA System Access Sign-up plugin'
   author 'Author name'

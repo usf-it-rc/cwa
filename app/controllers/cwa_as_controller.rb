@@ -8,7 +8,7 @@ class CwaAsController < ApplicationController
     _user_not_anonymous
 
     begin
-      u = @cwa_as.ipa_exists(User.current.login.downcase)
+      u = @cwa_as.ipa_exists?
     rescue Exception => e
       flash[:error] = e.message
     end
@@ -141,11 +141,8 @@ class CwaAsController < ApplicationController
       user = _query_validate user, password, action == "user_del"
       logger.debug "_provision(): _query_validate() => " + user.to_s
 
-      if (user == nil)
-        raise 'This user was not found in the NetID system'
-      elsif (user[:password] != "valid")
-        raise 'You entered an incorrect password'
-      end
+      raise 'This user was not found in the NetID system' if user == nil
+      raise 'You entered an incorrect password' if user[:password] != "valid"
 
       logger.debug "provision(): " + user.to_s
 
@@ -166,8 +163,14 @@ class CwaAsController < ApplicationController
 }
 EOF
 
+      logger.debug @cwa_as.ipa_server + "/ipa/json"
       begin
-        json_return = @cwa_as.json_helper(json_string)
+        json_return = Redmine::CwaAs.simple_json_rpc(
+          "https://" + @cwa_as.ipa_server + "/ipa/json", 
+          @cwa_as.ipa_account, 
+          @cwa_as.ipa_password,
+          json_string
+        )
       rescue Exception => e
         raise e.message
       end
@@ -184,7 +187,7 @@ EOF
       namsid = -100000
 
       if !bypass
-        valid = _cas_verify_login(user, password, Setting.plugin_redmine_omniauth_cas['cas_server'])
+        valid = Redmine::CwaAs.simple_cas_validator(user, password, Setting.plugin_redmine_omniauth_cas['cas_server'])
 
         if !valid
           logger.debug "_query_validate(): bad credentials/configuration passed to cas"
@@ -213,22 +216,6 @@ EOF
       logger.debug h.to_s
 
       h
-    end
-
-    def _cas_verify_login(user, password, url)
-      params = {
-        :username => user,
-        :password => password,
-      }
-
-      c = Curl::Easy.http_post(url + '/v1/tickets?', params.to_query) do |curl|
-        curl.ssl_verify_host = false
-        curl.ssl_verify_peer = false
-        curl.verbose = false
-      end
-
-      logger.debug "_cas_verify_login(): " + url + "/v1/tickets?" + params.to_query + " => " + c.response_code.to_s
-      c.response_code == 201 ? true : false
     end
 
     def _user_not_anonymous
