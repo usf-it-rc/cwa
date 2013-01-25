@@ -13,7 +13,7 @@ Redmine::Plugin.register :cwa_as do
     :saa => "Service Access Agreement goes here",
     :tos => "Terms of Service go here" }, :partial => 'settings/cwaas_settings'
   permission :cwa_as, { :cwa_as => [:index] }, :public => true
-  menu :project_menu, :cwa_as, { :controller => 'cwa_as', :action => 'index' }, :caption => 'Account Management', :after => :activity
+  menu :project_menu, :cwa_as, { :controller => 'cwa_as', :action => 'index' }, :caption => 'My Account', :after => :activity
 end
 
 Redmine::MenuManager.map :project_menu do |menu|

@@ -19,10 +19,10 @@ class CwaAs < ActiveRecord::Base
       elsif @@fields.has_key?(name.to_sym)
         @@fields[name.to_sym]
       else
-        super
+        nil
       end
     else
-      super
+      nil
     end
   end
 
@@ -60,6 +60,7 @@ EOF
         @ipa_user = r['result']
       end
     end
+    logger.debug "ipa_query() => " + @ipa_user.to_s
     @ipa_user
   end
 
@@ -107,7 +108,9 @@ EOF
   def make_user_fields
     @@fields = Hash.new
     User.current.available_custom_fields.each do |field|
+      logger.debug "make_user_fields(): add " + field.name.to_s + " = " + User.current.custom_field_value(field.id).to_s
       @@fields[field.name.to_sym] = User.current.custom_field_value(field.id)
     end
+    logger.debug "make_user_fields(): " + @@fields.to_s
   end
 end
