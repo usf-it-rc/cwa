@@ -8,7 +8,7 @@ class CwaAsController < ApplicationController
     _user_not_anonymous
 
     begin
-      u = @cwa_as.ipa_exists?
+      u = @cwa_as.uidnumber
     rescue Exception => e
       flash[:error] = e.message
     end
@@ -38,7 +38,6 @@ class CwaAsController < ApplicationController
 
     if params[:loginshell]
       s = @cwa_as.shells.invert
-      logger.debug s.to_s
       p = params[:loginshell]
       login_shell = s[p.to_i]
       logger.debug "Setting user shell to #{login_shell} from param #{p}"
@@ -139,12 +138,9 @@ class CwaAsController < ApplicationController
       @cwa_as = CwaAs.new
 
       user = _query_validate user, password, action == "user_del"
-      logger.debug "_provision(): _query_validate() => " + user.to_s
 
       raise 'This user was not found in the NetID system' if user == nil
       raise 'You entered an incorrect password' if user[:password] != "valid"
-
-      logger.debug "provision(): " + user.to_s
 
       json_string = <<EOF
 {
@@ -189,7 +185,6 @@ EOF
         valid = Redmine::CwaAs.simple_cas_validator(user, password, Setting.plugin_redmine_omniauth_cas['cas_server'])
 
         if !valid
-          logger.debug "_query_validate(): bad credentials/configuration passed to cas"
           return { :password => "wrong" } 
         end
       end
@@ -211,8 +206,6 @@ EOF
         :netid => user, :password => "valid", :namsid => namsid,
         :givenname => User.current.firstname, :sn => User.current.lastname 
       }
-
-      logger.debug h.to_s
 
       h
     end

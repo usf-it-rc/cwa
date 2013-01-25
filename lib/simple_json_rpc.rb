@@ -9,7 +9,7 @@ module Redmine::CwaAs
           curl.password = password
           curl.ssl_verify_host = false
           curl.ssl_verify_peer = false
-          curl.verbose = false
+          curl.verbose = true
           curl.headers['referer'] = url
           curl.headers['Accept'] = 'application/json'
           curl.headers['Content-Type'] = 'application/json'
@@ -20,10 +20,11 @@ module Redmine::CwaAs
       end
   
       h = JSON.parse(c.body_str).to_hash
+
+      Rails.logger.debug "Redmine::CwaAs.simple_json_rpc() => " + h.to_s
   
       # If we get an error AND its not "user not found"
       if h['error'] != nil and h['error']['code'] != 4001
-        logger.debug h['error'].to_s
         raise h['error']['message']
       else
         h

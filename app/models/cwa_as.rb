@@ -1,4 +1,5 @@
-class CwaAs < ActiveRecord::Base
+#class CwaAs < ActiveRecord::Base
+class CwaAs
   # This gets us all of our accessor methods for plugin settings
   # and ipa-based attributes
   @@fields = nil
@@ -10,7 +11,7 @@ class CwaAs < ActiveRecord::Base
     elsif args.empty? && blk.nil? 
       make_user_fields if @@fields == nil
       if @@ipa_record == nil
-        @@ipa_record = ipa_query(User.current.login.downcase)['result'] 
+        ipa_query(User.current.login)
       end
       # return if valid ipa record
       if @@ipa_record.has_key?(name.to_s)
@@ -34,12 +35,12 @@ class CwaAs < ActiveRecord::Base
   # Set user shell
   def set_loginshell(shell)
     user_set(User.current.login.downcase, { :loginshell => shell })
+    ipa_query User.current.login.downcase
   end
 
   # Get wonderful attributes from IPA server
   def ipa_query(user)
-    if @ipa_user == nil
-      json_string = <<EOF
+    json_string = <<EOF
 { "method": "user_show", 
   "params":[
    [],
@@ -47,31 +48,17 @@ class CwaAs < ActiveRecord::Base
    ] 
 }
 EOF
-      begin
-        r = Redmine::CwaAs.simple_json_rpc(
-          "https://" + ipa_server + "/ipa/json", 
-          ipa_account,
-          ipa_password,
-          json_string
-        )
-      rescue Exception => e
-        raise e.message
-      else
-        @ipa_user = r['result']
-      end
-    end
-    logger.debug "ipa_query() => " + @ipa_user.to_s
-    @ipa_user
-  end
-
-  # Wrap around ipa_query to give a true/false for whether the user exists
-  def ipa_exists?
     begin
-      r = ipa_query(User.current.login.downcase) 
+      r = Redmine::CwaAs.simple_json_rpc(
+        "https://" + ipa_server + "/ipa/json", 
+        ipa_account,
+        ipa_password,
+        json_string
+      )
     rescue Exception => e
-      raise e.message 
-    end 
-    r != nil ? true : false
+      raise e.message
+    end
+    @@ipa_record = r['result']['result']
   end
 
   # update user parameters in IPA
@@ -96,7 +83,6 @@ EOF
    ] 
 }
 EOF
-    logger.debug ipa_server + "/ipa/json"
     Redmine::CwaAs.simple_json_rpc(
       "https://" + ipa_server + "/ipa/json", 
       ipa_account,
@@ -108,9 +94,7 @@ EOF
   def make_user_fields
     @@fields = Hash.new
     User.current.available_custom_fields.each do |field|
-      logger.debug "make_user_fields(): add " + field.name.to_s + " = " + User.current.custom_field_value(field.id).to_s
       @@fields[field.name.to_sym] = User.current.custom_field_value(field.id)
     end
-    logger.debug "make_user_fields(): " + @@fields.to_s
   end
 end
