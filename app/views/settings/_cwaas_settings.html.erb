@@ -16,6 +16,11 @@
   <br />
 </p>
 <p>
+  <label><%= l(:label_delete_saa) %> :</label>
+  <%= text_area_tag 'settings[delete_saa]', @settings['delete_saa'], :rows => 10, :cols => 50 %>
+  <br />
+</p>
+<p>
   <label><%= l(:label_ipa_server) %> :</label>
   <%= text_field_tag 'settings[ipa_server]', @settings['ipa_server'] %>
   <br />

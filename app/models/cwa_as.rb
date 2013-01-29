@@ -1,28 +1,32 @@
-class CwaAs < ActiveRecord::Base
+#class CwaAs < ActiveRecord::Base
+class CwaAs
   # This gets us all of our accessor methods for plugin settings
   # and ipa-based attributes
-  @@fields = nil
-  @@ipa_record = nil
+  @@ipa_result = Hash.new
+  @@fields = Hash.new
 
   def method_missing(name, *args, &blk)
-    if args.empty? && blk.nil? && Setting.plugin_cwa_as.has_key?(name)
-      Setting.plugin_cwa_as[name]
-    elsif args.empty? && blk.nil? 
-      make_user_fields if @@fields == nil
-      if @@ipa_record == nil
-        @@ipa_record = ipa_query(User.current.login.downcase)['result'] 
+    # If its an option in the settings hash, return it
+    Rails.logger.debug "mm() called with " + name.to_s
+    if args.empty? && blk.nil?
+      if Setting.plugin_cwa_as.has_key?(name.to_s)
+        return Setting.plugin_cwa_as[name.to_s]
       end
-      # return if valid ipa record
-      if @@ipa_record.has_key?(name.to_s)
-        @@ipa_record[name.to_s].to_a.join
-      # return if valid custom_field
-      elsif @@fields.has_key?(name.to_sym)
-        @@fields[name.to_sym]
-      else
-        nil
+
+      make_user_fields
+      if @@fields != nil && @@fields[User.current.login].has_key?(name)
+        return @@fields[User.current.login][name.to_sym]
       end
+
+      ipa_query
+      if @@ipa_result.has_key?(User.current.login) &&
+        @@ipa_result[User.current.login].try(:[], :result) &&
+        @@ipa_result[User.current.login][:result].try(:[], name.to_s)
+        return @@ipa_result[User.current.login][:result][name.to_s].first
+      end
+      super
     else
-      nil
+      super
     end
   end
 
@@ -33,55 +37,46 @@ class CwaAs < ActiveRecord::Base
 
   # Set user shell
   def set_loginshell(shell)
-    user_set(User.current.login.downcase, { :loginshell => shell })
+    user_set :loginshell => shell
   end
 
   # Get wonderful attributes from IPA server
-  def ipa_query(user)
-    if @ipa_user == nil
-      json_string = <<EOF
+  def ipa_query
+    if @@ipa_result[User.current.login].try(:[], :timestamp) && (Time.now - @@ipa_result[User.current.login][:timestamp]) <= 30.seconds
+      return
+    end
+      
+    Rails.logger.debug "ipa_query() => " + @@ipa_result[User.current.login].to_s
+    json_string = <<EOF
 { "method": "user_show", 
   "params":[
    [],
-   { "uid":"#{user}" }
+   { "uid":"#{User.current.login}" }
    ] 
 }
 EOF
-      begin
-        r = Redmine::CwaAs.simple_json_rpc(
-          "https://" + ipa_server + "/ipa/json", 
-          ipa_account,
-          ipa_password,
-          json_string
-        )
-      rescue Exception => e
-        raise e.message
-      else
-        @ipa_user = r['result']
-      end
+    r = Redmine::CwaAs.simple_json_rpc(
+      "https://" + self.ipa_server + "/ipa/json", 
+      self.ipa_account,
+      self.ipa_password,
+      json_string
+    )
+    Rails.logger.debug "ipa_query() => " + r['result'].to_s
+    if r != nil && r['result'] != nil 
+      @@ipa_result = { User.current.login => { :timestamp => Time.now, :result => r['result']['result'] } }
+    else
+      @@ipa_result = { User.current.login => nil }
     end
-    logger.debug "ipa_query() => " + @ipa_user.to_s
-    @ipa_user
   end
-
-  # Wrap around ipa_query to give a true/false for whether the user exists
-  def ipa_exists?
-    begin
-      r = ipa_query(User.current.login.downcase) 
-    rescue Exception => e
-      raise e.message 
-    end 
-    r != nil ? true : false
-  end
-
+      
   # update user parameters in IPA
-  def user_set(user,params)
+  def user_set(params)
     json_string = <<EOF
 { "method": "user_mod", 
   "params":[
    [],
     { 
-     "uid":"#{user}",
+     "uid":"#{User.current.login}",
 EOF
 
     p_keys = params.keys
@@ -96,21 +91,22 @@ EOF
    ] 
 }
 EOF
-    logger.debug ipa_server + "/ipa/json"
     Redmine::CwaAs.simple_json_rpc(
-      "https://" + ipa_server + "/ipa/json", 
-      ipa_account,
-      ipa_password,
+      "https://" + self.ipa_server + "/ipa/json", 
+      self.ipa_account,
+      self.ipa_password,
       json_string
     )
+    @@ipa_result[User.current.login][:timestamp] -= 30.seconds
+    ipa_query
   end
 
+  # Populate custom_fields as accessible attributes
   def make_user_fields
-    @@fields = Hash.new
+    @@fields[User.current.login] = Hash.new
     User.current.available_custom_fields.each do |field|
-      logger.debug "make_user_fields(): add " + field.name.to_s + " = " + User.current.custom_field_value(field.id).to_s
-      @@fields[field.name.to_sym] = User.current.custom_field_value(field.id)
+      @@fields[User.current.login][field.name.to_sym] = User.current.custom_field_value(field.id)
     end
-    logger.debug "make_user_fields(): " + @@fields.to_s
+    @@fields
   end
 end
