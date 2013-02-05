@@ -40,6 +40,11 @@ class CwaAs
     user_set :loginshell => shell
   end
 
+  # Force a full query on the next ipa_query run
+  def ipa_query_cache_reset
+    @@ipa_result[User.current.login][:timestamp] -= 60.seconds
+  end
+
   # Get wonderful attributes from IPA server
   def ipa_query
     if @@ipa_result[User.current.login].try(:[], :timestamp) && (Time.now - @@ipa_result[User.current.login][:timestamp]) <= 30.seconds
@@ -97,7 +102,7 @@ EOF
       self.ipa_password,
       json_string
     )
-    @@ipa_result[User.current.login][:timestamp] -= 30.seconds
+    self.ipa_query_cache_reset
     ipa_query
   end
 

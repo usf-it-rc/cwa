@@ -26,6 +26,7 @@ Redmine::MenuManager.map :top_menu do |menu|
   menu.delete :my_page
   menu.delete :projects
   menu.delete :administration
+  menu.push "MyRC", nil
   menu.push :administration, { :controller => 'admin', :action => 'index' }, :last => true, 
             :if => Proc.new { |p| User.current.admin? }
   menu.delete :help

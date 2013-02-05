@@ -178,6 +178,7 @@ EOF
       end
  
       # Push an update, too
+      @cwa_as.ipa_query_cache_reset
       @cwa_as.ipa_query
 
       # TODO: parse out the details and return appropriate messages 
