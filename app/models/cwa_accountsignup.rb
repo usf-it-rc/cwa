@@ -1,5 +1,5 @@
 #class CwaAs < ActiveRecord::Base
-class CwaAs
+class CwaAccountsignup
   # This gets us all of our accessor methods for plugin settings
   # and ipa-based attributes
   @@ipa_result = Hash.new
@@ -9,8 +9,8 @@ class CwaAs
     # If its an option in the settings hash, return it
     Rails.logger.debug "mm() called with " + name.to_s
     if args.empty? && blk.nil?
-      if Setting.plugin_cwa_as.has_key?(name.to_s)
-        return Setting.plugin_cwa_as[name.to_s]
+      if Setting.plugin_cwa.has_key?(name.to_s)
+        return Setting.plugin_cwa[name.to_s]
       end
 
       make_user_fields
@@ -60,7 +60,7 @@ class CwaAs
    ] 
 }
 EOF
-    r = Redmine::CwaAs.simple_json_rpc(
+    r = Redmine::Cwa.simple_json_rpc(
       "https://" + self.ipa_server + "/ipa/json", 
       self.ipa_account,
       self.ipa_password,
@@ -96,7 +96,7 @@ EOF
    ] 
 }
 EOF
-    Redmine::CwaAs.simple_json_rpc(
+    Redmine::Cwa.simple_json_rpc(
       "https://" + self.ipa_server + "/ipa/json", 
       self.ipa_account,
       self.ipa_password,

@@ -2,18 +2,28 @@ require 'redmine'
 require 'simple_json_rpc'
 require 'simple_cas_validator'
 
-Redmine::Plugin.register :cwa_as do
-  name 'CWA System Access Sign-up plugin'
-  author 'Author name'
-  description 'This plugin uses JSON-RPC to provision an account in FreeIPA after agreeing to ToS and SAA'
+Redmine::Plugin.register :cwa do
+  name 'CWA: Cluster Web Access plugin'
+  author 'Brian Smith'
+  description 'This plugin provides tools and features useful for HPC' 
   version '0.0.1'
-  url 'http://example.com/path/to/plugin'
-  author_url 'http://example.com/about'
+  url 'https://redmine.rc.usf.edu/projects/jobman'
+  author_url 'http://blah'
   settings :default => {
     :saa => "Service Access Agreement goes here",
-    :tos => "Terms of Service go here" }, :partial => 'settings/cwaas_settings'
-  permission :cwa_as, { :cwa_as => [:index] }, :public => true
-  menu :project_menu, :cwa_as, { :controller => 'cwa_as', :action => 'index' }, :caption => 'My Account', :after => :activity
+    :tos => "Terms of Service go here" }, :partial => 'settings/cwa_settings'
+  permission :cwa_accountsignup, { :cwa_accountsignup => [:index] }, :public => true
+  permission :cwa_groupmanager, { :cwa_groupmanager => [:index] }, :public => true
+  permission :cwa_jobmanager, { :cwa_jobmanager => [:index] }, :public => true
+  permission :cwa_tutorials, { :cwa_tutorials => [:index] }, :public => true
+  menu :project_menu, :cwa_accountsignup, { :controller => 'cwa_accountsignup', :action => 'index' }, 
+       :caption => 'My Account', :after => :activity
+  menu :project_menu, :cwa_groupmanager, { :controller => 'cwa_groupmanager', :action => 'index' }, 
+       :caption => 'My Groups', :after => :cwa_accountsignup
+  menu :project_menu, :cwa_jobmanager, { :controller => 'cwa_jobmanager', :action => 'index' }, 
+       :caption => 'My Jobs', :after => :cwa_groupmanager
+  menu :project_menu, :cwa_tutorials, { :controller => 'cwa_tutorials', :action => 'index' }, 
+       :caption => 'Tutorials', :after => :cwa_jobmanager
 end
 
 Redmine::MenuManager.map :project_menu do |menu|

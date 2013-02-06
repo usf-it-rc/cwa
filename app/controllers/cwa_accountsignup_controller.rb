@@ -1,8 +1,8 @@
-class CwaAsController < ApplicationController
+class CwaAccountsignupController < ApplicationController
   unloadable
 
   def index
-    @cwa_as = CwaAs.new
+    @cwa_as = CwaAccountsignup.new
     @project = Project.find(@cwa_as.project_id)
 
     _user_not_anonymous
@@ -38,7 +38,7 @@ class CwaAsController < ApplicationController
   end
 
   def user_shell
-    @cwa_as = CwaAs.new
+    @cwa_as = CwaAccountsignup.new
     @project = Project.find(@cwa_as.project_id)
 
     _user_not_anonymous
@@ -65,7 +65,7 @@ class CwaAsController < ApplicationController
   end
 
   def user_info
-    @cwa_as = CwaAs.new
+    @cwa_as = CwaAccountsignup.new
     @project = Project.find(@cwa_as.project_id)
 
     _user_not_anonymous
@@ -76,7 +76,7 @@ class CwaAsController < ApplicationController
   end
  
   def no_auth
-    @cwa_as = CwaAs.new
+    @cwa_as = CwaAccountsignup.new
     respond_to do |format|
       format.html
     end
@@ -89,7 +89,7 @@ class CwaAsController < ApplicationController
   # and returning to the index
   def create
     _user_not_anonymous
-    @cwa_as = CwaAs.new
+    @cwa_as = CwaAccountsignup.new
 
     if !params[:saa] 
       flash[:error] = "Please indicate that you accept the system access agreement"
@@ -117,7 +117,7 @@ class CwaAsController < ApplicationController
   def delete
     _user_not_anonymous
 
-    @cwa_as = CwaAs.new
+    @cwa_as = CwaAccountsignup.new
     
     # some sanity checks
     if (User.current.login.downcase == "admin")
@@ -142,7 +142,7 @@ class CwaAsController < ApplicationController
   private
     # Provision the account in the IPA server
     def _provision(user, password, action)
-      @cwa_as = CwaAs.new
+      @cwa_as = CwaAccountsignup.new
 
       user = _query_validate user, password, action == "user_del"
 
@@ -167,7 +167,7 @@ class CwaAsController < ApplicationController
 EOF
 
       begin
-        json_return = Redmine::CwaAs.simple_json_rpc(
+        json_return = Redmine::Cwa.simple_json_rpc(
           "https://" + @cwa_as.ipa_server + "/ipa/json", 
           @cwa_as.ipa_account, 
           @cwa_as.ipa_password,
@@ -193,7 +193,7 @@ EOF
       namsid = -100000
 
       if !bypass
-        valid = Redmine::CwaAs.simple_cas_validator(user, password, Setting.plugin_redmine_omniauth_cas['cas_server'])
+        valid = Redmine::Cwa.simple_cas_validator(user, password, Setting.plugin_redmine_omniauth_cas['cas_server'])
 
         if !valid
           return { :password => "wrong" } 

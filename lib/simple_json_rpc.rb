@@ -1,4 +1,4 @@
-module Redmine::CwaAs
+module Redmine::Cwa
   class << self
     def simple_json_rpc(url, user, password, json_string)
       begin
@@ -21,7 +21,7 @@ module Redmine::CwaAs
   
       h = JSON.parse(c.body_str).to_hash
 
-      Rails.logger.debug "Redmine::CwaAs.simple_json_rpc() => " + h.to_s
+      Rails.logger.debug "Redmine::Cwa.simple_json_rpc() => " + h.to_s
   
       # If we get an error AND its not "user not found"
       if h['error'] != nil and h['error']['code'] != 4001
