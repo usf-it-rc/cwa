@@ -1,0 +1,19 @@
+<h2>Submit Allocation Request</h2>
+
+<%= form_for @allocation, :url => { :action => "submit" }  do |a|%>
+  <p>
+    <%= a.label :summary %>
+    <%= a.text_field :summary %>
+  </p>
+  <p>
+    <%= a.label :proposal %>
+    <%= a.text_area :proposal %>
+  </p>
+  <p>
+    <%= a.label :time_in_hours %>
+    <%= a.text_field :time_in_hours %>
+  </p>
+  <p>
+    <%= a.submit %>
+  </p>
+<% end %>

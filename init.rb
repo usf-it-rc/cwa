@@ -12,14 +12,19 @@ Redmine::Plugin.register :cwa do
   settings :default => {
     :saa => "Service Access Agreement goes here",
     :tos => "Terms of Service go here" }, :partial => 'settings/cwa_settings'
+  # TODO: Get permissions nailed down
   permission :cwa_accountsignup, { :cwa_accountsignup => [:index] }, :public => true
   permission :cwa_groupmanager, { :cwa_groupmanager => [:index] }, :public => true
   permission :cwa_jobmanager, { :cwa_jobmanager => [:index] }, :public => true
   permission :cwa_tutorials, { :cwa_tutorials => [:index] }, :public => true
+  permission :cwa_allocations, { :cwa_allocations => [:index] }, :public => true
+
   menu :project_menu, :cwa_accountsignup, { :controller => 'cwa_accountsignup', :action => 'index' }, 
        :caption => 'My Account', :after => :activity
+  menu :project_menu, :cwa_allocations, { :controller => 'cwa_allocations', :action => 'index' }, 
+       :caption => 'Allocations', :after => :cwa_accountsignup
   menu :project_menu, :cwa_groupmanager, { :controller => 'cwa_groupmanager', :action => 'index' }, 
-       :caption => 'My Groups', :after => :cwa_accountsignup
+       :caption => 'My Groups', :after => :cwa_allocations
   menu :project_menu, :cwa_jobmanager, { :controller => 'cwa_jobmanager', :action => 'index' }, 
        :caption => 'My Jobs', :after => :cwa_groupmanager
   menu :project_menu, :cwa_tutorials, { :controller => 'cwa_tutorials', :action => 'index' }, 
