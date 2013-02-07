@@ -2,16 +2,16 @@
 
 <%= form_for @allocation, :url => { :action => "submit" }  do |a|%>
   <p>
-    <%= a.label :summary %>
-    <%= a.text_field :summary %>
+    <%= a.label :summary, "Summary: " %>
+    <%= a.text_field :summary, :size => "64" %>
   </p>
   <p>
-    <%= a.label :proposal %>
-    <%= a.text_area :proposal %>
+    <%= a.label :proposal, "Proposal: " %>
+    <%= a.text_area :proposal, :cols => "64", :rows => "18" %>
   </p>
   <p>
-    <%= a.label :time_in_hours %>
-    <%= a.text_field :time_in_hours %>
+    <%= a.label :time_in_hours, "Required CPU hours: " %>
+    <%= a.text_field :time_in_hours, :size => "10" %>
   </p>
   <p>
     <%= a.submit %>
