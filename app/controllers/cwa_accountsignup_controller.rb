@@ -89,6 +89,7 @@ class CwaAccountsignupController < ApplicationController
   # and returning to the index
   def create
     _user_not_anonymous
+    @project = Project.find(@cwa_as.project_id)
     @cwa_as = CwaAccountsignup.new
 
     if !params[:saa] 
@@ -103,12 +104,18 @@ class CwaAccountsignupController < ApplicationController
       return
     end
 
+    # TODO 
+    # 1. Call REST to messaging service to notify about account creation
+    # 2. Add user to research-computing project
+
     begin
       _provision(User.current.login.downcase ,params[:netid_password], "user_add")
     rescue Exception => e
       flash[:error] = "Registration failed: " + e.message
     else
       logger.info "Account #{User.current.login.downcase} provisioned in FreeIPA"
+      # Add them to the project... allows notifications
+      User.current.project_ids = [ @project.id ]
       flash[:notice] = 'You are now successfully registered!'
     end
     redirect_to :action => :index
@@ -133,6 +140,8 @@ class CwaAccountsignupController < ApplicationController
       logger.debug "Account #{User.current.login.downcase} failed to be de-provisioned in FreeIPA: " + e.message
       flash[:error] = "Deactivation failed: " + e.message
     else
+      # Remove user from project, to stop notifications
+      User.current.project_ids = []
       logger.debug "Account #{User.current.login.downcase} de-provisioned in FreeIPA"
       flash[:notice] = 'Your account has been deactivated!'
     end

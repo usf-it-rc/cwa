@@ -20,7 +20,7 @@ Redmine::Plugin.register :cwa do
   permission :cwa_allocations, { :cwa_allocations => [:index] }, :public => true
 
   menu :project_menu, :cwa_accountsignup, { :controller => 'cwa_accountsignup', :action => 'index' }, 
-       :caption => 'My Account', :after => :activity
+       :caption => 'System Access', :after => :activity
   menu :project_menu, :cwa_allocations, { :controller => 'cwa_allocations', :action => 'index' }, 
        :caption => 'Allocations', :after => :cwa_accountsignup
   menu :project_menu, :cwa_groupmanager, { :controller => 'cwa_groupmanager', :action => 'index' }, 
@@ -41,7 +41,7 @@ Redmine::MenuManager.map :top_menu do |menu|
   menu.delete :my_page
   menu.delete :projects
   menu.delete :administration
-  menu.push "MyRC", nil
+  menu.push "MyRC", { :controller => 'projects', :action => 'show', :id => Setting.plugin_cwa['project_id'] }
   menu.push :administration, { :controller => 'admin', :action => 'index' }, :last => true, 
             :if => Proc.new { |p| User.current.admin? }
   menu.delete :help
