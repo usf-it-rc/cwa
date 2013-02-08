@@ -41,11 +41,12 @@ class CwaAllocationsController < ApplicationController
       redirect_to :action => :index
     end
 
-    if params[:cwa_allocation] != nil
-      params[:cwa_allocation]['time_approved'] = Time.now if params[:cwa_allocation]['approved'] = true
+    if params['cwa_allocation'] != nil
+      params['cwa_allocation']['time_approved'] = Time.now if params['cwa_allocation']['approved'] == true
     end
     
-    allocation = CwaAllocation.update(params[:allocation_id], params[:cwa_allocation])
+    logger.debug "CwaAllocationController::update => " + params['cwa_allocation'].to_s
+    allocation = CwaAllocation.find_by_id(params[:allocation_id]).update_attributes(params['cwa_allocation'])
     
     if allocation
       flash[:notice] = "Allocations updated!"

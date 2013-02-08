@@ -1,4 +1,4 @@
-<% @project = Project.find(Setting.plugin_cwa[:project_id]) %>
+<% @project = Project.find(Redmine::Cwa.project_id) %>
 <% @allocations = CwaAllocation.all :conditions => { :user_id => User.current.id } %>
 
 <h2>Allocations</h2>
@@ -6,14 +6,13 @@
 <p>
 Allocations are grants of time provided on the system for running calculations.  
 Below are allocation requests you have made and their status.  If you are working 
-with a contributing research group, you needn't worry about allocations.
+with a contributing research group or you are using CIRCE to fulfill coursework
+requirements, you needn't worry about allocations.
 </p>
 
 <% if @allocations.length == 0 %>
   <h4>You have no allocation requests!</h4>
-  <p>You should make a request if you need access to system resources to run 
-     calculations.  If you're working with a contributing research group, you
-     do not need to apply for an allocation.</p>
+  <p>Maybe you should request one?</p>
 <% else %>
  <table class="list"><tr>
    <td><b>Delete?</b></td>

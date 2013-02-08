@@ -1,4 +1,4 @@
-<% @project = Project.find(Setting.plugin_cwa[:project_id]) %>
+<% @project = Project.find(Redmine::Cwa.project_id) %>
 <% @allocations = CwaAllocation.all %>
 
 <h2>Allocation Administration</h2>

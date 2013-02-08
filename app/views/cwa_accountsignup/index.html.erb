@@ -1,7 +1,7 @@
 <h2>System Access Request</h2>
 <center>
 <% if flash[:notice] %>
- <meta http-equiv='refresh' content='5;url=/projects/<%= @cwa_as.project_id %>'>
+ <meta http-equiv='refresh' content='5;url=/projects/<%= Redmine::Cwa.project_id %>'>
 <% else %>
 <div style="width:800px">
  <%= form_tag :action => :create, :project_id => params[:project_id] do %>
@@ -9,7 +9,7 @@
   <div class="box" width="100%" align="left">
    <h3>University System Access Agreement</h3>
    <p align="left">
-    <%= textilizable @cwa_as.saa, :options => { } %>
+    <%= textilizable Redmine::Cwa.saa, :options => { } %>
    </p>
    <%= check_box_tag :saa, 'yes', false, :class => 'accept_saa' %>
    <%= label_tag :saa, "Accept System Access Agreement" %>
@@ -17,7 +17,7 @@
   <div class="box" width="100%" align="left">
    <h3>Research Computing Terms of Service</h3>
    <p align="left">
-    <%= textilizable @cwa_as.tos, :options => { } %>
+    <%= textilizable Redmine::Cwa.tos, :options => { } %>
    </p>
    <%= check_box_tag :tos, 'yes', false, :class => 'accept_tos' %>
    <%= label_tag :tos, "Accept Terms of Service" %>
@@ -26,7 +26,7 @@
  <div class="box" width="100%" align="left">
   <center>
   <p align="left">
-   <%= textilizable @cwa_as.pwd_agreement, :options => { } %>
+   <%= textilizable Redmine::Cwa.pwd_agreement, :options => { } %>
   </p>
   <p>
    <%= label_tag :netid_password, "Enter your NetID password" %>:

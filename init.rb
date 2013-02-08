@@ -1,17 +1,17 @@
 require 'redmine'
 require 'simple_json_rpc'
 require 'simple_cas_validator'
+require 'cwa'
+require 'redmine_omniauth_cas'
 
 Redmine::Plugin.register :cwa do
-  name 'CWA: Cluster Web Access plugin'
+  name 'Cluster Web Access plugin'
   author 'Brian Smith'
   description 'This plugin provides tools and features useful for HPC' 
   version '0.0.1'
   url 'https://redmine.rc.usf.edu/projects/jobman'
   author_url 'http://blah'
-  settings :default => {
-    :saa => "Service Access Agreement goes here",
-    :tos => "Terms of Service go here" }, :partial => 'settings/cwa_settings'
+  settings :default => { 'empty' => true }, :partial => 'settings/cwa_settings'
   # TODO: Get permissions nailed down
   permission :cwa_accountsignup, { :cwa_accountsignup => [:index] }, :public => true
   permission :cwa_groupmanager, { :cwa_groupmanager => [:index] }, :public => true
@@ -41,7 +41,7 @@ Redmine::MenuManager.map :top_menu do |menu|
   menu.delete :my_page
   menu.delete :projects
   menu.delete :administration
-  menu.push "MyRC", { :controller => 'projects', :action => 'show', :id => Setting.plugin_cwa['project_id'] }
+  menu.push "MyRC", { :controller => 'projects', :action => 'show', :id => "research-computing" }
   menu.push :administration, { :controller => 'admin', :action => 'index' }, :last => true, 
             :if => Proc.new { |p| User.current.admin? }
   menu.delete :help

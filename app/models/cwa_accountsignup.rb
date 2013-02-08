@@ -9,10 +9,6 @@ class CwaAccountsignup
     # If its an option in the settings hash, return it
     Rails.logger.debug "mm() called with " + name.to_s
     if args.empty? && blk.nil?
-      if Setting.plugin_cwa.has_key?(name.to_s)
-        return Setting.plugin_cwa[name.to_s]
-      end
-
       make_user_fields
       if @@fields != nil && @@fields[User.current.login].has_key?(name)
         return @@fields[User.current.login][name.to_sym]
@@ -61,9 +57,9 @@ class CwaAccountsignup
 }
 EOF
     r = Redmine::Cwa.simple_json_rpc(
-      "https://" + self.ipa_server + "/ipa/json", 
-      self.ipa_account,
-      self.ipa_password,
+      "https://" + Redmine::Cwa.ipa_server + "/ipa/json", 
+      Redmine::Cwa.ipa_account,
+      Redmine::Cwa.ipa_password,
       json_string
     )
     Rails.logger.debug "ipa_query() => " + r['result'].to_s
@@ -97,9 +93,9 @@ EOF
 }
 EOF
     Redmine::Cwa.simple_json_rpc(
-      "https://" + self.ipa_server + "/ipa/json", 
-      self.ipa_account,
-      self.ipa_password,
+      "https://" + Redmine::Cwa.ipa_server + "/ipa/json", 
+      Redmine::Cwa.ipa_account,
+      Redmine::Cwa.ipa_password,
       json_string
     )
     self.ipa_query_cache_reset

@@ -3,7 +3,7 @@ class CwaAccountsignupController < ApplicationController
 
   def index
     @cwa_as = CwaAccountsignup.new
-    @project = Project.find(@cwa_as.project_id)
+    @project = Project.find(Redmine::Cwa.project_id)
 
     _user_not_anonymous
 
@@ -39,7 +39,7 @@ class CwaAccountsignupController < ApplicationController
 
   def user_shell
     @cwa_as = CwaAccountsignup.new
-    @project = Project.find(@cwa_as.project_id)
+    @project = Project.find(Redmine::Cwa.project_id)
 
     _user_not_anonymous
 
@@ -66,7 +66,7 @@ class CwaAccountsignupController < ApplicationController
 
   def user_info
     @cwa_as = CwaAccountsignup.new
-    @project = Project.find(@cwa_as.project_id)
+    @project = Project.find(Redmine::Cwa.project_id)
 
     _user_not_anonymous
 
@@ -89,7 +89,7 @@ class CwaAccountsignupController < ApplicationController
   # and returning to the index
   def create
     _user_not_anonymous
-    @project = Project.find(@cwa_as.project_id)
+    @project = Project.find(Redmine::Cwa.project_id)
     @cwa_as = CwaAccountsignup.new
 
     if !params[:saa] 
@@ -202,7 +202,7 @@ EOF
       namsid = -100000
 
       if !bypass
-        valid = Redmine::Cwa.simple_cas_validator(user, password, Setting.plugin_redmine_omniauth_cas['cas_server'])
+        valid = Redmine::Cwa.simple_cas_validator(user, password, Redmine::OmniAuthCAS.cas_server)
 
         if !valid
           return { :password => "wrong" } 

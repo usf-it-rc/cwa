@@ -45,7 +45,7 @@
 </center>
   <%= form_tag :action => :delete, :project_id => params[:project_id] do %>
   <div style="text-align: left">
-    <%= textilizable @cwa_as.delete_saa, :options => { } %>
+    <%= textilizable Redmine::Cwa.delete_saa, :options => { } %>
   </div>
   <p>
     <%= submit_tag "Disable System Access", :disable_with => "Please wait..." %>
