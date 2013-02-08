@@ -1,0 +1,39 @@
+<% @project = Project.find(Setting.plugin_cwa[:project_id]) %>
+<% @allocations = CwaAllocation.all %>
+
+<h2>Allocation Administration</h2>
+
+<% if @allocations.length == 0 %>
+  <h4>You have no allocation requests to manage!</h4>
+  <%= link_to "Return to allocation request", :action => "index" %>
+<% else %>
+ <table class="list"><tr>
+   <td><b>Delete?</b></td>
+   <td><b>Approve?</b></td>
+   <td><b>Summary</b></td>
+   <td><b>Proposal</b></td>
+   <td><b>Hours Requested</b></td>
+   <td><b>Hours Used</b></td>
+   <td><b>Date Requested</br></td>
+ </tr>
+ <% @allocations.each do |allocation| %>
+   <tr>
+     <% if allocation.approved == false || allocation.approved == nil %>
+       <td><%= button_to "Delete", { :action => "delete", :allocation_id => allocation.id } %></td>
+       <td><%= button_to "Approve", { :action => "update", :cwa_allocation => { :approved => true }, :allocation_id => allocation.id } %></td>
+     <% else %> 
+       <td> </td>
+       <td><%= button_to "Unapprove", { :action => "update", :cwa_allocation => { :approved => false }, :allocation_id => allocation.id } %></td>
+     <% end %>
+
+     <td><%= allocation.summary %></td>
+     <td><%= allocation.proposal %></td>
+     <td><%= allocation.time_in_hours %></td>
+     <td><%= allocation.used_hours %></td>
+     <td><%= allocation.time_submitted.to_s %></td>
+
+   </tr>
+ <% end %>
+ </table>
+
+<% end %>
