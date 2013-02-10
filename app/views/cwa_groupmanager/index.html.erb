@@ -1,0 +1,25 @@
+<h2>Group Manager</h2>
+
+<center>
+<div class="box" style="width:800px; text-align:left;">
+<h3>My groups</h3>
+
+<p>
+This is a list of groups you belong to.  You can unjoin from any groups you no longer wish to be a part of.
+</p>
+
+<table class="list">
+<tr><td><b>Group Name</b></td><td><b>Description</b></td></tr>
+<% @groups.member_of_groups.each do |g| %>
+  <tr>
+    <td><%= g[:cn] %></td>
+    <td><%= g[:desc] %></td>
+  </tr>
+<% end %>
+</table>
+</div>
+
+<div class="box" style="width:800px; text-align:left;">
+<h3>Search for Groups</h3>
+</div>
+</center>

@@ -3,6 +3,7 @@ require 'simple_json_rpc'
 require 'simple_cas_validator'
 require 'cwa'
 require 'redmine_omniauth_cas'
+require 'ipagroup'
 
 Redmine::Plugin.register :cwa do
   name 'Cluster Web Access plugin'

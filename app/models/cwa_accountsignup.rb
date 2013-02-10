@@ -38,7 +38,9 @@ class CwaAccountsignup
 
   # Force a full query on the next ipa_query run
   def ipa_query_cache_reset
-    @@ipa_result[User.current.login][:timestamp] -= 60.seconds
+    if @@ipa_result.has_key?(User.current.login) && @@ipa_result[User.current.login].has_key?(:timestamp)
+      @@ipa_result[User.current.login][:timestamp] -= 60.seconds
+    end
   end
 
   # Get wonderful attributes from IPA server

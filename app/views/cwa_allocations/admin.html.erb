@@ -10,6 +10,7 @@
  <table class="list"><tr>
    <td><b>Delete?</b></td>
    <td><b>Approve?</b></td>
+   <td><b>User</b></td>
    <td><b>Summary</b></td>
    <td><b>Proposal</b></td>
    <td><b>Hours Requested</b></td>
@@ -26,6 +27,7 @@
        <td><%= button_to "Unapprove", { :action => "update", :cwa_allocation => { :approved => false }, :allocation_id => allocation.id } %></td>
      <% end %>
 
+     <td><%= User.find_by_id(allocation.user_id).login %></td>
      <td><%= allocation.summary %></td>
      <td><%= allocation.proposal %></td>
      <td><%= allocation.time_in_hours %></td>

@@ -107,29 +107,33 @@ class CwaAccountsignupController < ApplicationController
     # TODO 
     # 1. Call REST to messaging service to notify about account creation
     # 2. Add user to research-computing project
-
     begin
       _provision(User.current.login.downcase ,params[:netid_password], "user_add")
     rescue Exception => e
-      flash[:error] = "Registration failed: " + e.message
+      flash[:error] = "Registration failed: " + e.to_s
     else
       logger.info "Account #{User.current.login.downcase} provisioned in FreeIPA"
+
       # Add them to the project... allows notifications
-      User.current.project_ids = [ @project.id ]
+      @project.members << Member.new(:user => User.current, :roles => [Role.find_by_name("Watcher")])
+
       flash[:notice] = 'You are now successfully registered!'
     end
-    redirect_to :action => :index
+    render :action => :index
   end
 
   def delete
     _user_not_anonymous
 
     @cwa_as = CwaAccountsignup.new
+    @project = Project.find(Redmine::Cwa.project_id)
+
+    logger.debug "create() => " + @project.methods.to_s
     
     # some sanity checks
     if (User.current.login.downcase == "admin")
       flash[:error] = "You cannot delete the admin user!"
-      redirect_to :action => :index
+      render :action => :index
       return
     end
 
@@ -139,9 +143,18 @@ class CwaAccountsignupController < ApplicationController
     rescue Exception => e
       logger.debug "Account #{User.current.login.downcase} failed to be de-provisioned in FreeIPA: " + e.message
       flash[:error] = "Deactivation failed: " + e.message
+      render :action => :index
+      return
     else
       # Remove user from project, to stop notifications
-      User.current.project_ids = []
+      members = @project.members
+
+      members.each do |member|
+        member.destroy if member.user_id == User.current.id
+      end
+     
+      @project.members = members
+
       logger.debug "Account #{User.current.login.downcase} de-provisioned in FreeIPA"
       flash[:notice] = 'Your account has been deactivated!'
     end
@@ -165,9 +178,18 @@ class CwaAccountsignupController < ApplicationController
     [],
     {
       "uid":"#{user[:netid]}",
-      "uidnumber":#{user[:namsid]},
-      "givenname":"#{user[:givenname]}",
-      "sn":"#{user[:sn]}",
+EOF
+      if user[:namsid] != nil
+        json_string += "\"uidnumber\":#{user[:namsid]},\n"
+      end
+      if user[:givenname] != nil
+        json_string += "      \"givenname\":\"#{user[:givenname].first}\",\n"
+      end
+      if user[:sn] != nil
+        json_string += "      \"sn\":\"#{user[:sn]}\",\n"
+      end
+
+      json_string += <<EOF
       "homedirectory":"/home/#{user[:netid].each_char.first.downcase}/#{user[:netid].downcase}",
       "userpassword":"#{password}"
     }
@@ -177,9 +199,9 @@ EOF
 
       begin
         json_return = Redmine::Cwa.simple_json_rpc(
-          "https://" + @cwa_as.ipa_server + "/ipa/json", 
-          @cwa_as.ipa_account, 
-          @cwa_as.ipa_password,
+          "https://" + Redmine::Cwa.ipa_server + "/ipa/json", 
+          Redmine::Cwa.ipa_account, 
+          Redmine::Cwa.ipa_password,
           json_string
         )
       rescue Exception => e
@@ -187,7 +209,7 @@ EOF
       end
  
       # Push an update, too
-      @cwa_as.ipa_query_cache_reset
+      @cwa_as.ipa_query_cache_reset if action == "user_del"
       @cwa_as.ipa_query
 
       # TODO: parse out the details and return appropriate messages 

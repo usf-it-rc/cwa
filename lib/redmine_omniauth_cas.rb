@@ -1,0 +1,17 @@
+module Redmine::OmniAuthCAS
+  class << self
+    def settings_hash
+      Setting["plugin_redmine_omniauth_cas"]
+    end
+
+    def method_missing(name, *args, &blk)
+    # If its an option in the settings hash, return it
+      Rails.logger.debug "mm() called with " + name.to_s
+      if args.empty? && blk.nil? && settings_hash.has_key?(name.to_sym)
+        settings_hash[name.to_sym]
+      else
+        nil
+      end
+    end
+  end
+end

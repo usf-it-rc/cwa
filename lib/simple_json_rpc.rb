@@ -1,6 +1,7 @@
 module Redmine::Cwa
   class << self
     def simple_json_rpc(url, user, password, json_string)
+      Rails.logger.debug "Redmine::Cwa.simple_json_rpc() => " + json_string.to_s
       begin
         c = Curl::Easy.http_post(url, json_string) do |curl|
           curl.cacert = 'ca.crt'
