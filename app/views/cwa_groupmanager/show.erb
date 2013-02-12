@@ -1,0 +1,70 @@
+<h2>Group Manager</h2>
+
+<p>
+<%= link_to "Group Manager", :action => :index %> > <%= link_to "All Groups", :action => :groups %> > <a href="/cwa_groupmanager/show?group_name=<%= params[:group_name] %>"><%= params[:group_name] %></a>
+</p>
+
+<div class="box">
+<h3>Group Information</h3>
+<% g = @gs.from_all_by_name(params[:group_name]) %>
+<p><%= g[:cn] %> group information</p>
+
+<table>
+  <tr><td><b>Name</b></td><td><%= g[:cn] %></td></tr>
+  <tr><td><b>Owner</b></td><td><%= g[:owner] %></td></tr>
+  <tr><td><b>GID Number</b></td><td><%= g[:gidnumber].first %></td></tr>
+  <tr><td><b>Description</b></td><td><%= g[:desc] %></td></tr>
+  <tr><td><b>Members</b></td><td>
+  <% if g[:owner] == User.current.login %>
+    <% g[:members].each do |m| %>
+      <% next if m == User.current.login %>
+      <div style="float:left;">
+        <%= button_to "X #{m}", { :action => :delete, :user_name => m, :group_name => g[:cn]}, :confirm => "Are you sure want to remove #{m} from #{g[:cn]}?", :class => "myButton" %>
+      </div>
+    <% end %>
+  <% else %>
+    <%= g[:members].reject {|m| User.current.login == m } * ", " if g[:members] != nil %>
+  <% end %>
+  </td></tr>
+</table>
+</div>
+
+<div class="box">
+<h3>Options</h3>
+<% in_group = false %>
+<% owner = false %>
+<% @gs.member_of.each {|r| in_group = true if r[:cn] == params[:group_name] } %>
+<% @gs.that_i_manage.each {|r| owner = true if r[:cn] == params[:group_name] } %>
+ <% if !in_group && owner %>
+  <p>
+    You manage this group!  Here are your options...
+  </p>
+  <p>
+    <h4>Add User to Group</h4>
+    <%= form_tag(:controller => "cwa_groupmanager", :action => "add") do %>
+      <%= hidden_field_tag :group_name, g[:cn] %>
+      <%= label_tag :user_name, "Enter USF NetID" %>
+      <%= text_field_tag :user_name %>
+      <%= submit_tag "Add" %>
+    <% end %>
+  </p>
+  <hr>
+  <p>
+   <p>
+    You can disband the group, deleting it from the system.  Any stored data under the group share will remain for 60 days.
+   </p>
+    <%= button_to "Disband Group", { :action => :disband, :group_name => g[:cn] }, :confirm => "Are you sure you want to disband \"#{g[:cn]}\"?" %>
+  </p>
+ <% elsif in_group && !owner %>
+  <p>
+    You're in this group!  Here are your options...
+  </p>
+  <%= button_to "Leave Group", { :action => :delete, :group_name => g[:cn] }, :confirm => "Are you sure you want to leave the \"#{g[:cn]}\" group?" %>
+ <% else %>
+  <p>
+    You're not in this group!  Here are your options...
+  </p>
+  <%= button_to "Join Group", { :action => :save_request, :gidnumber => g[:gidnumber].first }, :confirm => "Are you sure you want to request to join \"#{g[:cn]}\"?" %>
+ <% end %>
+</div>
+

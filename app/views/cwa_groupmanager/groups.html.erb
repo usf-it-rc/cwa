@@ -1,0 +1,26 @@
+<h2>Group Manager</h2>
+<p>
+<%= link_to "Group Manager", :action => :index %> > <%= link_to "All Groups", :action => :groups %>
+</p>
+<div class="box">
+<h3>CIRCE Groups</h3>
+<% group_list = @gs.all_groups %>
+<p><%= group_list.length %> total groups</p>
+<p>Click on any of the groups below to view the group information and request to join</p>
+
+<table class="list">
+  <tr>
+    <td><b>Name</b></td>
+    <td><b>Owner</b></td>
+    <td><b>Description</b></td>
+  </tr>
+  <% group_list.each do |g| %>
+  <% next if g[:owner] == User.current.login %>
+  <tr>
+    <td><a href="/cwa_groupmanager/show?group_name=<%= g[:cn] %>"><div style="height:100%;width=100%"><%= g[:cn] %></div></a></td>
+    <td><%= g[:owner] %></td>
+    <td><%= g[:desc] %></td>
+  </tr>
+  <% end %>
+</table>
+</div>

@@ -1,25 +1,103 @@
 <h2>Group Manager</h2>
 
 <center>
+
+<% if @groups.that_i_manage.length > 0 %>
 <div class="box" style="width:800px; text-align:left;">
-<h3>My groups</h3>
-
-<p>
-This is a list of groups you belong to.  You can unjoin from any groups you no longer wish to be a part of.
-</p>
-
-<table class="list">
-<tr><td><b>Group Name</b></td><td><b>Description</b></td></tr>
-<% @groups.member_of_groups.each do |g| %>
-  <tr>
-    <td><%= g[:cn] %></td>
-    <td><%= g[:desc] %></td>
-  </tr>
+<h3>My Groups</h3>
+  <p>
+    This is a list of groups you manage.
+  </p>
+  <table class="list">
+  <tr><td><b>Group Name</b></td><td><b>Description</b></td></tr>
+  <% my_gidnumbers = Array.new %>
+  <% @groups.that_i_manage.each do |g| %>
+    <% my_gidnumbers << g[:gidnumber] %>
+    <tr>
+      <td><a href="/cwa_groupmanager/show?group_name=<%= g[:cn] %>"><div style="height:100%;width=100%"><%= g[:cn] %></a></div></td>
+      <td><%= g[:desc] %></td>
+    </tr>
+  <% end %>
+  </table>
+</div>
 <% end %>
+
+<% requests = CwaGroupRequests.find_all_by_group_id(my_gidnumbers) %>
+<% if !requests.empty? %>
+<div class="box" style="width:800px; text-align:left;">
+<h3>Requests to join your groups</h3>
+  <p>
+    These are current requests to join your groups
+  </p>
+  <table>
+  <tr><td><b>Approve</b></td><td><b>Reject</b></td><td><b>User Name</b></td><td><b>Group Name</b></td></tr>
+    <% requests.each do |r| %>
+    <tr>
+      <td><%= button_to "Approve", { :action => :allow_join, :request_id => r.id } %> </td>
+      <td><%= button_to "Reject", { :action => :delete_request, :request_id => r.id, :group_name => @groups.by_id(r.group_id)[:cn] } %> </td>
+      <td><%= User.find_by_id(r.user_id).login %></td>
+      <td><%= @groups.by_id(r.group_id)[:cn] %></td>
+    </tr>
+    <% end %>
+  </table>
+</div>
+<% end %>
+
+<% requests = CwaGroupRequests.find_all_by_user_id(User.current.id) %>
+<% if !requests.empty? %>
+<div class="box" style="width:800px; text-align:left;">
+<h3>Your join requests</h3>
+  <p>
+    These are your pending requests to join groups
+  </p>
+  <table>
+  <tr><td><b>Delete</b></td><td><b>Group Name</b></td></tr>
+    <% requests.each do |r| %>
+    <tr>
+      <td><%= button_to "Delete", { :action => :delete_request, :request_id => r.id, :group_name => @groups.by_id(r.group_id)[:cn] } %></td>
+      <td><%= @groups.by_id(r.group_id)[:cn] %></td>
+    </tr>
+    <% end %>
+  </table>
+</div>
+<% end %>
+
+<div class="box" style="width:800px; text-align:left;">
+<h3>Group Memberships</h3>
+<% if @groups.member_of.length > 0 %>
+  <p>
+    This is a list of groups to which you belong.
+  </p>
+  <table class="list">
+    <tr>
+      <td><b>Group Name</b></td>
+      <td><b>Description</b></td>
+      <td><b>Owner</b></td>
+      <td><b>Members</b></td>
+    </tr>
+  <% @groups.member_of.each do |g| %>
+    <% if g[:owner] != User.current.login %>
+      <tr>
+        <td><a href="/cwa_groupmanager/show?group_name=<%= g[:cn] %>"><div style="height:100%;width=100%"><%= g[:cn] %></a></div></td>
+        <td><%= g[:desc] %></td>
+        <td><%= g[:owner] %></td>
+        <td><%= g[:members].reject {|m| m == User.current.login} * ", " %></td>
+      </tr>
+    <% end %>
+  <% end %>
 </table>
+<% else %>
+  <p>
+    You are not in any groups :(
+  </p>
+  <p>
+    Use the search below to find a group to join.  You'll need to be approved by the group's owner.
+  </p>
+<% end %>
 </div>
 
 <div class="box" style="width:800px; text-align:left;">
-<h3>Search for Groups</h3>
+<h3>Options</h3>
+<%= link_to "Browse Groups to Join", :action => :groups %>
 </div>
 </center>
