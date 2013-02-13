@@ -5,6 +5,7 @@ get 'cwa_accountsignup', :to => 'cwa_accountsignup#index'
 get 'cwa_groupmanager', :to => 'cwa_groupmanager#index'
 get 'cwa_groupmanager/groups', :to => 'cwa_groupmanager#groups'
 get 'cwa_groupmanager/show', :to => 'cwa_groupmanager#show'
+get 'cwa_groupmanager/create', :to => 'cwa_groupmanager#create'
 get 'cwa_jobmanager', :to => 'cwa_jobmanager#index'
 get 'cwa_tutorials', :to => 'cwa_tutorials#index'
 get 'cwa_allocations', :to => 'cwa_allocations#index'
@@ -25,3 +26,5 @@ match 'cwa_groupmanager/disband', :to => 'cwa_groupmanager#disband', :via => :po
 match 'cwa_groupmanager/save_request', :to => 'cwa_groupmanager#save_request', :via => :post
 match 'cwa_groupmanager/delete_request', :to => 'cwa_groupmanager#delete_request', :via => :post
 match 'cwa_groupmanager/allow_join', :to => 'cwa_groupmanager#allow_join', :via => :post
+match 'cwa_groupmanager/create_group', :to => 'cwa_groupmanager#create_group', :via => :post
+match 'cwa_groupmanager/delete_group', :to => 'cwa_groupmanager#delete_group', :via => :post

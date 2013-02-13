@@ -26,6 +26,42 @@ class CwaGroupmanagerController < ApplicationController
     end
   end
 
+  def create 
+    @project = Project.find(Redmine::Cwa.project_id)
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  # Create group
+  def create_group
+    @project = Project.find(Redmine::Cwa.project_id)
+    @groups = CwaGroups.new
+    Rails.logger.debug "create_group() => " + @groups.that_i_manage.length.to_s
+    if @groups.that_i_manage.length < 5
+      if @groups.create({ :owner => User.current.login, :group_name => params[:group_name], :desc => params[:desc] })
+        flash[:notice] = "Your group \"#{params[:group_name]}\" has been created!"
+      else
+        flash[:error] = "Could not create group \"#{params[:group_name]}\".  Name is already taken!"
+        render :action => :create
+        return
+      end
+    else
+      flash[:error] = "You've reached the maximum 10 group limitation.  You can't have any more!"
+    end
+    redirect_to :action => :index
+  end
+
+  def delete_group
+    @groups = CwaGroups.new
+    if @groups.delete params[:group_name]
+      flash[:notice] = "Group \"#{params[:group_name]}\" deleted!"
+    else
+      flash[:error] = "Unable to delete group \"#{params[:group_name]}\"!"
+    end
+    redirect_to :action => :index
+  end
+
   # Add a user to a group
   def add
     @groups = CwaGroups.new
@@ -59,7 +95,9 @@ class CwaGroupmanagerController < ApplicationController
   end
 
   def disband
-    if CwaGroups.delete params[:group_name]
+    groups = CwaGroups.new
+
+    if groups.delete(params[:group_name])
       flash[:notice] = "\"#{params[:group_name]}\" has been disbanded!"
     else
       flash[:error] = "Problem disbanding \"#{params[:group_name]}\""

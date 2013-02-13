@@ -4,7 +4,8 @@
 <%= link_to "Group Manager", :action => :index %> > <%= link_to "All Groups", :action => :groups %> > <a href="/cwa_groupmanager/show?group_name=<%= params[:group_name] %>"><%= params[:group_name] %></a>
 </p>
 
-<div class="box">
+<center>
+<div class="box" style="width:800px; text-align:left;">
 <h3>Group Information</h3>
 <% g = @gs.from_all_by_name(params[:group_name]) %>
 <p><%= g[:cn] %> group information</p>
@@ -29,7 +30,7 @@
 </table>
 </div>
 
-<div class="box">
+<div class="box" style="width:800px; text-align:left;">
 <h3>Options</h3>
 <% in_group = false %>
 <% owner = false %>
@@ -48,12 +49,14 @@
       <%= submit_tag "Add" %>
     <% end %>
   </p>
-  <hr>
   <p>
    <p>
+    <h4>Disband Group</h4>
     You can disband the group, deleting it from the system.  Any stored data under the group share will remain for 60 days.
    </p>
+   <p>
     <%= button_to "Disband Group", { :action => :disband, :group_name => g[:cn] }, :confirm => "Are you sure you want to disband \"#{g[:cn]}\"?" %>
+   </p>
   </p>
  <% elsif in_group && !owner %>
   <p>
@@ -67,4 +70,4 @@
   <%= button_to "Join Group", { :action => :save_request, :gidnumber => g[:gidnumber].first }, :confirm => "Are you sure you want to request to join \"#{g[:cn]}\"?" %>
  <% end %>
 </div>
-
+</center>

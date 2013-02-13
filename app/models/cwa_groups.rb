@@ -52,10 +52,24 @@ class CwaGroups
     refresh_all_groups
     res
   end
+ 
+  def create(group_info)
+    res = Redmine::IPAGroup.create_new_group(group_info)
+    refresh_all_groups
+    refresh_groups
+    res
+  end
+
+  def delete(name)
+    res = Redmine::IPAGroup.delete_group(name)
+    refresh_all_groups
+    refresh_groups
+    res
+  end
 
   def delete_from_my_group(user, group)
     res = Redmine::IPAGroup.remove_user user, group
-    refresh_all_groups
+    refresh_groups
     res
   end
 

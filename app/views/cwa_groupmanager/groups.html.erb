@@ -2,7 +2,8 @@
 <p>
 <%= link_to "Group Manager", :action => :index %> > <%= link_to "All Groups", :action => :groups %>
 </p>
-<div class="box">
+<center>
+<div class="box" style="width:800px; text-align:left">
 <h3>CIRCE Groups</h3>
 <% group_list = @gs.all_groups %>
 <p><%= group_list.length %> total groups</p>
@@ -24,3 +25,4 @@
   <% end %>
 </table>
 </div>
+</center>

@@ -1,0 +1,35 @@
+<h2>Group Manager</h2>
+
+<p>
+<%= link_to "Group Manager", :action => :index %> > <%= link_to "Create Groups", :action => :create %>
+</p>
+
+<center>
+<div class="box" style="width:800px;text-align:left;">
+ <h3>Create Group</h3>
+ <p>
+   Here, you can create a group which people can join, in order to facilitate file sharing and collaboration.
+ <p>
+  <%= form_tag :action => :create_group do %>
+  <table>
+    <tr>
+    <td>
+    <%= label_tag :group_name, "Name of group" %>
+    </td>
+    <td>
+    <%= text_field_tag :group_name %>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <%= label_tag :desc, "Description" %>
+    </td>
+    <td>
+    <%= text_area_tag :desc, nil, :rows => 3, :cols => 52 %>
+    </td>
+    </tr>
+  </table> 
+  <%= submit_tag "Create" %>
+  <% end %>
+</div>
+</center>
