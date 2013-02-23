@@ -21,6 +21,7 @@ module Redmine::Cwa
       end
   
       h = JSON.parse(c.body_str).to_hash
+      c.close
 
       Rails.logger.debug "Redmine::Cwa.simple_json_rpc() => " + h.to_s
   
