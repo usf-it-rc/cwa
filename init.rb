@@ -1,5 +1,4 @@
 require 'redmine'
-require 'simple_json_rpc'
 require 'simple_cas_validator'
 require 'cwa'
 require 'redmine_omniauth_cas'
