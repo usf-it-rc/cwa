@@ -36,6 +36,21 @@
   <br />
 </p>
 <p>
+  <label><%= l(:label_msg_url) %> :</label>
+  <%= text_field_tag 'settings[msg_url]', @settings['msg_url'] %>
+  <br />
+</p>
+<p>
+  <label><%= l(:label_msg_user) %> :</label>
+  <%= text_field_tag 'settings[msg_user]', @settings['msg_user'] %>
+  <br />
+</p>
+<p>
+  <label><%= l(:label_msg_password) %> :</label>
+  <%= password_field_tag 'settings[msg_password]', @settings['msg_password'] %>
+  <br />
+</p>
+<p>
   <label><%= l(:label_project_id) %> :</label>
   <%= text_field_tag 'settings[project_id]', @settings['project_id'] %>
   <br />

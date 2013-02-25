@@ -3,35 +3,35 @@
 module Redmine::IPAGroup
   class << self
     def find_all
-      json_string = {
+      json = {
         :method => "group_find", 
         :params => [ [], {
           :sizelimit => 0
         } ]
-      }.to_json
-      _ipa_json_rpc json_string
+      }
+      _ipa_json_rpc json
     end  
 
     def find_by_user(user)
-      json_string = {
+      json = {
         :method => "group_find", 
         :params => [ [], {
           :user => [ user ]
         } ]
-      }.to_json
-      _ipa_json_rpc json_string
+      }
+      _ipa_json_rpc json
     end  
 
     def add_user(user, groupname)
-      json_string = {
+      json = {
         :method => "group_add_member",
         :params => [ [], {
           :user => [ user ],
           :cn => groupname
         } ]
-      }.to_json       
+      }
 
-      resp = _ipa_json_rpc json_string
+      resp = _ipa_json_rpc json
       Rails.logger.debug "add_user() => " + resp.to_s + " ==> " + resp['result']['completed'].to_s
       if resp['result']['completed'] != 0
         true
@@ -46,16 +46,16 @@ module Redmine::IPAGroup
         :owner => group_info[:owner],
         :desc  => group_info[:desc]
       }
-      json_string = {
+      json = {
         :method => "group_add",
         :params => [ [], {
           :cn => group_info[:group_name],
           :description => description.to_s
         } ]
-      }.to_json       
+      }
 
       begin
-        resp = _ipa_json_rpc json_string
+        resp = _ipa_json_rpc json
       rescue
         return false    
       end
@@ -71,13 +71,13 @@ module Redmine::IPAGroup
     end
 
     def delete_group(group_name)
-      json_string = {
+      json = {
         :method => "group_del",
         :params => [ [], {
           :cn => group_name
         } ]
-      }.to_json       
-      resp = _ipa_json_rpc json_string
+      }
+      resp = _ipa_json_rpc json
       Rails.logger.debug "delete_group() => " + resp.to_s + " ==> " + resp['result']['completed'].to_s
       if resp['result']['completed'] != 0
         true
@@ -88,15 +88,15 @@ module Redmine::IPAGroup
 
 
     def remove_user(user, groupname)
-      json_string = {
+      json = {
         :method => "group_remove_member",
         :params => [ [], {
           :user => [ user ],
           :cn => groupname
         } ]
-      }.to_json       
+      }
 
-      resp = _ipa_json_rpc json_string
+      resp = _ipa_json_rpc json
       Rails.logger.debug "remove_user() => " + resp.to_s
       if resp[:error] == nil
         true
@@ -106,13 +106,14 @@ module Redmine::IPAGroup
     end
 
     private
-    def _ipa_json_rpc (json_string)
-      Redmine::Cwa.simple_json_rpc(
-        "https://" + Redmine::Cwa.ipa_server + "/ipa/json",
-        Redmine::Cwa.ipa_account,
-        Redmine::Cwa.ipa_password,
-        json_string.to_s
-      )
+    def _ipa_json_rpc (json)
+      CwaRest.client({
+        :verb => :POST,
+        :url  => "https://" + Redmine::Cwa.ipa_server + "/ipa/json",
+        :user => Redmine::Cwa.ipa_account,
+        :password => Redmine::Cwa.ipa_password,
+        :json => json
+      })
     end
   end
 end

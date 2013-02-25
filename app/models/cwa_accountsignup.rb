@@ -1,4 +1,6 @@
-#class CwaAs < ActiveRecord::Base
+require 'cwa_rest'
+include ::CwaRest
+
 class CwaAccountsignup
   # This gets us all of our accessor methods for plugin settings
   # and ipa-based attributes
@@ -50,21 +52,23 @@ class CwaAccountsignup
     end
       
     Rails.logger.debug "ipa_query() => " + @@ipa_result[User.current.login].to_s
-    json_string = <<EOF
-{ "method": "user_show", 
-  "params":[
-   [],
-   { "uid":"#{User.current.login}" }
-   ] 
-}
-EOF
-    r = Redmine::Cwa.simple_json_rpc(
-      "https://" + Redmine::Cwa.ipa_server + "/ipa/json", 
-      Redmine::Cwa.ipa_account,
-      Redmine::Cwa.ipa_password,
-      json_string
-    )
-    Rails.logger.debug "ipa_query() => " + r['result'].to_s
+
+    begin 
+      r = CwaRest.client({
+        :verb => :POST,
+        :url  => "https://" + Redmine::Cwa.ipa_server + "/ipa/json",
+        :user => Redmine::Cwa.ipa_account,
+        :password => Redmine::Cwa.ipa_password,
+        :json => {
+          'method' => 'user_show',
+          'params' => [ [], { 'uid' => User.current.login } ]
+        }
+      })
+    rescue Exception => e
+      raise e.message
+    end
+ 
+    Rails.logger.debug "ipa_query() => " + r.to_s
     if r != nil && r['result'] != nil 
       @@ipa_result = { User.current.login => { :timestamp => Time.now, :result => r['result']['result'] } }
     else
@@ -72,34 +76,27 @@ EOF
     end
   end
       
-  # update user parameters in IPA
   def user_set(params)
-    json_string = <<EOF
-{ "method": "user_mod", 
-  "params":[
-   [],
-    { 
-     "uid":"#{User.current.login}",
-EOF
-
-    p_keys = params.keys
-    last = p_keys.pop
+    param_list = Hash.new
     params.keys.each do |k|
-      json_string += "     \"#{k.to_s}\":\"#{params[k]}\",\n" 
+      param_list.merge!({ k => params[k] })    
     end
 
-    json_string += <<EOF 
-     "#{last.to_s}":"#{params[last]}"
-    }
-   ] 
-}
-EOF
-    Redmine::Cwa.simple_json_rpc(
-      "https://" + Redmine::Cwa.ipa_server + "/ipa/json", 
-      Redmine::Cwa.ipa_account,
-      Redmine::Cwa.ipa_password,
-      json_string
-    )
+    begin
+      r = CwaRest.client({
+        :verb => :POST,
+        :url  => "https://" + Redmine::Cwa.ipa_server + "/ipa/json",
+        :user => Redmine::Cwa.ipa_account,
+        :password => Redmine::Cwa.ipa_password,
+        :json => {
+          'method' => 'user_mod',
+          'params' => [ [], { 'uid' => User.current.login }.merge(param_list) ]
+        }
+      })
+    rescue Exception => e
+      raise e.message
+    end
+
     self.ipa_query_cache_reset
     ipa_query
   end

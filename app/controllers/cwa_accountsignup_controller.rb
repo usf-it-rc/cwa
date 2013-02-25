@@ -171,51 +171,61 @@ class CwaAccountsignupController < ApplicationController
       raise 'This user was not found in the NetID system' if user == nil
       raise 'You entered an incorrect password' if user[:password] != "valid"
 
-      json_string = <<EOF
-{
-  "method": "#{action}",
-  "params": [
-    [],
-    {
-      "uid":"#{user[:netid]}",
-EOF
-      if user[:namsid] != nil
-        json_string += "\"uidnumber\":#{user[:namsid]},\n"
-      end
-      if user[:givenname] != nil
-        json_string += "      \"givenname\":\"#{user[:givenname].first}\",\n"
-      end
-      if user[:sn] != nil
-        json_string += "      \"sn\":\"#{user[:sn]}\",\n"
-      end
+      param_list = {
+        'uid'  => user[:netid],
+        'homedirectory' => "/home/#{user[:netid].each_char.first.downcase}/#{user[:netid].downcase}",
+        'userpassword' => password
+      }
 
-      json_string += <<EOF
-      "homedirectory":"/home/#{user[:netid].each_char.first.downcase}/#{user[:netid].downcase}",
-      "userpassword":"#{password}"
-    }
-  ]
-}
-EOF
+      param_list.merge!({ 'uidnumber' => user[:namsid] }) if user[:namsid] != nil
+      param_list.merge!({ 'givenname' => user[:givenname] }) if user[:givenname] != nil
+      param_list.merge!({ 'sn' => user[:sn] }) if user[:sn] != nil
 
+      logger.debug param_list.to_s
+
+      # Add the account to IPA
       begin
-        json_return = Redmine::Cwa.simple_json_rpc(
-          "https://" + Redmine::Cwa.ipa_server + "/ipa/json", 
-          Redmine::Cwa.ipa_account, 
-          Redmine::Cwa.ipa_password,
-          json_string
-        )
+        r = CwaRest.client({
+          :verb => :POST,
+          :url  => "https://" + Redmine::Cwa.ipa_server + "/ipa/json",
+          :user => Redmine::Cwa.ipa_account,
+          :password => Redmine::Cwa.ipa_password,
+          :json => { 'method' => action, 'params' => [ [], param_list ] }
+        })
       rescue Exception => e
         raise e.message
       end
- 
+
       # Push an update, too
       @cwa_as.ipa_query_cache_reset if action == "user_del"
       @cwa_as.ipa_query
 
       # TODO: parse out the details and return appropriate messages 
-      if json_return['error'] != nil
-        raise json_return['error']['message']
+      if r['error'] != nil
+        raise r['error']['message']
       end
+
+      # Let NAMS know this is now an RC.USF.EDU user
+      begin 
+        r = CwaRest.client({
+          :verb => :POST,
+          :url  => Redmine::Cwa.msg_url,
+          :user => Redmine::Cwa.msg_user,
+          :password => Redmine::Cwa.msg_password,
+          :json => { 
+            'apiVersion' => '1',
+            'createProg' => 'EDU:USF:RC:cwa',
+            'messageData' => {
+              'host' => 'rc.usf.edu',
+              'username' => User.current.login,
+              'accountStatus' => 'active'
+            }
+          }
+        })
+      rescue Exception => e
+        raise e.message
+      end
+      logger.debug r.to_s
     end
 
     # TODO: CAS Auth user and get some attributes

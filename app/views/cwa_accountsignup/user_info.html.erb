@@ -10,7 +10,7 @@
   <h3>Basic Information</h3>
   <table>
     <tr><td><b>Name:<b></td><td><%= @cwa_as.givenname %> <%= @cwa_as.sn %></td></tr>
-    <tr><td><b>UID Number:<b></td><td><%= @cwa_as.namsid %></td></tr>
+    <tr><td><b>UID Number:<b></td><td><%= @cwa_as.uidnumber %></td></tr>
     <tr><td><b>Username:<b></td><td><%= @cwa_as.uid %></td></tr>
     <tr><td><b>Home directory:<b></td><td><%= @cwa_as.homedirectory %></td></tr>
     <tr><td><b>Affiliation:<b></td><td><%= @cwa_as.affiliation %></td></tr>
@@ -45,7 +45,7 @@
     <%= textilizable Redmine::Cwa.delete_saa, :options => { } %>
   </div>
   <p>
-    <%= submit_tag "Disable System Access", :disable_with => "Please wait..." %>
+    <%= submit_tag "Disable System Access", :disable_with => "Please wait...", :confirm => "Are you sure you want to disable your system access?" %>
   </p>
   <% end %>
 </div>
