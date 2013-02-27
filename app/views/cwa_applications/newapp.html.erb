@@ -1,0 +1,47 @@
+<h2>App Manager</h2>
+<%= form_for @app do |a| %>
+ <div class="box">
+  <h3>Basic Information</h3>
+  <table>
+  <tr>
+   <td><%= a.label :name %></td>
+   <td><%= a.text_field :name, :size => 25 %></td>
+  </tr>
+  <tr>
+    <td><%= a.label :version %></td>
+    <td><%= a.text_field :version, :size => 25 %></td>
+  </tr>
+  </table>
+  </p>
+ </div>
+ <div class="box">
+  <h3>Job Execution Code</h3>
+  <p>
+    <%= a.text_area :exec  %>
+  </p>
+ </div>
+ <div class="box">
+ <h3>Environment Variables</h3>
+  <% a.fields_for :envvars do |env| %>
+    <p>
+      <%= env.label :name %>
+      <%= env.text_field :name, :size => 50 %>
+      <%= env.check_box :_destroy %>
+      <%= env.label :_destroy, 'delete' %>
+    </p>
+  <% end -%>
+  <p>
+    <%= a.submit 'Add variable', :name => "add_envvar" %>
+    <%= a.submit 'Delete selected variables', :name => "remove_envvar" %>
+  </p>
+  </div>
+  <div class="box">
+  <h3>End-user Submit Form</h3>
+  <p>
+    <%= a.text_area :haml_form %>
+  </p>
+  <p>
+    <%= a.submit %>
+  </p>
+  </div>
+<% end %>

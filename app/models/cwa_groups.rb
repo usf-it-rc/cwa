@@ -1,3 +1,6 @@
+require 'cwa_rest'
+include ::CwaRest
+
 class CwaGroups
   @@groups = nil
   @@allGroups = nil

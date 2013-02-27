@@ -7,6 +7,8 @@ get 'cwa_groupmanager/groups', :to => 'cwa_groupmanager#groups'
 get 'cwa_groupmanager/show', :to => 'cwa_groupmanager#show'
 get 'cwa_groupmanager/create', :to => 'cwa_groupmanager#create'
 get 'cwa_jobmanager', :to => 'cwa_jobmanager#index'
+get 'cwa_applications', :to => 'cwa_applications#index'
+get 'cwa_applications/newapp', :to => 'cwa_applications#newapp'
 get 'cwa_tutorials', :to => 'cwa_tutorials#index'
 get 'cwa_allocations', :to => 'cwa_allocations#index'
 get 'cwa_allocations/admin', :to => 'cwa_allocations#admin'
@@ -28,3 +30,6 @@ match 'cwa_groupmanager/delete_request', :to => 'cwa_groupmanager#delete_request
 match 'cwa_groupmanager/allow_join', :to => 'cwa_groupmanager#allow_join', :via => :post
 match 'cwa_groupmanager/create_group', :to => 'cwa_groupmanager#create_group', :via => :post
 match 'cwa_groupmanager/delete_group', :to => 'cwa_groupmanager#delete_group', :via => :post
+match 'cwa_applications', :to => 'cwa_applications#create', :via => :post
+match 'cwa_applications/newapp', :to => 'cwa_applications#newapp', :via => :post
+match 'cwa_jobmanager/delete', :to => 'cwa_jobmanager#delete', :via => :post

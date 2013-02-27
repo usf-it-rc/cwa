@@ -1,0 +1,34 @@
+<h2>Job Manager</h2>
+<center>
+<div class="box" style="width:800px; text-align:left;">
+<h3>My Jobs</h3>
+<% if @jobs.count > 0 %>
+  <table class="list">
+    <tr>
+      <td><b>Delete</b></td>
+      <td><b>JobID</b></td>
+      <td><b>Name</b></td>
+      <td><b>Owner</b></td>
+      <td><b>Slots</b></td>
+      <td><b>Status</b></td>
+    </tr>
+  <% @jobs.each do |job| %>
+    <tr>
+      <td><%= button_to "X", { :action => 'delete', :jobid => job.jobid }, :confirm => "Are you sure you want to delete job #{job.jobid}?" %></td>
+      <td><%= job.jobid %></td>
+      <td><%= job.job_name %></td>
+      <td><%= job.job_owner %></td>
+      <td><%= job.slots %></td>
+      <td><%= job.state %></td>
+    </tr>
+  <% end %>
+  </table>
+<% else %>
+  <p>You have no submitted or running jobs.</p>
+<% end %>
+</div>
+
+<div class="box" style="width:800px; text-align:left;">
+<h3>Options</h3>
+</div>
+</center>

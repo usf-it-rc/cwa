@@ -23,8 +23,10 @@ Redmine::Plugin.register :cwa do
        :caption => 'System Access', :after => :activity
   menu :project_menu, :cwa_allocations, { :controller => 'cwa_allocations', :action => 'index' }, 
        :caption => 'Allocations', :after => :cwa_accountsignup
+  menu :project_menu, :applications, { :controller => 'wiki', :action => 'show', :id => 'applications' }, :param => :project_id,
+       :caption => "Applications", :after => :cwa_allocations
   menu :project_menu, :cwa_groupmanager, { :controller => 'cwa_groupmanager', :action => 'index' }, 
-       :caption => 'My Groups', :after => :cwa_allocations
+       :caption => 'My Groups', :after => :applications
   menu :project_menu, :cwa_jobmanager, { :controller => 'cwa_jobmanager', :action => 'index' }, 
        :caption => 'My Jobs', :after => :cwa_groupmanager
   menu :project_menu, :cwa_tutorials, { :controller => 'cwa_tutorials', :action => 'index' }, 
@@ -34,6 +36,8 @@ end
 Redmine::MenuManager.map :project_menu do |menu|
   menu.delete :activity if menu.exists? :activity
   menu.delete :calendar if menu.exists? :calendar
+  menu.push  :app_manager, { :controller => 'cwa_applications', :action => 'index' }, 
+       :caption => 'App Manager', :after => :cwa_tutorials, :if => Proc.new { |p| User.current.admin? }
 end
 
 Redmine::MenuManager.map :top_menu do |menu|
@@ -41,7 +45,7 @@ Redmine::MenuManager.map :top_menu do |menu|
   menu.delete :my_page
   menu.delete :projects
   menu.delete :administration
-  menu.push "MyRC", { :controller => 'projects', :action => 'show', :id => "research-computing" }
+  menu.push "My RC", { :controller => 'projects', :action => 'show', :id => "research-computing" }
   menu.push :administration, { :controller => 'admin', :action => 'index' }, :last => true, 
             :if => Proc.new { |p| User.current.admin? }
   menu.delete :help
