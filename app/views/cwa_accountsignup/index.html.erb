@@ -1,10 +1,7 @@
 <h2>System Access</h2>
 <center>
-<% if flash[:notice] %>
- <meta http-equiv='refresh' content='5;url=/projects/<%= Redmine::Cwa.project_id %>'>
-<% else %>
 <div style="width:800px">
- <%= form_tag :action => :create, :project_id => params[:project_id] do %>
+<%= form_tag :action => 'create' do %>
  <div>
   <div class="box" width="100%" align="left">
    <h3>University System Access Agreement</h3>
@@ -42,4 +39,3 @@
 <% end %>
 </div>
 </center>
-<% end %>

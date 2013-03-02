@@ -2,18 +2,44 @@ class CwaAllocationsController < ApplicationController
   unloadable
 
   def index
+    @user = CwaIpaUser.new
+
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
+
+    @project = Project.find(Redmine::Cwa.project_id)
+    @allocations = CwaAllocation.all :conditions => { :user_id => User.current.id }
+
     respond_to do |format|
       format.html
     end
   end
 
   def form
+    @user = CwaIpaUser.new
+
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
+
+    @project = Project.find(Redmine::Cwa.project_id)
+
+    if params[:cwa_allocation] != nil
+      @allocation = CwaAllocation.new params[:cwa_allocation]
+    else
+      @allocation = CwaAllocation.new
+    end
+
     respond_to do |format|
       format.html
     end
   end
 
   def admin
+    @user = CwaIpaUser.new
+
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
+
+    @allocations = CwaAllocation.all
+    @project = Project.find(Redmine::Cwa.project_id)
+
     if !User.current.admin?
       flash[:error] = "Only an administrator can do that!"
       redirect_to :action => :index

@@ -6,6 +6,8 @@ class CwaJobmanagerController < ApplicationController
   def index
     @project = Project.find(Redmine::Cwa.project_id)
     @jobs = RsgeJobs.new User.current.login
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     respond_to do |format|
       format.html
     end

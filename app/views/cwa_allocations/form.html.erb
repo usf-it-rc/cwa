@@ -15,14 +15,6 @@ system resources and how they will help with your work.</p>
 <p>Finally, provide the <b>Required CPU hours</b>.  If you're unsure, leave the default value, 50,000 
 hours as that will be a good starting point.</p>
 
-<% @project = Project.find(Redmine::Cwa.project_id) %>
-
-<% if params[:cwa_allocation] != nil %>
-  <% @allocation = CwaAllocation.new params[:cwa_allocation] %>
-<% else %>
-  <% @allocation = CwaAllocation.new %>
-<% end %>
-
 <%= form_for @allocation, :url => { :action => "submit" }  do |a|%>
  <center>
   <table>

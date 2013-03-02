@@ -10,6 +10,8 @@ class CwaApplicationsController < ApplicationController
   end
 
   def show
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     @project = Project.find(Redmine::Cwa.project_id)
     @app = CwaApplication.find(params[:id])
     respond_to do |format|
@@ -46,6 +48,8 @@ class CwaApplicationsController < ApplicationController
   end
 
   def index
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     @project = Project.find(Redmine::Cwa.project_id)
     @apps = CwaApplication.all
     respond_to do |format|
@@ -54,6 +58,8 @@ class CwaApplicationsController < ApplicationController
   end
 
   def display
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     @project = Project.find(Redmine::Cwa.project_id)
     @app = CwaApplication.find(params[:id])
     @job = RsgeJob.new

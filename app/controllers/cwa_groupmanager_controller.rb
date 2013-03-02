@@ -5,6 +5,8 @@ class CwaGroupmanagerController < ApplicationController
   def index
     @project = Project.find(Redmine::Cwa.project_id)
     @groups = CwaGroups.new
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     respond_to do |format|
       format.html
     end
@@ -13,6 +15,8 @@ class CwaGroupmanagerController < ApplicationController
   def groups
     @project = Project.find(Redmine::Cwa.project_id)
     @gs = CwaGroups.new
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     respond_to do |format|
       format.html
     end
@@ -21,6 +25,8 @@ class CwaGroupmanagerController < ApplicationController
   def show
     @project = Project.find(Redmine::Cwa.project_id)
     @gs = CwaGroups.new
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     respond_to do |format|
       format.html
     end

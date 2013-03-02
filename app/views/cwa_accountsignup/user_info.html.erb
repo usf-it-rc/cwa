@@ -9,25 +9,25 @@
 <div class="box" style="width:800px;text-align:left;">
   <h3>Basic Information</h3>
   <table>
-    <tr><td><b>Name:<b></td><td><%= @cwa_as.givenname %> <%= @cwa_as.sn %></td></tr>
-    <tr><td><b>UID Number:<b></td><td><%= @cwa_as.uidnumber %></td></tr>
-    <tr><td><b>Username:<b></td><td><%= @cwa_as.uid %></td></tr>
-    <tr><td><b>Home directory:<b></td><td><%= @cwa_as.homedirectory %></td></tr>
-    <tr><td><b>Affiliation:<b></td><td><%= @cwa_as.affiliation %></td></tr>
-    <tr><td><b>Campus:<b></td><td><%= @cwa_as.campus %></td></tr>
-    <tr><td><b>College:<b></td><td><%= @cwa_as.college %></td></tr>
+    <tr><td><b>Name:<b></td><td><%= @user.givenname %> <%= @user.sn %></td></tr>
+    <tr><td><b>UID Number:<b></td><td><%= @user.uidnumber %></td></tr>
+    <tr><td><b>Username:<b></td><td><%= @user.uid %></td></tr>
+    <tr><td><b>Home directory:<b></td><td><%= @user.homedirectory %></td></tr>
+    <tr><td><b>Affiliation:<b></td><td><%= @user.affiliation %></td></tr>
+    <tr><td><b>Campus:<b></td><td><%= @user.campus %></td></tr>
+    <tr><td><b>College:<b></td><td><%= @user.college %></td></tr>
   </table>
 </div>
 
 <div class="box" style="width:800px;text-align:left;" >
   <h3>Advanced Options</h3>
   <p><b>Please only change these options if you know what you are doing!</b></p>
-  <%= form_tag :action => :user_shell, :project_id => params[:project_id] do %>
-    <% shell = @cwa_as.loginshell %>
-    <% shell_id = @cwa_as.shells[shell] %>
+  <%= form_tag :action => :set_shell do %>
+    <% shell = @user.loginshell %>
+    <% shell_id = @user.available_shells[shell] %>
   <p>
     <table>
-      <tr><td><b>Login shell:</b></td><td><%= select_tag 'loginshell', options_for_select(@cwa_as.shells, :selected => shell_id) %></td></tr>
+      <tr><td><b>Login shell:</b></td><td><%= select_tag 'loginshell', options_for_select(@user.available_shells, :selected => shell_id) %></td></tr>
     </table>
   </p>
   <p>
@@ -36,11 +36,11 @@
   <% end %>
 </div>
 
-<% if @cwa_as.uid != "admin" %>
+<% if @user.uid != "admin" %>
 
 <div class="box" style="width:800px;text-align:left;">
 <h3>Disable My System Access</h3>
-  <%= form_tag :action => :delete, :project_id => params[:project_id] do %>
+  <%= form_tag :action => :delete do %>
   <div style="text-align: left">
     <%= textilizable Redmine::Cwa.delete_saa, :options => { } %>
   </div>
