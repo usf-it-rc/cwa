@@ -1,5 +1,52 @@
-<h2>Application Manager</h2>
-<% @apps.each do |app| %>
-<p><%= app.name %></p>
-<p><%= app.version %></p>
+<h2>App Manager</h2>
+<center>
+<% if User.current.admin? %>
+<div class="box" style="width:800px; text-align:left;">
+  <h3>Configured Applications</h3>
+  <table class="list">
+  <tr>
+    <td><b>Delete</b></td>
+    <td><b>Name</b></td>
+    <td><b>Action</b></td>
+    <td><b>Version</b></td>
+    <td><b>Documentation</b></td>
+  </tr>
+  <% @apps.each do |app| %>
+    <tr>
+      <td><%= button_to "X", { :action => 'delete', :id => app.id }, :confirm => "Are you sure you want to delete #{app.name} v#{app.version}?", :method => :delete %></td>
+      <td><%= link_to app.name, :action => 'show', :id => app.id %></td>
+      <td><%= link_to "Run", :action => 'display', :id => app.id %></td>
+      <td><%= app.version %></td>
+      <td><%= textilizable "[[#{app.name}|Documentation]]" %></td>
+    </tr>
+  <% end %>
+  </table>
+</div>
+
+<div class="box" style="width:800px; text-align:left;">
+  <h3>Options</h3>
+  <p>
+    <%= link_to "Add new application", :action => 'new' %>
+  </p>
+</div>
+
+<% else %>
+
+<div class="box" style="width:800px; text-align:left;">
+  <h3>Available Apps to Run</h3>
+  <table class="list">
+  <tr>
+    <td><b>Name</b></td>
+    <td><b>Version</b></td>
+    <td><b>Docs</b></td>
+  </tr>
+  <% @apps.each do |app| %>
+    <tr>
+      <td><%= link_to app.name, :action => 'display', :id => app.id %></td>
+      <td><%= app.version %></td>
+      <td><%= textilizable "[[#{app.name}|Documentation]]" %></td>
+    </tr>
+  <% end %>
+  </table>
+</div>
 <% end %>

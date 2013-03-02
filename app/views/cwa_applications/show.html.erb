@@ -1,0 +1,38 @@
+<h2>App Manager</h2>
+<center>
+<%= form_for @app do |a| %>
+ <div class="box" style="width:800px; text-align:left;">
+  <h3>Basic Information</h3>
+  <table>
+  <tr>
+   <td><%= a.label :name %></td>
+   <td><%= a.text_field :name, :size => 25 %></td>
+  </tr>
+  <tr>
+    <td><%= a.label :version %></td>
+    <td><%= a.text_field :version, :size => 25 %></td>
+  </tr>
+  </table>
+  </p>
+ </div>
+ <div class="box" style="width:800px; text-align:left;">
+  <h3>Job Execution Code</h3>
+  <p>
+    <center>
+    <%= a.text_area :exec, :rows => 20, :cols => 80  %>
+    </center>
+  </p>
+ </div>
+  <div class="box"style="width:800px; text-align:left;">
+  <h3>End-user Submit Form</h3>
+  <p>
+    <center>
+    <%= a.text_area :haml_form, :rows => 20, :cols => 80%>
+    </center>
+  </p>
+  <p>
+    <%= a.submit %>
+  </p>
+  </div>
+<% end %>
+</center>
