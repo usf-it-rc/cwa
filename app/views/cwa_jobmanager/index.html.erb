@@ -11,8 +11,11 @@
       <td><b>Owner</b></td>
       <td><b>Slots</b></td>
       <td><b>Status</b></td>
+      <td><b>Output Link</b></td>
     </tr>
   <% @jobs.each do |job| %>
+    <% jobs_hist = CwaJobHistory.find_by_jobid(job.jobid) %>
+    <% workdir = jobs_hist.workdir if jobs_hist != nil %>
     <tr>
       <td><%= button_to "X", { :action => 'delete', :jobid => job.jobid }, :confirm => "Are you sure you want to delete job #{job.jobid}?" %></td>
       <td><%= job.jobid %></td>
@@ -20,6 +23,13 @@
       <td><%= job.job_owner %></td>
       <td><%= job.slots %></td>
       <td><%= job.state %></td>
+      <td>
+        <% if workdir != nil %>
+          <a href="<%= workdir %>">Link</a>
+        <% else %>
+          n/a
+        <% end %>
+      </td>
     </tr>
   <% end %>
   </table>
@@ -30,21 +40,26 @@
 
 <div class="box" style="width:800px; text-align:left;">
 <h3>Job History</h3>
+<% hist_jobs = CwaJobHistory.find_all_by_owner(User.current.login).last(25).reverse %>
+<% if hist_jobs.count > 0 %>
 <table class="list">
   <tr>
     <td><b>Job Name</b></td>
     <td><b>JobID</b></td>
-    <td><b>Output URL</b></td>
+    <td><b>Output Link</b></td>
   </tr>
-<% CwaJobHistory.find_all_by_owner(User.current.login).last(25).reverse.each do |h| %>
+<% hist_jobs.each do |h| %>
   <% if @jobs.where_id_is(h.jobid) == nil %>
     <tr>
       <td><%= h.job_name %></td>
       <td><%= h.jobid %></td>
-      <td><a target="_blank" href="<%= h.workdir %>">Output</a></td>
+      <td><a href="<%= h.workdir %>">Link</a></td>
     </tr>
   <% end %>
 <% end %>
 </table>
+<% else %>
+<p>You have no jobs in your history</p>
+<% end %>
 </div>
 </center>

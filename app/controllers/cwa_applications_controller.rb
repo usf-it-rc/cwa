@@ -67,9 +67,8 @@ class CwaApplicationsController < ApplicationController
 
     (1..168).to_a.each { |t| @times << t.to_s + ":00:00" }
 
-
+    # Render haml from the database, include nice header
     haml =  "%h2 Run #{@app.name} v#{@app.version}\n" + @app.haml_form
-    Rails.logger.debug "CwaApplicationController.display() => " + haml
     render :inline => haml, :type => 'haml', :layout => true
   end
 

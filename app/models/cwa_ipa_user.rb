@@ -56,7 +56,8 @@ class CwaIpaUser
 
   # 
   def valid_passwd?
-    Redmine::Cwa.simple_cas_validator(User.current.login, self.passwd, Redmine::OmniAuthCAS.cas_server)
+    self.passwd =~ /[0-9A-Za-z\!@#\$%\^&\(\)-_=\+|\[\]\{\};:\/\?\.\>\<]{8,}$/ &&
+      Redmine::Cwa.simple_cas_validator(User.current.login, self.passwd, Redmine::OmniAuthCAS.cas_server)
   end
 
   # Update parameters in IPA

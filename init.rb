@@ -4,6 +4,12 @@ require 'cwa'
 require 'redmine_omniauth_cas'
 require 'ipagroup'
 
+Redmine::MenuManager.map :project_menu do |menu|
+  menu.delete :wiki if menu.exists? :wiki
+  menu.delete :activity if menu.exists? :activity
+  menu.delete :calendar if menu.exists? :calendar
+end
+
 Redmine::Plugin.register :cwa do
   name 'Cluster Web Access plugin'
   author 'Brian Smith'
@@ -21,22 +27,19 @@ Redmine::Plugin.register :cwa do
   permission :cwa_applications, { :cwa_applications => [:index] }, :public => true
 
   menu :project_menu, :cwa_accountsignup, { :controller => 'cwa_accountsignup', :action => 'index' }, 
-       :caption => 'System Access', :after => :activity
+       :caption => 'My Access', :after => :activity
   menu :project_menu, :cwa_allocations, { :controller => 'cwa_allocations', :action => 'index' }, 
        :caption => 'Allocations', :after => :cwa_accountsignup
   menu :project_menu, :cwa_groupmanager, { :controller => 'cwa_groupmanager', :action => 'index' }, 
-       :caption => 'My Groups', :after => :cwa_accountsignup
+       :caption => 'Groups', :after => :cwa_allocations
   menu :project_menu, :app_manager, { :controller => 'cwa_applications', :action => 'index' }, 
-       :caption => 'App Manager', :after => :cwa_groupmanager
+       :caption => 'Web Apps', :after => :cwa_groupmanager
   menu :project_menu, :cwa_jobmanager, { :controller => 'cwa_jobmanager', :action => 'index' }, 
-       :caption => 'Job Manager', :after => :app_manager
+       :caption => 'My Jobs', :after => :app_manager
+  menu :project_menu, :wiki, { :controller => 'wiki', :action => 'show', :id => nil }, :param => :project_id,
+       :caption => 'Documentation', :after => :cwa_jobmanager, :if => Proc.new { |p| p.wiki && !p.wiki.new_record? }
 #  menu :project_menu, :cwa_tutorials, { :controller => 'cwa_tutorials', :action => 'index' }, 
 #       :caption => 'Tutorials', :after => :cwa_jobmanager
-end
-
-Redmine::MenuManager.map :project_menu do |menu|
-  menu.delete :activity if menu.exists? :activity
-  menu.delete :calendar if menu.exists? :calendar
 end
 
 Redmine::MenuManager.map :top_menu do |menu|

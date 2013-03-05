@@ -40,6 +40,7 @@ class CwaAccountsignupController < ApplicationController
     end
 
     if @user.update :loginshell => login_shell
+      CwaMailer.shell_change(@user).deliver
       flash[:notice] = "Options saved!"
     else
       flash[:error] = "There was a problem saving your options!"
@@ -93,6 +94,8 @@ class CwaAccountsignupController < ApplicationController
       # Add them to the project... allows notifications
       @project.members << Member.new(:user => User.current, :roles => [Role.find_by_name("Watcher")])
 
+      CwaMailer.activation(@user).deliver
+
       flash[:notice] = 'You are now successfully registered!'
     end
     redirect_to :action => :index
@@ -122,6 +125,7 @@ class CwaAccountsignupController < ApplicationController
       end
       @project.members = members
       logger.debug "Account #{User.current.login.downcase} de-provisioned in FreeIPA"
+      CwaMailer.deactivation(@user).deliver
       flash[:notice] = 'Your account has been deactivated!'
     else
       logger.debug "Account #{User.current.login.downcase} failed to be de-provisioned in FreeIPA!"

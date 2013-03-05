@@ -27,9 +27,14 @@ class CwaGroups
     group_list
   end
 
+  def by_name(name)
+    get_all_groups.each do |g| 
+      return g if g[:cn].first.to_i == name
+    end
+  end
+
   def by_id(id)
     get_all_groups.each do |g| 
-      Rails.logger.debug "by_id() => " + g[:gidnumber].first.to_s + " = " + id.to_s
       return g if g[:gidnumber].first.to_i == id.to_i
     end
   end
@@ -46,26 +51,24 @@ class CwaGroups
 
   def delete_me_from_group(group)
     res = Redmine::IPAGroup.remove_user User.current.login, group
-    refresh_all_groups
+    refresh_groups
     res
   end
 
   def add_to_my_group(user, group)
     res = Redmine::IPAGroup.add_user user, group
-    refresh_all_groups
+    refresh_groups
     res
   end
  
   def create(group_info)
     res = Redmine::IPAGroup.create_new_group(group_info)
-    refresh_all_groups
     refresh_groups
     res
   end
 
   def delete(name)
     res = Redmine::IPAGroup.delete_group(name)
-    refresh_all_groups
     refresh_groups
     res
   end
@@ -82,15 +85,15 @@ class CwaGroups
 
   private
   def refresh_groups
-    if @@groups != nil
-      @@groups[User.current.login][:timestamp] -= 60.seconds
-    end
-  end
-
-  def refresh_all_groups
     if @@allGroups != nil
       @@allGroups[:timestamp] -= 60.seconds
     end
+
+    if @@groups != nil && @@groups[User.current.login] != nil
+      @@groups[User.current.login][:timestamp] -= 60.seconds
+    end
+    get_groups
+    get_all_groups
   end
 
   def get_all_groups

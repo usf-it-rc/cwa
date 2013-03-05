@@ -73,6 +73,7 @@ class CwaGroupmanagerController < ApplicationController
     @groups = CwaGroups.new
 
     if @groups.add_to_my_group(params[:user_name], params[:group_name])
+      CwaMailer.group_add_member(params[:user_name], params[:group_name]).deliver
       flash[:notice] = "\"#{params[:user_name]}\" has been added to \"#{params[:group_name]}\""
     else
       flash[:error] = "There was a problem adding \"#{params[:user_name]}\" to \"#{params[:group_name]}\".  The user probably does not exist."
@@ -86,6 +87,7 @@ class CwaGroupmanagerController < ApplicationController
 
     if params[:user_name]
       if @groups.delete_from_my_group(params[:user_name], params[:group_name])
+        CwaMailer.group_remove_member(User.find_by_login(params[:user_name]), params[:group_name]).deliver
         flash[:notice] = "\"#{params[:user_name]}\" has been removed from \"#{params[:group_name]}\""
       else
         flash[:error] = "There was a problem removing \"#{params[:user_name]}\" from \"#{params[:group_name]}\""
@@ -132,6 +134,7 @@ class CwaGroupmanagerController < ApplicationController
 
     if groups.add_to_my_group(user_name, group_name)
       request.delete
+      CwaMailer.group_add_member(user_name, group_name).deliver
       flash[:notice] = "User #{user_name} added to group #{group_name}!"
     else
       flash[:error] = "Problem adding #{user_name} to group #{group_name}!"
@@ -141,6 +144,7 @@ class CwaGroupmanagerController < ApplicationController
       
   # store request to join group
   def save_request
+    @groups = CwaGroups.new
     if CwaGroupRequests.find(:first, :conditions => ["group_id = ? and user_id = ?", params[:gidnumber], User.current.id])
       flash[:error] = "You've already requested to join this group!"
     else
@@ -148,8 +152,12 @@ class CwaGroupmanagerController < ApplicationController
         r.group_id = params[:gidnumber]
         r.user_id  = User.current.id
       end
- 
+
+      group_name = @groups.by_id(params[:gidnumber])[:cn]
+      group_owner = User.find_by_login(@groups.by_id(params[:gidnumber])[:owner])
+
       if req
+        CwaMailer.group_member_request(group_owner, group_name).deliver
         flash[:notice] = "Your request to join #{params[:group_name]} has been registered!"
       else
         flash[:error] = "There was a problem registering your request to join  #{params[:group_name]}!"

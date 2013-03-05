@@ -56,8 +56,23 @@ class CwaJobmanagerController < ApplicationController
     end
 
     @job.script = script
-
     @job.job_owner  = User.current.login
+
+    if params.has_key?('work_dir')
+      case params['work_dir']
+      when "home"
+        script.gsub!(/%%WORK_DIR_PATH%%/, "$HOME/.cwa/#{@app.name}/#{@job.job_name}")
+        output_uri = "\\\\" + Redmine::Cwa.output_server + "\\" + @job.job_owner + "\\.cwa\\" + @app.name + "\\" + @job.job_name
+        output_uri += ";sftp://#{Redmine::Cwa.output_server}/home/#{@job.job_owner[0,1]}/#{@job.job_owner}/.cwa/#{@app.name}/#{@job.job_name}"
+      when "work"
+        script.gsub!(/%%WORK_DIR_PATH%%/, "$WORK/cwa/#{@app.name}/#{@job.job_name}")
+        output_uri = "sftp://#{Redmine::Cwa.output_server}/work/#{@job.job_owner[0,1]}/#{@job.job_owner}/cwa/#{@app.name}/#{@job.job_name}"
+      end
+    else
+      script.gsub!(/%%WORK_DIR_PATH%%/, "$WORK/cwa/#{@app.name}/#{@job.job_name}")
+      output_uri = "sftp://#{Redmine::Cwa.output_server}/work/#{@job.job_owner[0,1]}/#{@job.job_owner}/cwa/#{@app.name}/#{@job.job_name}"
+    end
+        
 
     Rails.logger.debug "CwaJobmanager.submit() => " + @job.script
 
@@ -67,7 +82,7 @@ class CwaJobmanagerController < ApplicationController
       flash[:error] = "Problem submitting job"
     end
 
-    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => "file://" + Redmine::Cwa.output_server + "/" + User.current.login + "/cwa/" + @app.name + "/" + @job.job_name + "/" + @job.jobid
+    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => output_uri + "/#{@job.jobid}"
       
     redirect_to :action => 'index'
   end

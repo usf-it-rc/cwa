@@ -52,6 +52,9 @@ class CwaAllocationsController < ApplicationController
 
   def delete
     allocation = CwaAllocation.find_by_id(params[:allocation_id])
+
+    CwaMailer.allocation_rejection(User.find_by_id(allocation.user_id), allocation).deliver if allocation.user_id != User.current.id
+
     if allocation.destroy
       flash[:notice] = "Allocation request deleted!"
       redirect_to :action => :index
@@ -67,12 +70,17 @@ class CwaAllocationsController < ApplicationController
       redirect_to :action => :index
     end
 
+    allocation = CwaAllocation.find_by_id(params[:allocation_id])
+
     if params['cwa_allocation'] != nil
-      params['cwa_allocation']['time_approved'] = Time.now if params['cwa_allocation']['approved'] == true
+      if params['cwa_allocation']['approved'] == true
+        params['cwa_allocation']['time_approved'] = Time.now
+        CwaMailer.allocation_approval(User.find_by_id(allocation.user_id), allocation).deliver
+      end
     end
     
     logger.debug "CwaAllocationController::update => " + params['cwa_allocation'].to_s
-    allocation = CwaAllocation.find_by_id(params[:allocation_id]).update_attributes(params['cwa_allocation'])
+    allocation = allocation.update_attributes(params['cwa_allocation'])
     
     if allocation
       flash[:notice] = "Allocations updated!"
@@ -92,6 +100,7 @@ class CwaAllocationsController < ApplicationController
     end
 
     if allocation.save
+      CwaMailer.allocation_submit_confirmation(User.current, allocation).deliver
       flash[:notice] = "Allocation request saved!"
       redirect_to :action => :index
     else
