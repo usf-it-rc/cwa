@@ -15,7 +15,6 @@ class CwaIpaUser
 
   def method_missing(name, *args, &blk)
     # If its an option in the settings hash, return it
-    Rails.logger.debug "mm() called with " + name.to_s
     if args.empty? && blk.nil?
       make_user_fields
       if @@fields != nil && @@fields[User.current.login].has_key?(name)
@@ -56,7 +55,7 @@ class CwaIpaUser
 
   # 
   def valid_passwd?
-    self.passwd =~ /[0-9A-Za-z\!@#\$%\^&\(\)-_=\+|\[\]\{\};:\/\?\.\>\<]{8,}$/ &&
+    self.passwd =~ ::CwaConstants::PASSWD_REGEX &&
       Redmine::Cwa.simple_cas_validator(User.current.login, self.passwd, Redmine::OmniAuthCAS.cas_server)
   end
 
@@ -197,7 +196,8 @@ class CwaIpaUser
           'messageData' => {
             'host' => 'rc.usf.edu',
             'username' => User.current.login,
-            'accountStatus' => action == "user_add" ? 'active' : 'disabled'
+            'accountStatus' => action == "user_add" ? 'active' : 'disabled',
+            'accountType' => 'Unix'
           }
         }
       })

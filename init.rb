@@ -3,6 +3,7 @@ require 'simple_cas_validator'
 require 'cwa'
 require 'redmine_omniauth_cas'
 require 'ipagroup'
+require 'cwa_constants'
 
 Redmine::MenuManager.map :project_menu do |menu|
   menu.delete :wiki if menu.exists? :wiki

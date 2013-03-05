@@ -31,24 +31,22 @@ class CwaJobmanagerController < ApplicationController
 
     Rails.logger.debug "CwaJobmanager.submit() => " + params.to_s
 
-    @job.job_name = params[:job_name] if params.has_key?(:job_name)
+    if params.has_key?(:job_name)
+      if params[:job_name] !~ ::CwaConstants::JOBNAME_REGEX
+        flash[:error] = "Invalid job name specified!"
+        redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id]
+        return
+      end
+      @job.job_name = params[:job_name]
+    end
 
-    # Place each input file in-line in submit script
-    n = 0
-    fupload = ""
-    params.keys.grep(/^.*_file_upload$/).each do |k|
-      uploaded_file = params[k]
-      file_content = Base64.encode64(uploaded_file.tempfile.read)
-      fupload += "base64 -d > " + uploaded_file.original_filename + " << EOFinfile#{n}\n"
-      fupload += file_content
-      fupload += "EOFinfile#{n}\n"
-      params.delete(k)
-      n += 1
+    if params[:job_dir] !~ ::CwaConstants::JOBPATH_REGEX
+      flash[:error] = "Invalid job directory specified! Make sure you're using forward-slash \"/\"!"
+      redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id]
+      return
     end
 
     script = @app.exec.gsub(/\r\n/, "\n")
-
-    script.gsub!(/%%FILES%%/, fupload)
 
     # Substitute out all %%KEY%% items in the job script, then assign
     params.keys.each do |k|
@@ -58,22 +56,6 @@ class CwaJobmanagerController < ApplicationController
     @job.script = script
     @job.job_owner  = User.current.login
 
-    if params.has_key?('work_dir')
-      case params['work_dir']
-      when "home"
-        script.gsub!(/%%WORK_DIR_PATH%%/, "$HOME/.cwa/#{@app.name}/#{@job.job_name}")
-        output_uri = "\\\\" + Redmine::Cwa.output_server + "\\" + @job.job_owner + "\\.cwa\\" + @app.name + "\\" + @job.job_name
-        output_uri += ";sftp://#{Redmine::Cwa.output_server}/home/#{@job.job_owner[0,1]}/#{@job.job_owner}/.cwa/#{@app.name}/#{@job.job_name}"
-      when "work"
-        script.gsub!(/%%WORK_DIR_PATH%%/, "$WORK/cwa/#{@app.name}/#{@job.job_name}")
-        output_uri = "sftp://#{Redmine::Cwa.output_server}/work/#{@job.job_owner[0,1]}/#{@job.job_owner}/cwa/#{@app.name}/#{@job.job_name}"
-      end
-    else
-      script.gsub!(/%%WORK_DIR_PATH%%/, "$WORK/cwa/#{@app.name}/#{@job.job_name}")
-      output_uri = "sftp://#{Redmine::Cwa.output_server}/work/#{@job.job_owner[0,1]}/#{@job.job_owner}/cwa/#{@app.name}/#{@job.job_name}"
-    end
-        
-
     Rails.logger.debug "CwaJobmanager.submit() => " + @job.script
 
     if @job.submit
@@ -82,7 +64,7 @@ class CwaJobmanagerController < ApplicationController
       flash[:error] = "Problem submitting job"
     end
 
-    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => output_uri + "/#{@job.jobid}"
+    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['job_dir']
       
     redirect_to :action => 'index'
   end

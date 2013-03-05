@@ -43,8 +43,16 @@ class CwaGroupmanagerController < ApplicationController
   def create_group
     @project = Project.find(Redmine::Cwa.project_id)
     @groups = CwaGroups.new
+
     Rails.logger.debug "create_group() => " + @groups.that_i_manage.length.to_s
-    if @groups.that_i_manage.length < 5
+
+    if params[:group_name] !~ ::CwaConstants::GROUP_REGEX
+      flash[:error] = "The group name you entered is invalid!"
+      render :action => :create
+      return
+    end
+
+    if @groups.that_i_manage.length < ::CwaConstants::GROUP_MAX
       if @groups.create({ :owner => User.current.login, :group_name => params[:group_name], :desc => params[:desc] })
         flash[:notice] = "Your group \"#{params[:group_name]}\" has been created!"
       else
@@ -53,7 +61,7 @@ class CwaGroupmanagerController < ApplicationController
         return
       end
     else
-      flash[:error] = "You've reached the maximum 10 group limitation.  You can't have any more!"
+      flash[:error] = "You've reached the maximum #{::CwaConstants::GROUP_MAX} group limitation.  You can't have any more!"
     end
     redirect_to :action => :index
   end
@@ -71,6 +79,14 @@ class CwaGroupmanagerController < ApplicationController
   # Add a user to a group
   def add
     @groups = CwaGroups.new
+
+    user_name_regex = /^[a-zA-Z0-9-]{3,20}$/
+
+    if params[:user_name] !~ ::CwaConstants::USER_REGEX
+      flash[:error] = "You entered an invalid username!"
+      redirect_to :action => :show, :group_name => params[:group_name]
+      return
+    end
 
     if @groups.add_to_my_group(params[:user_name], params[:group_name])
       CwaMailer.group_add_member(params[:user_name], params[:group_name]).deliver

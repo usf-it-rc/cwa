@@ -37,3 +37,4 @@ match '/cwa_applications/display/:id', :to => 'cwa_applications#display'
 resources 'cwa_applications', :only => [:create, :delete, :show, :update]
 match '/cwa_jobmanager/submit', :to => 'cwa_jobmanager#submit', :via => :post
 match 'cwa_jobmanager/delete', :to => 'cwa_jobmanager#delete', :via => :post
+resources :jqueryfiletree
