@@ -58,10 +58,12 @@ class CwaJobmanagerController < ApplicationController
 
     Rails.logger.debug "CwaJobmanager.submit() => " + @job.script
 
-    if @job.submit
-      flash[:notice] = "Submitted job"
+    begin
+      @job.submit
+    rescue Exception => e
+      flash[:error] = e.message
     else
-      flash[:error] = "Problem submitting job"
+      flash[:notice] = "Submitted job"
     end
 
     CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['job_dir']

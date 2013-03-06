@@ -178,6 +178,14 @@ class CwaIpaUser
       raise e.message
     end
 
+    # Force password expiry update
+    pwexp = `/var/lib/redmine/plugins/cwa/support/pwexpupdate.sh #{user}`
+    if $?.success?
+      Rails.logger.info "User password expiry updated. " + pwexp
+    else
+      Rails.logger.info "Failed to update user password expiry! " + pwexp
+    end
+
     # TODO: parse out the details and return appropriate messages 
     if r['error'] != nil
       raise r['error']['message']
