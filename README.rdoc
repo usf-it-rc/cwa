@@ -1,11 +1,75 @@
-= cwa_as Cluster Web Access Account Signup
+= cwa Cluster Web Access
 
-This plugin will provide a means for new users, after Single-Sign-On auth, to
+This Redmine plugin turns Redmine into a portal for High-Performance computing 
+account, group, job, and application managment.  Users can
 
-1. Agree to terms-of-service (configurable via wiki)
+1.  Register for accounts, provisioned in a FreeIPA environment
+2.  Create, manage, join and leave groups, also provisioned in FreeIPA, to facilitate data sharing within an HPC environemtn
+3.  View documentation
+4.  Participate in forums
+5.  File trouble tickets
+6.  News items are bulk mailed to all account holders, similar to mailing list messages
+7.  Submit jobs to a GridEngine batch environment from a web interface
+8.  Request and manage time allocations on the HPC system
+9.  view a dashboard of their utilization of various metrics (cpu time, number of jobs, disk utilization, etc.)
 
-2. Agree to system access agreement (configurable via wiki)
+Administrators can
 
-3. Grab Single-Sign-On password to generate JSON-RPC request to create a new IPA user
+1.  Integrate various applications to provide point-and-click interfaces for common applications used in HPC
+2.  Manage users and groups
+3.  Provide documentation, support
+4.  Manage trouble tickets
+5.  Manage and approve time allocations
 
-4. Provide for account "deletion" with terms-of-discontinuation-of-service (wiki)
+The plugin is fairly configurable, providing for the selection of
+
+1.  A FreeIPA server
+2.  A messaging service for managing password syncronization between the HPC center users and a central identity management authority
+3.  File repository server
+4.  Various account/usage agreement verbiage (via redmine wiki markup)
+
+The plugin is broken into several sections
+
+* Models
+ * cwa_ipa_user => describes the user in the context of FreeIPA
+ * cwa_job_history => Provides job history for web-submitted jobs
+ * cwa_groups => describes groups in the context of FreeIPA
+ * cwa_group_request => Provides for a social-networking type experience for user-driven group management
+ * cwa_allocation => describes allocation requests
+ * cwa_application => describes applications for the purpose of integrating with the job manager
+ * cwa_dashboard => describes the datapoints for a user's utilization
+
+* Controllers
+ * cwa_accountsignup => actions for provisioning/de-provisioning user accounts
+ * cwa_allocations => actions for creating/managing allocation requests
+ * cwa_applications => actions for managing application integrations
+ * cwa_groupmanager => actions for managing groups
+ * cwa_jobmanager => actions for submitting/deleting/managing jobs with SGE
+
+= Installation
+
+Installation is fairly non-trivial and we plan to remedy this.  It assumes
+
+1.  A fresh FreeIPA 2.x-3.x implementation
+2.  A fresh Remdine installation
+3.  Installation of cwa_rest and rsge gems (available in the usf-it-rc organization github space)
+4.  Ruby 1.9.3 (or greater)
+5.  Rails
+6.  A working GridEngine installation
+7.  A REST-based messaging service to facilitate account syncronization with a central identity provider (will provide more details on this)
+
+This is (basically) how we get an environment running:
+
+1.  Provision server #1 with RHEL/CentOS/Scientific 6.3-6.4 w/ FreeIPA installed and run ipa-server-install, create realm, etc.
+2.  Create a service account that allows for user and group managment
+3.  Provision server #2 with RHEL/CentOS/Scientific 6.3-6.4 w/ RVM installation and GridEngine utilities
+4.  Provision server #3 as a GridEngine master host and allow server #2 to be a submit host
+5.  Install redmine on server #2
+6.  Install rsge and cwa_rest on server #2
+7.  Install cwa plugin into redmine instance on server #2
+8.  We use CAS authentication, so we'll be installing our modified redmine_omniauth_cas plugin (available from usf-it-rc github space)
+9.  Set various configuration settings for the plugin, to point to your IPA installation and service account
+10. Point to your identity provider's messaging system
+11. ...
+
+Yeah, its a lot.  We plan on providing pre-packaged virtual machine instances that are pre-baked and ready to run, on our project website: https://redmine.rc.usf.edu/projects/2012-jobman
