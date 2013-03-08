@@ -4,7 +4,7 @@ require 'cwa'
 require 'redmine_omniauth_cas'
 require 'ipagroup'
 require 'cwa_constants'
-
+require 'googlecharts'
 Redmine::MenuManager.map :project_menu do |menu|
   menu.delete :wiki if menu.exists? :wiki
   menu.delete :activity if menu.exists? :activity
@@ -26,6 +26,7 @@ Redmine::Plugin.register :cwa do
   permission :cwa_tutorials, { :cwa_tutorials => [:index] }, :public => true
   permission :cwa_allocations, { :cwa_allocations => [:index] }, :public => true
   permission :cwa_applications, { :cwa_applications => [:index] }, :public => true
+    permission :cwa_dashboard, { :cwa_dashboard => [:index] }, :public => true
 
   menu :project_menu, :cwa_accountsignup, { :controller => 'cwa_accountsignup', :action => 'index' }, 
        :caption => 'My Access', :after => :activity
@@ -41,6 +42,8 @@ Redmine::Plugin.register :cwa do
        :caption => 'Documentation', :after => :cwa_jobmanager, :if => Proc.new { |p| p.wiki && !p.wiki.new_record? }
 #  menu :project_menu, :cwa_tutorials, { :controller => 'cwa_tutorials', :action => 'index' }, 
 #       :caption => 'Tutorials', :after => :cwa_jobmanager
+  menu :project_menu, :cwa_dashboard, { :controller => 'cwa_dashboard', :action => 'index' }, 
+       :caption => 'Dashboard', :after => :app_manager
 end
 
 Redmine::MenuManager.map :top_menu do |menu|
