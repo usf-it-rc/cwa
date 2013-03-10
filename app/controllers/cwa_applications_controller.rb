@@ -69,33 +69,7 @@ class CwaApplicationsController < ApplicationController
 
     # Render haml from the database, include nice header
     haml = <<EOF
-%script{:type => "text/javascript", :src => "/plugin_assets/cwa/javascripts/jquery.js"}
-%script{:type => "text/javascript", :src => "/plugin_assets/cwa/javascripts/jquery.easing.js"}
-%script{:type => "text/javascript", :src => "/plugin_assets/cwa/javascripts/jqueryFileTree.js"}
-= stylesheet_link_tag '/plugin_assets/cwa/stylesheets/jqueryFileTree.css'
-:plain
-  <style type="text/css">
-    .fileTree{
-      background-color:#FFFFFF;
-      border-color:#BBBBBB #FFFFFF #FFFFFF #BBBBBB;
-      border-style:solid;
-      border-width:1px;
-      height:400px;
-      padding:5px;
-      width:800px;
-      position:absolute;
-      top: 128px;
-      visibility: hidden;
-    }
-  </style>
-:javascript
-  $('#fileTree').fileTree({ root: '/tmp', script: 'jqueryfiletree/content' }, function(file) {
-    alert(file);
-  });
-  function showFileTree(){
-    document.getElementById('ft').style.visibility='visible'; 
-  }
-%div{:id => 'ft', :class => 'fileTree'}
+= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css"
 %h2 Run #{@app.name} v#{@app.version}
 #{@app.haml_form}
 EOF

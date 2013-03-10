@@ -1,0 +1,75 @@
+div.browserButtonContainer {
+  float:left;
+}
+div.browserButton {
+  color:#DFDFDF;
+  background:#444444;
+  background:#CCCCCC;
+  float:left;
+  position:relative;
+  padding: 3px;
+  text-align:center;
+  max-width:64px;
+  min-width:48px;
+  border:2px solid;
+  border-radius:8px;
+  -moz-border-radius:8px; /* Old Firefox */
+  z-index:2;
+  -webkit-user-select: none; /* Chrome/Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
+
+  /* Rules below not implemented in browsers yet */
+  -o-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+div.browserButtonSelected {
+  float:left;
+  position:relative;
+  background:#CCCCCC;
+  padding: 3px;
+  text-align:center;
+  max-width:64px;
+  min-width:48px;
+  border:2px solid;
+  border-radius:8px;
+  -moz-border-radius:8px; /* Old Firefox */
+  z-index:2;
+  -webkit-user-select: none; /* Chrome/Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
+
+  /* Rules below not implemented in browsers yet */
+  -o-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+div.browserSelector {
+  position:relative;
+  z-index:1;
+}
+table.options {
+  table-layout: fixed;
+  border: 0px solid black;
+}
+table.browserTab {
+  border-collapse: collapse;
+  table-layout: fixed;
+  border: none;
+  width:100%;
+}
+.descCol {
+  width: 33%;
+}
+.itemCol {
+  width: 67%;
+}
+.dirCol {
+  border: none;
+  width: 40%;
+}
+.fileCol {
+  border: none;
+  width: 60%;
+}

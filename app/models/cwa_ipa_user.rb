@@ -85,6 +85,10 @@ class CwaIpaUser
     return true
   end
 
+  def workdirectory
+    self.homedirectory.gsub(/\/home\//, "/work/")
+  end
+
   def create
     Rails.logger.debug "provision() => { " + User.current.login + ", " + self.passwd.to_s + ", user_add }"
     begin

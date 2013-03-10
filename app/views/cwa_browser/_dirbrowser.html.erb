@@ -1,0 +1,61 @@
+<%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
+
+<% if params[:job_dir] != nil %>
+  <% begin %>
+    <% browser = CwaBrowser.new params[:job_dir] %>
+  <% rescue Exception => e %>
+    <% flash[:error] = e.message %>
+    <% browser = CwaBrowser.new @user.homedirectory %>
+    <% params[:job_dir] = @user.homedirectory %>
+    <script type="text/javascript">
+      window.location="<%= request.path %>"
+    </script>
+  <% end %>
+  <%= hidden_field_tag :current_dir, params[:job_dir] %>
+<% else %>
+  <% browser = CwaBrowser.new @user.homedirectory %>
+  <%= hidden_field_tag :current_dir, @user.homedirectory %>
+<% end %>
+
+<div>
+
+<div id="goHome" class="<%= browser.current_dir.include?(@user.homedirectory) ? "browserButtonSelected" : "browserButton" %>">Home</div>
+<div id="goWork" class="<%= browser.current_dir.include?(@user.workdirectory) ? "browserButtonSelected" : "browserButton" %>">Work</div>
+<% if browser.current_dir != browser.home_dir && browser.current_dir != browser.work_dir %>
+  <div id="goUpOne" class="browserButtonSelected">Back</div>
+<% end %>
+<div class="browserSelector">
+<div style="width:100%; float:left; position:relative; text-align:center;"><b><%= browser.current_dir %></b></div>
+<table class="browserTab">
+<tr><td><b>Select Directory</b></td></tr>
+<tr><td>
+<%= select_tag :job_dir, options_for_select(browser.directories.map{|dir| [dir, browser.current_dir + "/" + dir]}), :size => 10, :style => "width:100%;" %>
+</td></tr>
+</table>
+</div>
+<p><b>Note:</b> Double-clicking a directory entry will change the current directory to the one selected, so you can view further sub-directories.  Use the back button when present to return to the previous level directory</p>
+</div>
+
+<script>
+document.getElementById('goHome').onclick = function(){
+  var queryString = $('#app_form').serialize();
+  window.location = "<%= request.path %>?" + queryString + "&job_dir=<%= CGI.escape(@user.homedirectory) %>";
+};
+
+document.getElementById('goWork').onclick = function(){
+  var queryString = $('#app_form').serialize();
+  window.location = "<%= request.path %>?" + queryString + "&job_dir=<%= CGI.escape(@user.workdirectory) %>";;
+};
+
+<% if browser.current_dir != browser.home_dir && browser.current_dir != browser.work_dir %>
+document.getElementById('goUpOne').onclick = function(){
+  var queryString = $('#app_form').serialize();
+  window.location = "<%= request.path %>?" + queryString + "&job_dir=<%= CGI.escape(browser.up_dir) %>";
+};
+<% end %>
+
+document.getElementById('job_dir').ondblclick = function(){
+  var queryString = $('#app_form').serialize();
+  window.location = "<%= request.path %>?" + queryString;
+};
+</script>

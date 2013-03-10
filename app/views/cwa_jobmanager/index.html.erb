@@ -8,7 +8,6 @@
       <td><b>Delete</b></td>
       <td><b>JobID</b></td>
       <td><b>Name</b></td>
-      <td><b>Owner</b></td>
       <td><b>Slots</b></td>
       <td><b>Status</b></td>
       <td><b>Job Directory</b></td>
@@ -20,9 +19,21 @@
       <td><%= button_to "X", { :action => 'delete', :jobid => job.jobid }, :confirm => "Are you sure you want to delete job #{job.jobid}?" %></td>
       <td><%= job.jobid %></td>
       <td><%= job.job_name %></td>
-      <td><%= job.job_owner %></td>
       <td><%= job.slots %></td>
-      <td><%= job.state %></td>
+      <td>
+        <% case job.state %>
+        <% when "qw" %>
+          <%= "Queued/Pending" %>
+        <% when "r" %>
+          <%= "Running" %>
+        <% when "dr" %>
+          <%= "Cleaning Up" %>
+        <% when "Eqw" %>
+          <%= "Error" %>
+        <% else %>
+          <%= job.state %>
+        <% end %>
+      </td>
       <td>
         <% if workdir != nil %>
           <a href="sftp://<%= Redmine::Cwa.output_server %><%= workdir %>"><%= workdir %></a>

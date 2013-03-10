@@ -40,6 +40,19 @@ class CwaJobmanagerController < ApplicationController
       @job.job_name = params[:job_name]
     end
 
+    if params[:job_file] != nil
+      if params[:job_file] !~ ::CwaConstants::JOBPATH_REGEX
+        flash[:error] = "Invalid job file specified! Make sure you're using forward-slash \"/\"!"
+        redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id]
+        return
+      end
+      params[:job_dir] = params[:job_file].gsub(/(.*)\/.*$/, '\1')
+    end
+
+    if params[:job_dir] == nil && params[:current_dir] != nil
+      params[:job_dir] = params[:current_dir]
+    end
+
     if params[:job_dir] !~ ::CwaConstants::JOBPATH_REGEX
       flash[:error] = "Invalid job directory specified! Make sure you're using forward-slash \"/\"!"
       redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id]
