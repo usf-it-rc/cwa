@@ -18,14 +18,15 @@
 <% end %>
 
 <div>
-
+<div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory: </b> <%= browser.current_dir %></div>
 <div id="goHome" class="<%= browser.current_dir.include?(@user.homedirectory) ? "browserButtonSelected" : "browserButton" %>">Home</div>
 <div id="goWork" class="<%= browser.current_dir.include?(@user.workdirectory) ? "browserButtonSelected" : "browserButton" %>">Work</div>
 <% if browser.current_dir != browser.home_dir && browser.current_dir != browser.work_dir %>
-  <div id="goUpOne" class="browserButtonSelected">Back</div>
+  <div id="goUpOne" class="browserButtonBack">&lt; Back</div>
+<% else %>
+  <div class="browserButtonBackInactive">&lt; Back</div>
 <% end %>
 <div class="browserSelector">
-<div style="width:100%; float:left; position:relative; text-align:center;"><b><%= browser.current_dir %></b></div>
 <table class="browserTab">
 <tr><td><b>Select Directory</b></td></tr>
 <tr><td>

@@ -2,18 +2,22 @@ div.browserButtonContainer {
   float:left;
 }
 div.browserButton {
-  color:#DFDFDF;
-  background:#444444;
-  background:#CCCCCC;
+  color:#444444;
+  background:#CDD3D6;
   float:left;
   position:relative;
   padding: 3px;
   text-align:center;
   max-width:64px;
-  min-width:48px;
-  border:2px solid;
-  border-radius:8px;
-  -moz-border-radius:8px; /* Old Firefox */
+  min-width:56px;
+  border:1px solid #DFDFDF;
+  border-bottom: 1px solid #CDD3D6;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  -moz-border-top-left-radius: 8px;
+  -moz-border-top-right-radius: 8px;
+  -webkit-border-top-left-radius: 8px;
+  -webkit-border-top-right-radius: 8px;
   z-index:2;
   -webkit-user-select: none; /* Chrome/Safari */        
   -moz-user-select: none; /* Firefox */
@@ -27,14 +31,67 @@ div.browserButton {
 div.browserButtonSelected {
   float:left;
   position:relative;
-  background:#CCCCCC;
+  background:#DEE4E7;
   padding: 3px;
-  text-align:center;
+  text-align: center;
+  max-width:64px;
+  min-width:56px;
+  border:1px solid #DFDFDF;
+  border-bottom: 1px solid #DEE4E7;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  -moz-border-top-left-radius: 8px;
+  -moz-border-top-right-radius: 8px;
+  -webkit-border-top-left-radius: 8px;
+  -webkit-border-top-right-radius: 8px;
+  z-index:2;
+  -webkit-user-select: none; /* Chrome/Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
+
+  /* Rules below not implemented in browsers yet */
+  -o-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+div.browserButtonBack {
+  float:right;
+  position:relative;
+  color: #FFFFFF;
+  background:#006747;
+  padding: 3px;
+  text-align: center;
+  text-decoration: bold;
   max-width:64px;
   min-width:48px;
-  border:2px solid;
-  border-radius:8px;
-  -moz-border-radius:8px; /* Old Firefox */
+  border:1px solid #DFDFDF;
+  border-radius: 14px;
+  -moz-border-radius: 14px;
+  -webkit-border-radius: 14px;
+  z-index:2;
+  -webkit-user-select: none; /* Chrome/Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
+
+  /* Rules below not implemented in browsers yet */
+  -o-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+div.browserButtonBackInactive {
+  float:right;
+  position:relative;
+  color: #AFAFAF;
+  background:#006747;
+  padding: 3px;
+  text-align: center;
+  text-decoration: bold;
+  max-width:64px;
+  min-width:48px;
+  border:1px solid #DFDFDF;
+  border-radius: 14px;
+  -moz-border-radius: 14px;
+  -webkit-border-radius: 14px;
   z-index:2;
   -webkit-user-select: none; /* Chrome/Safari */        
   -moz-user-select: none; /* Firefox */
@@ -54,9 +111,10 @@ table.options {
   border: 0px solid black;
 }
 table.browserTab {
+  background:#DEE4E7;
   border-collapse: collapse;
   table-layout: fixed;
-  border: none;
+  border: 1px solid;
   width:100%;
 }
 .descCol {
