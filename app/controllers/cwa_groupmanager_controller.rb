@@ -48,7 +48,7 @@ class CwaGroupmanagerController < ApplicationController
 
     if params[:group_name] !~ ::CwaConstants::GROUP_REGEX
       flash[:error] = "The group name you entered is invalid!"
-      render :action => :create
+      redirect_to :action => :create
       return
     end
 
@@ -57,7 +57,7 @@ class CwaGroupmanagerController < ApplicationController
         flash[:notice] = "Your group \"#{params[:group_name]}\" has been created!"
       else
         flash[:error] = "Could not create group \"#{params[:group_name]}\".  Name is already taken!"
-        render :action => :create
+        redirect_to :action => :create
         return
       end
     else

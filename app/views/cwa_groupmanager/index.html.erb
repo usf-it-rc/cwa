@@ -1,9 +1,7 @@
 <h2>Group Manager</h2>
 
-<center>
-
 <% if @groups.that_i_manage.length > 0 %>
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
 <h3>My Groups</h3>
   <p>
     This is a list of groups you manage.
@@ -24,7 +22,7 @@
 
 <% requests = CwaGroupRequests.find_all_by_group_id(my_gidnumbers) %>
 <% if !requests.empty? %>
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
 <h3>Requests to join your groups</h3>
   <p>
     These are current requests to join your groups
@@ -45,7 +43,7 @@
 
 <% requests = CwaGroupRequests.find_all_by_user_id(User.current.id) %>
 <% if !requests.empty? %>
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
 <h3>Your join requests</h3>
   <p>
     These are your pending requests to join groups
@@ -62,7 +60,7 @@
 </div>
 <% end %>
 
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
 <h3>Group Memberships</h3>
 <% if @groups.member_of.length > 0 %>
   <p>
@@ -96,7 +94,7 @@
 <% end %>
 </div>
 
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
 <h3>Options</h3>
 <p>
 <%= link_to "Browse Groups to Join", :action => :groups %>
@@ -105,4 +103,3 @@
 <%= link_to "Create a new Group", :action => :create %>
 </p>
 </div>
-</center>

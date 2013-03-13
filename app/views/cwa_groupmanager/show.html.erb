@@ -4,8 +4,7 @@
 <%= link_to "Group Manager", :action => :index %> > <%= link_to "All Groups", :action => :groups %> > <a href="/cwa_groupmanager/show?group_name=<%= params[:group_name] %>"><%= params[:group_name] %></a>
 </p>
 
-<center>
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
 <h3>Group Information</h3>
 <% g = @gs.from_all_by_name(params[:group_name]) %>
 <p><%= g[:cn] %> group information</p>
@@ -30,7 +29,7 @@
 </table>
 </div>
 
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
 <h3>Options</h3>
 <% in_group = false %>
 <% owner = false %>
@@ -70,4 +69,3 @@
   <%= button_to "Join Group", { :action => :save_request, :gidnumber => g[:gidnumber].first }, :confirm => "Are you sure you want to request to join \"#{g[:cn]}\"?" %>
  <% end %>
 </div>
-</center>
