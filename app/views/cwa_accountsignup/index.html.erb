@@ -1,9 +1,8 @@
 <h2>System Access</h2>
-<center>
-<div style="width:800px">
+<div>
 <%= form_tag :action => 'create' do %>
  <div>
-  <div class="box" width="100%" align="left">
+  <div class="box">
    <h3>University System Access Agreement</h3>
    <p align="left">
     <%= textilizable Redmine::Cwa.saa, :options => { } %>
@@ -11,7 +10,7 @@
    <%= check_box_tag :saa, 'yes', false, :class => 'accept_saa' %>
    <%= label_tag :saa, "Accept System Access Agreement" %>
   </div>
-  <div class="box" width="100%" align="left">
+  <div class="box">
    <h3>Research Computing Terms of Service</h3>
    <p align="left">
     <%= textilizable Redmine::Cwa.tos, :options => { } %>
@@ -20,7 +19,7 @@
    <%= label_tag :tos, "Accept Terms of Service" %>
   </div>
  </div>
- <div class="box" width="100%" align="left">
+ <div class="box">
   <center>
   <p align="left">
    <%= textilizable Redmine::Cwa.pwd_agreement, :options => { } %>
@@ -38,4 +37,3 @@
  </div>
 <% end %>
 </div>
-</center>

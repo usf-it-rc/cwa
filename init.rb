@@ -4,6 +4,7 @@ require 'cwa'
 require 'redmine_omniauth_cas'
 require 'ipagroup'
 require 'cwa_constants'
+require_dependency 'cwa/hooks'
 
 Redmine::MenuManager.map :project_menu do |menu|
   menu.delete :wiki if menu.exists? :wiki
@@ -18,7 +19,24 @@ Redmine::Plugin.register :cwa do
   version '0.0.1'
   url 'https://redmine.rc.usf.edu/projects/jobman'
   author_url 'http://blah'
-  settings :default => { 'empty' => true }, :partial => 'settings/cwa_settings'
+
+  settings :default => { 
+    'tos' => "", 
+    'saa' => "",  
+    'pwd_agreement' => "",
+    'delete_saa' => "",
+    'ipa_server' => "ipa.example.com",
+    'ipa_account' => "ipa-service-account",
+    'ipa_password' => "",
+    'msg_url' => "sync.example.com",
+    'msg_user' => "msg-service-account",
+    'msg_password' => "",
+    'project_id' => "default",
+    'output_server' => "sftp.example.com",
+    'production_cell_name' => "default",
+    'testing_cell_name' => "testing",
+  }, :partial => 'settings/cwa_settings'
+
   # TODO: Get permissions nailed down
   permission :cwa_accountsignup, { :cwa_accountsignup => [:index] }, :public => true
   permission :cwa_groupmanager, { :cwa_groupmanager => [:index] }, :public => true

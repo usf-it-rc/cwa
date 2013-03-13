@@ -3,7 +3,7 @@ div.browserButtonContainer {
 }
 div.browserButton {
   color:#444444;
-  background:#CDD3D6;
+  background:#BCC2C5;
   float:left;
   position:relative;
   padding: 3px;
@@ -65,9 +65,9 @@ div.browserButtonBack {
   max-width:64px;
   min-width:48px;
   border:1px solid #DFDFDF;
-  border-radius: 14px;
-  -moz-border-radius: 14px;
-  -webkit-border-radius: 14px;
+  border-radius: 8px;
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
   z-index:2;
   -webkit-user-select: none; /* Chrome/Safari */        
   -moz-user-select: none; /* Firefox */
@@ -89,9 +89,9 @@ div.browserButtonBackInactive {
   max-width:64px;
   min-width:48px;
   border:1px solid #DFDFDF;
-  border-radius: 14px;
-  -moz-border-radius: 14px;
-  -webkit-border-radius: 14px;
+  border-radius: 8px;
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
   z-index:2;
   -webkit-user-select: none; /* Chrome/Safari */        
   -moz-user-select: none; /* Firefox */

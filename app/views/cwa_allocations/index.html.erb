@@ -1,21 +1,6 @@
 <h2>Allocations</h2>
 
-<center>
-<div class="box" style="width:800px;text-align:left">
-<h3>What are allocations?</h3>
-<p>
-Allocations are grants of time provided on the system for running calculations.  
-Below are allocation requests you have made and their status.  If you are working 
-with a contributing research group or you are using CIRCE to fulfill coursework
-requirements, you needn't worry about allocations.
-</p>
-
-<p>
-You can read more about allocations here: <%= textilizable "[[Do I need an Allocation?]]" %>
-</p>
-</div>
-
-<div class="box" style="width:800px;text-align:left">
+<div class="box">
 <h3>My Allocation Requests</h3>
 <% if @allocations.length == 0 %>
   <h4>You have no allocation requests!</h4>
@@ -47,7 +32,7 @@ You can read more about allocations here: <%= textilizable "[[Do I need an Alloc
 <% end %>
 </div>
 
-<div class="box" style="width:800px;text-align:left">
+<div class="box">
 <h3>Options</h3>
 <p>
  <%= link_to "Request an Allocation", :action => "form" %>

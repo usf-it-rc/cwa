@@ -8,6 +8,7 @@ class CwaJobmanagerController < ApplicationController
     @jobs = RsgeJobs.new User.current.login
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
+    call_hook(:view_layouts_base_sidebar, :sidebar => "cwa_jobmanager/index_sidebar")
     respond_to do |format|
       format.html
     end
@@ -57,6 +58,12 @@ class CwaJobmanagerController < ApplicationController
       flash[:error] = "Invalid job directory specified! Make sure you're using forward-slash \"/\"!"
       redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id]
       return
+    end
+
+    if params[:testing]
+      ENV['SGE_CELL'] = Redmine::Cwa.testing_cell_name
+    else
+      ENV['SGE_CELL'] = Redmine::Cwa.production_cell_name
     end
 
     script = @app.exec.gsub(/\r\n/, "\n")

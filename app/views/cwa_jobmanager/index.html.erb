@@ -1,7 +1,6 @@
 <h2>Job Manager</h2>
-<center>
-<div class="box" style="width:800px; text-align:left;">
-<h3>My Jobs</h3>
+<div class="box">
+<h3>Current Jobs</h3>
 <% if @jobs.count > 0 %>
   <table class="list">
     <tr>
@@ -36,7 +35,7 @@
       </td>
       <td>
         <% if workdir != nil %>
-          <a href="sftp://<%= Redmine::Cwa.output_server %><%= workdir %>"><%= workdir %></a>
+          <a href="sftp://<%= User.current.login %>@<%= Redmine::Cwa.output_server %><%= workdir %>/"><%= workdir %>/</a>
         <% else %>
           n/a
         <% end %>
@@ -49,16 +48,10 @@
 <% end %>
 </div>
 
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
 <h3>Job History</h3>
 <% hist_jobs = CwaJobHistory.find_all_by_owner(User.current.login).last(25).reverse %>
 <% if hist_jobs.count > 0 %>
-<p>
-This is a list of the jobs you've run through the CWA interface.  Jobs submitted
-to the cluster outside of the CWA interface will not appear in your history.  The
-<b>Output Links</b> will work for Windows users who've installed <b>WinSCP</b> and
-will work for Mac users by default.
-</p>
 <table class="list">
   <tr>
     <td><b>Job Name</b></td>
@@ -70,7 +63,7 @@ will work for Mac users by default.
     <tr>
       <td><%= h.job_name %></td>
       <td><%= h.jobid %></td>
-      <td><a href="sftp://<%= Redmine::Cwa.output_server %><%= h.workdir %>"><%= h.workdir %></a></td>
+      <td><a href="sftp://<%= User.current.login %>@<%= Redmine::Cwa.output_server %><%= h.workdir %>/"><%= h.workdir %>/</a></td>
     </tr>
   <% end %>
 <% end %>
@@ -79,4 +72,3 @@ will work for Mac users by default.
 <p>You have no jobs in your history</p>
 <% end %>
 </div>
-</center>

@@ -60,4 +60,15 @@
   <%= text_field_tag 'settings[output_server]', @settings['output_server'] %>
   <br />
 </p>
+<p>
+  <label><%= l(:production_cell_name) %> :</label>
+  <%= text_field_tag 'settings[production_cell_name]', @settings['production_cell_name'] %>
+  <br />
+</p>
+<p>
+  <label><%= l(:testing_cell_name) %> :</label>
+  <%= text_field_tag 'settings[testing_cell_name]', @settings['testing_cell_name'] %>
+  <br />
+</p>
+
 </fieldset>

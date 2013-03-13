@@ -1,7 +1,6 @@
 <h2>App Manager</h2>
-<center>
 <% if User.current.admin? %>
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
   <h3>Configured Applications</h3>
   <table class="list">
   <tr>
@@ -23,7 +22,7 @@
   </table>
 </div>
 
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
   <h3>Options</h3>
   <p>
     <%= link_to "Add new application", :action => 'new' %>
@@ -32,7 +31,7 @@
 
 <% else %>
 
-<div class="box" style="width:800px; text-align:left;">
+<div class="box">
   <h3>Available Apps to Run</h3>
   <table class="list">
   <tr>

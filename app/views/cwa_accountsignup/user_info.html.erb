@@ -1,7 +1,6 @@
-<h2>System Access</h2>
-<center>
+<h2>My Access Information</h2>
 
-<div class="box" style="width:800px;text-align:left;">
+<div class="box">
   <h3>Account Status</h3>
   <h4>Your account is configured for access to the system!</h4>
   <p>
@@ -12,7 +11,7 @@
   </p>
 </div>
 
-<div class="box" style="width:800px;text-align:left;">
+<div class="box">
   <h3>Basic Information</h3>
   <table>
     <tr><td><b>Name:<b></td><td><%= @user.givenname %> <%= @user.sn %></td></tr>
@@ -25,7 +24,7 @@
   </table>
 </div>
 
-<div class="box" style="width:800px;text-align:left;" >
+<div class="box">
   <h3>Advanced Options</h3>
   <p><b>Please only change these options if you know what you are doing!</b></p>
   <%= form_tag :action => :set_shell do %>
@@ -44,7 +43,7 @@
 
 <% if @user.uid != "admin" %>
 
-<div class="box" style="width:800px;text-align:left;">
+<div class="box">
 <h3>Disable My System Access</h3>
   <%= form_tag :action => :delete do %>
   <div style="text-align: left">
@@ -56,5 +55,3 @@
   <% end %>
 </div>
 <% end %>
-
-</center>

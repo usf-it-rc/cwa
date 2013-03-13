@@ -1,22 +1,9 @@
 <h2>Allocations</h2>
 
-<center>
-<div class="box" style="width:800px; text-align:left;">
-
+<div class="box">
 <h3>Request Allocation</h3>
-<p>An allocation request allows you to formally request a block of CPU-time, 
-to be used at your discretion, on the CIRCE system.</p>
-
-<p>Provide a <b>Summary</b> as a brief title/sentence that identifies your proposal.</p>  
-
-<p>Then provide the <b>Proposal</b> itself, a paragraph or paragraphs describing why you need the
-system resources and how they will help with your work.</p>
-
-<p>Finally, provide the <b>Required CPU hours</b>.  If you're unsure, leave the default value, 50,000 
-hours as that will be a good starting point.</p>
 
 <%= form_for @allocation, :url => { :action => "submit" }  do |a|%>
- <center>
   <table>
    <tr>
     <td style="text-align:right"><b><%= a.label :summary, "Summary: " %></b></td>
@@ -34,6 +21,5 @@ hours as that will be a good starting point.</p>
   <p>
     <%= a.submit %>
   </p>
- </center>
 <% end %>
 </div>
