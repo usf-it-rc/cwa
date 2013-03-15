@@ -103,6 +103,7 @@ div.browserButtonBackInactive {
   cursor: default;
 }
 div.browserSelector {
+  float:left;
   position:relative;
   z-index:1;
 }

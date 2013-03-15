@@ -167,8 +167,6 @@ class CwaIpaUser
     param_list.merge!({ 'givenname' => User.current.firstname })
     param_list.merge!({ 'sn' => User.current.lastname })
 
-    Rails.logger.debug param_list.to_s
-
     # Add the account to IPA
     begin
       r = CwaRest.client({
@@ -216,6 +214,5 @@ class CwaIpaUser
     rescue Exception => e
       raise e.message
     end
-    Rails.logger.debug r.to_s
   end
 end

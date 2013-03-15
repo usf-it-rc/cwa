@@ -1,0 +1,18 @@
+<% @queues = RsgeQueue.new %>
+<h3>Current Queue Status</h3>
+  <table class="list">
+    <tr>
+      <td><b>Queue Name</b></td>
+      <td><b>Used Slots</b></td>
+      <td><b>Available Slots</b></td>
+      <td><b>Total Slots</b></td>
+    </tr>
+  <% @queues.each do |queue| %>
+    <tr>
+      <td><%= queue.name.to_s %></td>
+      <td><%= queue.used.to_s %></td>
+      <td><%= queue.avail.to_s %></td>
+      <td><%= queue.total.to_s %></td>
+    </tr>
+  <% end %>
+  </table>

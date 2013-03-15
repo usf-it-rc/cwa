@@ -1,4 +1,6 @@
 require 'rsgejobs.rb'
+require 'rsgequeue.rb'
+require 'rsgehost.rb'
 
 class CwaJobmanagerController < ApplicationController
   unloadable
@@ -8,10 +10,22 @@ class CwaJobmanagerController < ApplicationController
     @jobs = RsgeJobs.new User.current.login
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-    call_hook(:view_layouts_base_sidebar, :sidebar => "cwa_jobmanager/index_sidebar")
     respond_to do |format|
       format.html
     end
+  end
+
+  def current_jobs
+    @jobs = RsgeJobs.new User.current.login
+    render :partial => 'cwa_jobmanager/current_jobs'
+  end
+
+  def queue_status
+    render :partial => 'cwa_jobmanager/queue_status'
+  end
+
+  def job_history
+    render :partial => 'cwa_jobmanager/job_history'
   end
 
   def delete

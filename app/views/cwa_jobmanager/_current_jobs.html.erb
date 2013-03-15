@@ -1,0 +1,52 @@
+<% @jobs = RsgeJobs.new User.current.login %>
+<h3>Current Jobs</h3>
+<% if @jobs.count > 0 %>
+  <table class="list">
+    <tr>
+      <td><b>Delete</b></td>
+      <td><b>JobID</b></td>
+      <td><b>Name</b></td>
+      <td><b>Slots</b></td>
+      <td><b>Status</b></td>
+      <td><b>Job Directory</b></td>
+    </tr>
+  <% @jobs.each do |job| %>
+    <% jobs_hist = CwaJobHistory.find_by_jobid(job.jobid) %>
+    <% workdir = jobs_hist.workdir if jobs_hist != nil %>
+    <% if job.state == "r" %>
+      <% host = RsgeHost.new(job.queue_name.to_s.split("@")[1]) %>
+      <tr title="Node: <%= host.name %> -- CPU Total Cores: <%= host.load_value(:num_proc).to_s %> -- CPU Model: <%= host.complex_value(:cpu_type).to_s.capitalize %> <%= host.complex_value(:cpu_model) %> -- Memory: <%= host.load_value(:mem_total) %>">
+    <% else %>
+      <tr>
+    <% end %>
+      <td><%= button_to "X", { :action => 'delete', :jobid => job.jobid }, :confirm => "Are you sure you want to delete job #{job.jobid}?" %></td>
+      <td><%= job.jobid %></td>
+      <td><%= job.job_name %></td>
+      <td><%= job.slots %></td>
+      <td>
+        <% case job.state %>
+        <% when "qw" %>
+          <%= "Queued/Pending" %>
+        <% when "r" %>
+          <%= "Running" %>
+        <% when "dr" %>
+          <%= "Cleaning Up" %>
+        <% when "Eqw" %>
+          <%= "Error" %>
+        <% else %>
+          <%= job.state %>
+        <% end %>
+      </td>
+      <td>
+        <% if workdir != nil %>
+          <a href="sftp://<%= User.current.login %>@<%= Redmine::Cwa.output_server %><%= workdir %>/"><%= workdir %>/</a>
+        <% else %>
+          n/a
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  </table>
+<% else %>
+  <p>You have no submitted or running jobs.</p>
+<% end %>
