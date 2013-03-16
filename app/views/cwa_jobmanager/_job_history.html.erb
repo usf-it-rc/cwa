@@ -1,6 +1,5 @@
 <h3>Job History</h3>
 <% hist_jobs = CwaJobHistory.find_all_by_owner(User.current.login).last(25).reverse %>
-<% jobs = RsgeJobs.new(User.current.login) %>
 <% if hist_jobs.count > 0 %>
 <table class="list">
   <tr>
@@ -9,7 +8,7 @@
     <td><b>Job Directory</b></td>
   </tr>
 <% hist_jobs.each do |h| %>
-  <% if jobs.where_id_is(h.jobid) == nil %>
+  <% if @jobs.where_id_is(h.jobid) == nil %>
     <tr>
       <td><%= h.job_name %></td>
       <td><%= h.jobid %></td>

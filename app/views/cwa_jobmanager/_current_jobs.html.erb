@@ -1,4 +1,3 @@
-<% @jobs = RsgeJobs.new User.current.login %>
 <h3>Current Jobs</h3>
 <% if @jobs.count > 0 %>
   <table class="list">
@@ -15,7 +14,7 @@
     <% workdir = jobs_hist.workdir if jobs_hist != nil %>
     <% if job.state == "r" %>
       <% host = RsgeHost.new(job.queue_name.to_s.split("@")[1]) %>
-      <tr title="Node: <%= host.name %> -- CPU Total Cores: <%= host.load_value(:num_proc).to_s %> -- CPU Model: <%= host.complex_value(:cpu_type).to_s.capitalize %> <%= host.complex_value(:cpu_model) %> -- Memory: <%= host.load_value(:mem_total) %>">
+      <tr title="Node: <%= host.name %>&#10;CPU Total Cores: <%= host.load_value(:num_proc).to_s %>&#10;CPU Model: <%= host.complex_value(:cpu_type).to_s.capitalize %> <%= host.complex_value(:cpu_model) %>&#10;Memory: <%= host.load_value(:mem_total) %>">
     <% else %>
       <tr>
     <% end %>

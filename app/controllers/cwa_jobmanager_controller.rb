@@ -5,6 +5,8 @@ require 'rsgehost.rb'
 class CwaJobmanagerController < ApplicationController
   unloadable
 
+  @@joblist = {}
+
   def index
     @project = Project.find(Redmine::Cwa.project_id)
     @jobs = RsgeJobs.new User.current.login
@@ -16,7 +18,13 @@ class CwaJobmanagerController < ApplicationController
   end
 
   def current_jobs
-    @jobs = RsgeJobs.new User.current.login
+    user = User.current.login
+    if !@@joblist.has_key?(user.to_sym)
+      @@joblist[user.to_sym] = { :jobs => RsgeJobs.new(user), :timestamp => Time.now }
+    elsif @@joblist[user.to_sym][:timestamp] < (Time.now - 5.seconds)
+      @@joblist[user.to_sym] = { :jobs => RsgeJobs.new(user), :timestamp => Time.now }
+    end 
+    @jobs = @@joblist[user.to_sym][:jobs]
     render :partial => 'cwa_jobmanager/current_jobs'
   end
 
@@ -25,6 +33,13 @@ class CwaJobmanagerController < ApplicationController
   end
 
   def job_history
+    user = User.current.login
+    if !@@joblist.has_key?(user.to_sym)
+      @@joblist[user.to_sym] = { :jobs => RsgeJobs.new(user), :timestamp => Time.now }
+    elsif @@joblist[user.to_sym][:timestamp] < (Time.now - 5.seconds)
+      @@joblist[user.to_sym] = { :jobs => RsgeJobs.new(user), :timestamp => Time.now }
+    end 
+    @jobs = @@joblist[user.to_sym][:jobs]
     render :partial => 'cwa_jobmanager/job_history'
   end
 
