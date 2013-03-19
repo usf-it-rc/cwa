@@ -1,0 +1,11 @@
+<h2>Dashboard</h2>
+<% @board = CwaDashboard.where("user_id == ?", User.current.id).first %>
+
+<img src = "<%= Gchart.pie(:data => [@board.hd_used], :title => 'Hard Disk Utilization', :legend => ['Jan'], :size => '175x175') %>">
+<table>
+<tr><td>User ID</td><td>Utilization</td></tr>
+<tr>
+<td><%= @board.user_id %></td>
+<td><%= @board.hd_used %></td>
+</tr></table>
+
