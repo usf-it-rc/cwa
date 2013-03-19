@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>User:</b>
+  <%= @cwa_db_user_util.user_id %>
+</p>
+
+<p>
+  <b>Cpu hrs:</b>
+  <%= @cwa_db_user_util.cpu_hrs %>
+</p>
+
+<p>
+  <b>Ave mem job:</b>
+  <%= @cwa_db_user_util.ave_mem_job %>
+</p>
+
+<p>
+  <b>Curr hd util:</b>
+  <%= @cwa_db_user_util.curr_hd_util %>
+</p>
+
+<p>
+  <b>Last update:</b>
+  <%= @cwa_db_user_util.last_update %>
+</p>
+
+
+<%= link_to 'Edit', edit_cwa_db_user_util_path(@cwa_db_user_util) %> |
+<%= link_to 'Back', cwa_db_user_utils_path %>

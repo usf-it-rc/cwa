@@ -1,0 +1,35 @@
+<h1>Listing cwa_db_hgrp_utils</h1>
+
+<table>
+  <tr>
+    <th>Free mem</th>
+    <th>Free swap</th>
+    <th>User cpu util</th>
+    <th>Sys cpu util</th>
+    <th>Nice cpu util</th>
+    <th>Last update</th>
+    <th>Hgrp</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @cwa_db_hgrp_utils.each do |cwa_db_hgrp_util| %>
+  <tr>
+    <td><%= cwa_db_hgrp_util.free_mem %></td>
+    <td><%= cwa_db_hgrp_util.free_swap %></td>
+    <td><%= cwa_db_hgrp_util.user_cpu_util %></td>
+    <td><%= cwa_db_hgrp_util.sys_cpu_util %></td>
+    <td><%= cwa_db_hgrp_util.nice_cpu_util %></td>
+    <td><%= cwa_db_hgrp_util.last_update %></td>
+    <td><%= cwa_db_hgrp_util.hgrp_id %></td>
+    <td><%= link_to 'Show', cwa_db_hgrp_util %></td>
+    <td><%= link_to 'Edit', edit_cwa_db_hgrp_util_path(cwa_db_hgrp_util) %></td>
+    <td><%= link_to 'Destroy', cwa_db_hgrp_util, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Cwa db hgrp util', new_cwa_db_hgrp_util_path %>

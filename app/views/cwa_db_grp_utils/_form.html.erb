@@ -1,0 +1,29 @@
+<%= form_for(@cwa_db_grp_util) do |f| %>
+  <% if @cwa_db_grp_util.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@cwa_db_grp_util.errors.count, "error") %> prohibited this cwa_db_grp_util from being saved:</h2>
+
+      <ul>
+      <% @cwa_db_grp_util.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :grp_id %><br />
+    <%= f.number_field :grp_id %>
+  </div>
+  <div class="field">
+    <%= f.label :grp_own_id %><br />
+    <%= f.number_field :grp_own_id %>
+  </div>
+  <div class="field">
+    <%= f.label :grp_hd_util %><br />
+    <%= f.number_field :grp_hd_util %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

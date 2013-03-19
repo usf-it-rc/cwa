@@ -1,0 +1,27 @@
+<h1>Listing cwa_db_grp_utils</h1>
+
+<table>
+  <tr>
+    <th>Grp</th>
+    <th>Grp own</th>
+    <th>Grp hd util</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @cwa_db_grp_utils.each do |cwa_db_grp_util| %>
+  <tr>
+    <td><%= cwa_db_grp_util.grp_id %></td>
+    <td><%= cwa_db_grp_util.grp_own_id %></td>
+    <td><%= cwa_db_grp_util.grp_hd_util %></td>
+    <td><%= link_to 'Show', cwa_db_grp_util %></td>
+    <td><%= link_to 'Edit', edit_cwa_db_grp_util_path(cwa_db_grp_util) %></td>
+    <td><%= link_to 'Destroy', cwa_db_grp_util, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Cwa db grp util', new_cwa_db_grp_util_path %>
