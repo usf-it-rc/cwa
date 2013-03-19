@@ -1,0 +1,45 @@
+<%= form_for(@cwa_db_hgrp_util) do |f| %>
+  <% if @cwa_db_hgrp_util.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@cwa_db_hgrp_util.errors.count, "error") %> prohibited this cwa_db_hgrp_util from being saved:</h2>
+
+      <ul>
+      <% @cwa_db_hgrp_util.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :free_mem %><br />
+    <%= f.number_field :free_mem %>
+  </div>
+  <div class="field">
+    <%= f.label :free_swap %><br />
+    <%= f.number_field :free_swap %>
+  </div>
+  <div class="field">
+    <%= f.label :user_cpu_util %><br />
+    <%= f.number_field :user_cpu_util %>
+  </div>
+  <div class="field">
+    <%= f.label :sys_cpu_util %><br />
+    <%= f.number_field :sys_cpu_util %>
+  </div>
+  <div class="field">
+    <%= f.label :nice_cpu_util %><br />
+    <%= f.number_field :nice_cpu_util %>
+  </div>
+  <div class="field">
+    <%= f.label :last_update %><br />
+    <%= f.date_select :last_update %>
+  </div>
+  <div class="field">
+    <%= f.label :hgrp_id %><br />
+    <%= f.number_field :hgrp_id %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

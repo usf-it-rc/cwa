@@ -1,0 +1,20 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Grp:</b>
+  <%= @cwa_db_grp_util.grp_id %>
+</p>
+
+<p>
+  <b>Grp own:</b>
+  <%= @cwa_db_grp_util.grp_own_id %>
+</p>
+
+<p>
+  <b>Grp hd util:</b>
+  <%= @cwa_db_grp_util.grp_hd_util %>
+</p>
+
+
+<%= link_to 'Edit', edit_cwa_db_grp_util_path(@cwa_db_grp_util) %> |
+<%= link_to 'Back', cwa_db_grp_utils_path %>
