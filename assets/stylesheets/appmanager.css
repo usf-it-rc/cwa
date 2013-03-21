@@ -106,6 +106,7 @@ div.browserSelector {
   float:left;
   position:relative;
   z-index:1;
+  width: 100%;
 }
 table.options {
   table-layout: fixed;

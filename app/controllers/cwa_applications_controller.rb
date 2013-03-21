@@ -51,7 +51,7 @@ class CwaApplicationsController < ApplicationController
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     @project = Project.find(Redmine::Cwa.project_id)
-    @apps = CwaApplication.all
+    @apps = CwaApplication.all.sort_by &:name
     respond_to do |format|
       format.html
     end
