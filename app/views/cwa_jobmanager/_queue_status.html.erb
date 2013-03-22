@@ -8,11 +8,21 @@
       <td><b>Total Slots</b></td>
     </tr>
   <% @queues.each do |queue| %>
-    <tr>
-      <td><%= queue.name.to_s %></td>
-      <td><%= queue.used.to_s %></td>
-      <td><%= queue.avail.to_s %></td>
-      <td><%= queue.total.to_s %></td>
-    </tr>
+  <!-- I hate having to do this, but I'll find a better, more generic way to handle this -->
+    <% if queue.name == "xlong" %>
+      <tr>
+        <td><%= queue.name.to_s %></td>
+        <td><%= queue.used.to_s %></td>
+        <td><%= (512 - queue.used.to_i).to_s %></td>
+        <td><%= 512.to_s %></td>
+      </tr>
+    <% else %>
+      <tr>
+        <td><%= queue.name.to_s %></td>
+        <td><%= queue.used.to_s %></td>
+        <td><%= queue.avail.to_s %></td>
+        <td><%= queue.total.to_s %></td>
+      </tr>
+    <% end %> 
   <% end %>
   </table>

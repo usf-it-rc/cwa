@@ -92,6 +92,12 @@ class CwaAllocationsController < ApplicationController
   end
     
   def submit
+    if CwaAllocation.find(:all, :conditions => { :approved => true, :allocation_finished => nil }).count > 0
+      flash[:error] = "You already have an active, unfinished allocation!"
+      redirect_to :action => 'index'
+      return
+    end
+
     allocation = CwaAllocation.new params[:cwa_allocation] do |a|
       a.time_submitted = Time.now
       a.user_id = User.current.id
