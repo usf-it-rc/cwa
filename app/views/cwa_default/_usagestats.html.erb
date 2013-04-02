@@ -1,5 +1,5 @@
 <!--This page grabs data from the CwaUserMetrics and CwaGroupMetrics tables (based on who's logged in) and puts it into tables -->
-<h3>Usage Statistics for the last 30 days</h3>
+<h3>Your usage for the last 30 days</h3>
   <table class="list">
     <% if !CwaUserMetrics.find_all_by_user_id(User.current.id).blank?%>
       <% @cwa_user_metrics = CwaUserMetrics.find_all_by_user_id(User.current.id) %>
@@ -8,13 +8,13 @@
           <th>Total CPU Time</th>
           <td><%= x.cpu_time.to_s %> hours</td>
         </tr><tr>
-          <th>CPU Time per Job</th>
+          <th>Average CPU Time per Job</th>
           <td><%= x.cpu_time_job.to_s %> hours</td>
         </tr><tr>
           <th>Total Wallclock Time</th>
           <td><%= (x.tot_wallclock.to_i/3600).to_i.to_s %> hours</td>
         </tr><tr>
-          <th>Wallclock Time per Job</th>
+          <th>Average Wallclock Time per Job</th>
           <td><%= x.average_job_time.to_s %> hours</td>
         </tr><tr>
           <th>Current /home usage</th>
