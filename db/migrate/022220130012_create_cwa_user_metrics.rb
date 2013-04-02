@@ -8,6 +8,7 @@ class CreateCwaUserMetrics < ActiveRecord::Migration
       t.float :disk_usage_home, :length => 22, :precision => 16
       t.float :disk_usage_work, :length => 22, :precision => 16
       t.integer :tot_jobs
+      t.integer :average_job_time
     end
   end
 end
