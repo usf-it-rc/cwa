@@ -89,11 +89,11 @@ class CwaJobmanagerController < ApplicationController
       return
     end
 
-    if params[:testing]
-      ENV['SGE_CELL'] = Redmine::Cwa.testing_cell_name
-    else
-      ENV['SGE_CELL'] = Redmine::Cwa.production_cell_name
-    end
+#    if params[:testing]
+#      ENV['SGE_CELL'] = Redmine::Cwa.testing_cell_name
+#    else
+#      ENV['SGE_CELL'] = Redmine::Cwa.production_cell_name
+#    end
 
     script = @app.exec.gsub(/\r\n/, "\n")
 

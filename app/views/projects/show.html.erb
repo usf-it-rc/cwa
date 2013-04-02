@@ -71,6 +71,12 @@
     <p><%= link_to l(:label_news_view_all), project_news_index_path(@project) %></p>
   </div>
   <% end %>
+  <% @user = CwaIpaUser.new %>
+  <div class="news box">
+  <% if @user.provisioned? %>
+    <%= render :partial => "cwa_default/usagestats" %>
+  <% end %>
+  </div>
   <%= call_hook(:view_projects_show_right, :project => @project) %>
 </div>
 

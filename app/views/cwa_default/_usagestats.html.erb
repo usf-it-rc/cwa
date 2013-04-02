@@ -1,37 +1,34 @@
 <!--This page grabs data from the CwaUserMetrics and CwaGroupMetrics tables (based on who's logged in) and puts it into tables -->
-
-    <table cellspacing = 10 >
+<h3>Usage Statistics for the last 30 days</h3>
+  <table class="list">
+    <% if !CwaUserMetrics.find_all_by_user_id(User.current.id).blank?%>
+      <% @cwa_user_metrics = CwaUserMetrics.find_all_by_user_id(User.current.id) %>
+      <% @cwa_user_metrics.each do |x| %>
         <tr>
-            <th>ID</th>
-            <th>CPU Time</th>
-            <th>CPU Time Per Job</th>
-            <th>Wall Clock</th>
-            <th>Disk Usage (Home)</th>
-            <th>Disk Usage (Work)</th>
-            <th>Total Jobs</th>
-            <th>Job Time</th>
-            
+          <th>CPU Time</th>
+          <td><%= x.cpu_time %></td>
+        </tr><tr>
+          <th>CPU Time Per Job</th>
+          <td><%= x.cpu_time_job %></td>
+        </tr><tr>
+          <th>Wallclock</th>
+          <td><%= x.tot_wallclock %></td>
+        </tr><tr>
+          <th>Wallclock per Job</th>
+          <td><%= x.average_job_time %></td>
+        </tr><tr>
+          <th>/home usage (current)</th>
+          <td><%= x.disk_usage_home %></td>
+        </tr><tr>
+          <th>/work usage (current)</th>
+          <td><%= x.disk_usage_work %></td>
+        </tr><tr>
+          <th># of Jobs Run</th>
+          <td><%= x.tot_jobs %></td>
         </tr>
-            <% if !CwaUserMetrics.find_all_by_user_id(User.current.id).blank?%>
-            <% @cwa_user_metrics = CwaUserMetrics.find_all_by_user_id(User.current.id) %>
-            <% @cwa_user_metrics.each do |x| %>
-
-        <tr>
-            <td><center><%= x.user_id %></center></td>
-            <td><center><%= x.cpu_time %></center></td>
-            <td><center><%= x.cpu_time_job %></center></td>
-            <td><center><%= x.tot_wallclock %></center></td>
-            <td><center><%= x.disk_usage_home %></center></td>
-            <td><center><%= x.disk_usage_work %></center></td>
-            <td><center><%= x.tot_jobs %></center></td>
-            <td><center><%= x.average_job_time %></center></td>
-            
-        </tr>
-
-            <% end %><% end %>
-
-    </table>
-
+      <% end %>
+    <% end %>
+  </table>
     <p>
 
    <!-- <table cellspacing = 10>
