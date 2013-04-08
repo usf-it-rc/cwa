@@ -53,7 +53,7 @@ Redmine::Plugin.register :cwa do
        :caption => 'Allocations', :after => :cwa_accountsignup
   menu :project_menu, :cwa_groupmanager, { :controller => 'cwa_groupmanager', :action => 'index' }, 
        :caption => 'Groups', :after => :cwa_allocations
-  menu :project_menu, :app_manager, { :controller => 'cwa_applications', :action => 'index' }, 
+  menu :project_menu, :cwa_applications, { :controller => 'cwa_applications', :action => 'index' }, 
        :caption => 'Web Apps', :after => :cwa_groupmanager
   menu :project_menu, :cwa_jobmanager, { :controller => 'cwa_jobmanager', :action => 'index' }, 
        :caption => 'My Jobs', :after => :app_manager
