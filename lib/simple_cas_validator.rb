@@ -1,7 +1,8 @@
 module Redmine::Cwa
   class << self
     # Use plain old CAS REST service to verify the supplied credentials
-    def simple_cas_validator(user, password, url)
+    def simple_cas_validator(user, password)
+      url = Setting["plugin_redmine_rubycas"][:base_url]
       params = {
         :username => user,
         :password => password,

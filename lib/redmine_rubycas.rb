@@ -1,7 +1,7 @@
-module Redmine::OmniAuthCAS
+module Redmine::RubyCAS
   class << self
     def settings_hash
-      Setting["plugin_redmine_omniauth_cas"]
+      Setting["plugin_redmine_rubycas"]
     end
 
     def method_missing(name, *args, &blk)
