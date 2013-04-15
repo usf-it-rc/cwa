@@ -6,16 +6,16 @@
       <% @cwa_user_metrics.each do |x| %>
         <tr>
           <th>Total CPU Time</th>
-          <td><%= x.cpu_time.to_s %> hours</td>
+          <td><%= x.total_cputime.to_s %> hours</td>
         </tr><tr>
           <th>Average CPU Time per Job</th>
-          <td><%= x.cpu_time_job.to_s %> hours</td>
+          <td><%= x.average_cputime.to_s %> hours</td>
         </tr><tr>
           <th>Total Wallclock Time</th>
-          <td><%= x.tot_wallclock.to_s %> hours</td>
+          <td><%= x.total_walltime.to_s %> hours</td>
         </tr><tr>
           <th>Average Wallclock Time per Job</th>
-          <td><%= x.average_job_time.to_s %> hours</td>
+          <td><%= x.average_walltime.to_s %> hours</td>
         </tr><tr>
           <th>Current /home usage</th>
           <td><%= ("%.02f" % x.disk_usage_home.to_f).to_s %> GB</td>
@@ -24,7 +24,7 @@
           <td><%= ("%.02f" % x.disk_usage_work.to_f).to_s %> GB</td>
         </tr><tr>
           <th>Total Number of Jobs Run</th>
-          <td><%= x.tot_jobs.to_s %></td>
+          <td><%= x.total_jobs.to_s %></td>
         </tr>
       <% end %>
     <% end %>
