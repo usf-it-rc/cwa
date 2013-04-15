@@ -12,7 +12,7 @@
           <td><%= x.cpu_time_job.to_s %> hours</td>
         </tr><tr>
           <th>Total Wallclock Time</th>
-          <td><%= (x.tot_wallclock.to_i/3600).to_i.to_s %> hours</td>
+          <td><%= x.tot_wallclock.to_s %> hours</td>
         </tr><tr>
           <th>Average Wallclock Time per Job</th>
           <td><%= x.average_job_time.to_s %> hours</td>

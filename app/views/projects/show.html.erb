@@ -65,11 +65,11 @@
 
 <div class="splitcontentright">
   <% @user = CwaIpaUser.new %>
-  <div class="news box">
   <% if @user.provisioned? %>
+    <div class="box">
     <%= render :partial => "cwa_default/usagestats" %>
+    </div>
   <% end %>
-  </div>
   <% if @news.any? && authorize_for('news', 'index') %>
   <div class="news box">
     <h3><%=l(:label_news_latest)%></h3>
