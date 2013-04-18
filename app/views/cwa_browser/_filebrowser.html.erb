@@ -14,6 +14,7 @@
 <% end %>
 
 <div>
+
 <div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory:</b> <%= browser.current_dir %></div>
 <div id="goHome" class="<%= browser.current_dir.include?(@user.homedirectory) ? "browserButtonSelected" : "browserButton" %>">Home</div>
 <div id="goWork" class="<%= browser.current_dir.include?(@user.workdirectory) ? "browserButtonSelected" : "browserButton" %>">Work</div>
@@ -24,16 +25,22 @@
 <% end %>
 
 <div class="browserSelector" style="width:100%">
-<table class="browserTab">
-<tr><td class="dirCol"><b>Directory</b></td><td class="fileCol"><b>File</b></td></tr>
-<tr><td class="dircCol">
-<%= select_tag :job_dir, options_for_select(browser.directories.map{|dir| [dir, browser.current_dir + "/" + dir]}), :size => 10, :style => "width:100%;" %></td>
-<td class="fileCol"><%= select_tag :job_file, options_for_select(browser.files.map{|file| [file, browser.current_dir + "/" + file]}), :size => 10, :style => "width:100%;" %></td>
-</tr>
-</table>
-</div>
+<div style="height: 100%; width:40%; position:relative; float:left; overflow:auto;">
+<center><p>Select a directory...</p></center>
+<%= hidden_field_tag :job_dir, browser.current_dir %>
+<% browser.directories.each do |dir| %>
+<div class="browserDirEntry" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p style="margin-left:28px;z-index:-1;"><%= dir %></p></div>
+<% end %>
 </div>
 
+<div style="height: 100%; width:60%; position:relative; float:left; overflow:auto;">
+<center><p>Select a file...</p></center>
+<%= hidden_field_tag :job_file %>
+<% browser.files.each do |file| %>
+<div class="browserFileEntry" onclick="select_file(this)" id="<%= browser.current_dir + '/' + file %>"><p style="margin-left:28px;z-index:-1;"><%= file %></p></div>
+<% end %>
+</div>
+</div>
 </div>
 
 <script>
@@ -54,8 +61,33 @@ document.getElementById('goUpOne').onclick = function(){
 };
 <% end %>
 
-document.getElementById('job_dir').ondblclick = function(){
+function change_directory(elem){
+  document.forms['app_form'].job_dir.value = elem.id;
   var queryString = $('#app_form').serialize();
   window.location = "<%= request.path %>?" + queryString;
 };
+
+function select_directory(elem){
+  var selected = document.getElementsByClassName("browserDirEntrySelected"),
+      items = selected.length,
+      element = null;
+  for (var i = 0; i < items; i++){
+    element = selected[i];
+    element.className = "browserDirEntry";
+  }
+  elem.className = "browserDirEntrySelected";
+  document.forms['app_form'].job_dir.value = elem.id;
+}
+
+function select_file(elem){
+  var selected = document.getElementsByClassName("browserFileEntrySelected"),
+      items = selected.length,
+      element = null;
+  for (var i = 0; i < items; i++){
+    element = selected[i];
+    element.className = "browserFileEntry";
+  }
+  elem.className = "browserFileEntrySelected";
+  document.forms['app_form'].job_file.value = elem.id;
+}
 </script>

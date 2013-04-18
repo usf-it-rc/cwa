@@ -27,12 +27,11 @@
   <div class="browserButtonBackInactive">&lt; Back</div>
 <% end %>
 <div class="browserSelector">
-<table class="browserTab">
-<tr><td><b>Select Directory</b></td></tr>
-<tr><td>
-<%= select_tag :job_dir, options_for_select(browser.directories.map{|dir| [dir, browser.current_dir + "/" + dir]}), :size => 10, :style => "width:100%;" %>
-</td></tr>
-</table>
+<center><p>Select a directory...</p></center>
+<%= hidden_field_tag :job_dir, browser.current_dir %>
+<% browser.directories.each do |dir| %>
+<div class="browserDirEntry" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p style="margin-left:28px;z-index:-1;"><%= dir %></p></div>
+<% end %>
 </div>
 </div>
 
@@ -54,8 +53,22 @@ document.getElementById('goUpOne').onclick = function(){
 };
 <% end %>
 
-document.getElementById('job_dir').ondblclick = function(){
+function change_directory(elem){
+  document.forms['app_form'].job_dir.value = elem.id;
   var queryString = $('#app_form').serialize();
   window.location = "<%= request.path %>?" + queryString;
 };
+
+function select_directory(elem){
+  var selected = document.getElementsByClassName("browserDirEntrySelected"),
+      items = selected.length,
+      element = null;
+  for (var i = 0; i < items; i++){
+    element = selected[i];
+    element.className = "browserDirEntry";
+  }
+  elem.className = "browserDirEntrySelected";
+  document.forms['app_form'].job_dir.value = elem.id;
+}
+
 </script>
