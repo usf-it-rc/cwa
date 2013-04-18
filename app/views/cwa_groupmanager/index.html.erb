@@ -52,8 +52,8 @@
   <tr><td><b>Delete</b></td><td><b>Group Name</b></td></tr>
     <% requests.each do |r| %>
     <tr>
-      <td><%= button_to "Delete", { :action => :delete_request, :request_id => r.id, :group_name => @groups.by_id(r.group_id)[:cn] } %></td>
-      <td><%= @groups.by_id(r.group_id)[:cn] %></td>
+      <td><%= button_to "Delete", { :action => :delete_request, :request_id => r.id, :group_name => @groups.from_all_by_id(r.group_id)[:cn] } %></td>
+      <td><%= @groups.from_all_by_id(r.group_id)[:cn] %></td>
     </tr>
     <% end %>
   </table>

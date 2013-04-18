@@ -29,18 +29,27 @@ class CwaGroups
 
   def by_name(name)
     get_all_groups.each do |g| 
-      return g if g[:cn].first.to_i == name
+      return g if g[:cn].first.to_s == name
     end
   end
 
   def by_id(id)
+    group = {}
     get_all_groups.each do |g| 
-      return g if g[:gidnumber].first.to_i == id.to_i
+      next if g[:gidnumber] == nil
+      group = g if g[:gidnumber].first.to_i == id.to_i
     end
+    return group
   end
 
+  # TODO: Remove the from_all methods
   def from_all_by_id(id)
-    get_all_groups.each { |g| g if g[:gidnumber] == id }
+    group = {}
+    get_all_groups.each do |g| 
+      next if g[:gidnumber] == nil
+      group = g if g[:gidnumber].first.to_i == id.to_i
+    end
+    return group
   end
 
   def from_all_by_name(name)
