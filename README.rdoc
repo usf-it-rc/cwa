@@ -30,7 +30,7 @@ The plugin is fairly configurable, providing for the selection of
 
 The plugin is broken into several sections
 
-* Models
+=== Models
  * cwa_ipa_user => describes the user in the context of FreeIPA
  * cwa_job_history => Provides job history for web-submitted jobs
  * cwa_groups => describes groups in the context of FreeIPA
@@ -39,7 +39,7 @@ The plugin is broken into several sections
  * cwa_application => describes applications for the purpose of integrating with the job manager
  * cwa_dashboard => describes the datapoints for a user's utilization
 
-* Controllers
+=== Controllers
  * cwa_accountsignup => actions for provisioning/de-provisioning user accounts
  * cwa_allocations => actions for creating/managing allocation requests
  * cwa_applications => actions for managing application integrations
@@ -48,28 +48,4 @@ The plugin is broken into several sections
 
 = Installation
 
-Installation is fairly non-trivial and we plan to remedy this.  It assumes
-
-1.  A fresh FreeIPA 2.x-3.x implementation
-2.  A fresh Remdine installation
-3.  Installation of cwa_rest and rsge gems (available in the usf-it-rc organization github space)
-4.  Ruby 1.9.3 (or greater)
-5.  Rails
-6.  A working GridEngine installation
-7.  A REST-based messaging service to facilitate account syncronization with a central identity provider (will provide more details on this)
-
-This is (basically) how we get an environment running:
-
-1.  Provision server #1 with RHEL/CentOS/Scientific 6.3-6.4 w/ FreeIPA installed and run ipa-server-install, create realm, etc.
-2.  Create a service account that allows for user and group managment
-3.  Provision server #2 with RHEL/CentOS/Scientific 6.3-6.4 w/ RVM installation and GridEngine utilities
-4.  Provision server #3 as a GridEngine master host and allow server #2 to be a submit host
-5.  Install redmine on server #2
-6.  Install rsge and cwa_rest on server #2
-7.  Install cwa plugin into redmine instance on server #2
-8.  We use CAS authentication, so we'll be installing our modified redmine_omniauth_cas plugin (available from usf-it-rc github space)
-9.  Set various configuration settings for the plugin, to point to your IPA installation and service account
-10. Point to your identity provider's messaging system
-11. ...
-
-Yeah, its a lot.  We plan on providing pre-packaged virtual machine instances that are pre-baked and ready to run, on our project website: https://redmine.rc.usf.edu/projects/2012-jobman
+See our main project page at http://redmine.rc.usf.edu/projects/2012-jobman and navigate to the Wiki for tips on installation. 
