@@ -31,20 +31,20 @@ The plugin is fairly configurable, providing for the selection of
 The plugin is broken into several sections
 
 === Models
- * cwa_ipa_user => describes the user in the context of FreeIPA
- * cwa_job_history => Provides job history for web-submitted jobs
- * cwa_groups => describes groups in the context of FreeIPA
- * cwa_group_request => Provides for a social-networking type experience for user-driven group management
- * cwa_allocation => describes allocation requests
- * cwa_application => describes applications for the purpose of integrating with the job manager
- * cwa_dashboard => describes the datapoints for a user's utilization
+* cwa_ipa_user: describes the user in the context of FreeIPA
+* cwa_job_history: Provides job history for web-submitted jobs
+* cwa_groups: describes groups in the context of FreeIPA
+* cwa_group_request: Provides for a social-networking type experience for user-driven group management
+* cwa_allocation: describes allocation requests
+* cwa_application: describes applications for the purpose of integrating with the job manager
+* cwa_dashboard: describes the datapoints for a user's utilization
 
 === Controllers
- * cwa_accountsignup => actions for provisioning/de-provisioning user accounts
- * cwa_allocations => actions for creating/managing allocation requests
- * cwa_applications => actions for managing application integrations
- * cwa_groupmanager => actions for managing groups
- * cwa_jobmanager => actions for submitting/deleting/managing jobs with SGE
+* cwa_accountsignup: actions for provisioning/de-provisioning user accounts
+* cwa_allocations: actions for creating/managing allocation requests
+* cwa_applications: actions for managing application integrations
+* cwa_groupmanager: actions for managing groups
+* cwa_jobmanager: actions for submitting/deleting/managing jobs with SGE
 
 = Installation
 
