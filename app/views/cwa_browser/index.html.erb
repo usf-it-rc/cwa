@@ -1,0 +1,90 @@
+<%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
+<% if params[:job_dir] != nil %>
+  <% begin %>
+    <% browser = CwaBrowser.new params[:job_dir] %>
+  <% rescue Exception => e %>
+    <% flash[:error] = e.message %>
+    <% browser = CwaBrowser.new @user.homedirectory %>
+    <% params[:job_dir] = @user.homedirectory %>
+    <script type="text/javascript">
+      window.location="<%= request.path %>"
+    </script>
+  <% end %>
+<% else %>
+  <% browser = CwaBrowser.new @user.homedirectory %>
+<% end %>
+
+<%= form_tag '/cwa_browser', :id => 'app_form', :multipart => true do %>
+<div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory:</b> <%= browser.current_dir %></div>
+<div id="goHome" class="<%= browser.current_dir.include?(@user.homedirectory) ? "browserButtonSelected" : "browserButton" %>">Home</div>
+<div id="goWork" class="<%= browser.current_dir.include?(@user.workdirectory) ? "browserButtonSelected" : "browserButton" %>">Work</div>
+<% if browser.current_dir != browser.home_dir && browser.current_dir != browser.work_dir %>
+  <div id="goUpOne" class="browserButtonBack">&lt; Back</div>
+<% else %>
+  <div class="browserButtonBackInactive">&lt; Back</div>
+<% end %>
+
+<div class="browserSelectorFull">
+<div class="browserBreadcrumbs">
+<!-- Insert Breadcrumbs -->
+
+<%= hidden_field_tag :job_dir, browser.current_dir %>
+
+<% browser.directories.each do |dir| %>
+<div class="browserDirEntryIcon" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntryIcon"><%= dir %></p></div>
+<% end %>
+<% browser.files.each do |file| %>
+<div class="browserFileEntryIcon" onclick="select_file(this)" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntryIcon"><%= file %></p></div>
+<% end %>
+</div>
+</div>
+<% end %>
+
+<script>
+document.getElementById('goHome').onclick = function(){
+  var queryString = $('#app_form').serialize();
+  window.location = "<%= request.path %>?" + queryString + "&job_dir=<%= CGI.escape(@user.homedirectory) %>";
+};
+
+document.getElementById('goWork').onclick = function(){
+  var queryString = $('#app_form').serialize();
+  window.location = "<%= request.path %>?" + queryString + "&job_dir=<%= CGI.escape(@user.workdirectory) %>";;
+};
+
+<% if browser.current_dir != browser.home_dir && browser.current_dir != browser.work_dir %>
+document.getElementById('goUpOne').onclick = function(){
+  var queryString = $('#app_form').serialize();
+  window.location = "<%= request.path %>?" + queryString + "&job_dir=<%= CGI.escape(browser.up_dir) %>";
+};
+<% end %>
+
+function change_directory(elem){
+  document.forms['app_form'].job_dir.value = elem.id;
+  var queryString = $('#app_form').serialize();
+  window.location = "<%= request.path %>?" + queryString;
+};
+
+function select_directory(elem){
+  var selected = document.getElementsByClassName("browserDirEntryIconSelected"),
+      items = selected.length,
+      element = null;
+  for (var i = 0; i < items; i++){
+    element = selected[i];
+    element.className = "browserDirEntryIcon";
+  }
+  elem.className = "browserDirEntryIconSelected";
+  document.forms['app_form'].job_dir.value = elem.id;
+}
+
+function select_file(elem){
+  var selected = document.getElementsByClassName("browserFileEntryIconSelected"),
+      items = selected.length,
+      element = null;
+  for (var i = 0; i < items; i++){
+    element = selected[i];
+    element.className = "browserFileEntryIcon";
+  }
+  elem.className = "browserFileEntryIconSelected";
+  document.forms['app_form'].job_file.value = elem.id;
+}
+</script>

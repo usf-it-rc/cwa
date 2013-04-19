@@ -20,7 +20,7 @@ get 'cwa_accountsignup/failure', :to => 'cwa_accountsignup#failure'
 get 'cwa_accountsignup/no_auth', :to => 'cwa_accountsignup#no_auth'
 get 'cwa_accountsignup/user_info', :to => 'cwa_accountsignup#user_info'
 get 'cwa_default/not_activated', :to => 'cwa_default#not_activated'
-get 'cwa_browser', :to => 'cwa_browser#test'
+get 'cwa_browser', :to => 'cwa_browser#index'
 get 'cwa_dashboard', :to => 'cwa_dashboard#index'
 match 'cwa_accountsignup/create', :to => 'cwa_accountsignup#create', :via => :post
 match 'cwa_accountsignup/set_shell', :to => 'cwa_accountsignup#set_shell', :via => :post

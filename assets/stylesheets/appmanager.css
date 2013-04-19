@@ -111,18 +111,57 @@ div.browserSelector {
   background: #FFFFFF;
 }
 
+div.browserSelectorFull {
+  float:left;
+  position:relative;
+  padding-top: 18px;
+  padding-bottom: 18px;
+  z-index:1;
+  background: #FFFFFF;
+  border-top: 12px solid #DEE4E7;
+  width: 100%;
+}
+
 div.browserDirEntry {
   background: #FFFFFF url('/plugin_assets/cwa/images/folder.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
-  padding: 6px;
+  padding: 4px;
 }
 
 div.browserDirEntrySelected {
   background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
-  padding: 6px;
+  padding: 4px;
+}
+
+div.browserDirEntryIcon {
+  background: #FFFFFF url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
+  background-size: 42px 42px;
+  z-index:10;
+  padding: 12px;
+  float: left;
+  height: 82px;
+  width: 82px;
+  overflow-wrap: break-word;
+}
+
+div.browserDirEntryIconSelected {
+  background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
+  background-size: 42px 42px;
+  z-index:10;
+  padding: 12px;
+  float: left;
+  height: 82px;
+  width: 82px;
+  overflow-wrap: break-word;
+}
+
+div.browserContainer {
+  height: 100%; 
+  position:relative; 
+  float:left; 
 }
 
 div.browserContainer {
@@ -144,11 +183,24 @@ p.browserEntry {
   user-select: none;
 }
 
+p.browserEntryIcon {
+  text-align: center;
+  margin-top: 38px;
+  cursor: default;
+  -webkit-user-select: none; /* Chrome/Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
+
+  /* Rules below not implemented in browsers yet */
+  -o-user-select: none;
+  user-select: none;
+}
+
 div.browserFileEntry {
   background: #FFFFFF url('/plugin_assets/cwa/images/file.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
-  padding: 6px;
+  padding: 4px;
 }
 
 div.browserFileEntrySelected {
@@ -156,21 +208,52 @@ div.browserFileEntrySelected {
   background-size: 24px 24px;
   color: #000000;
   z-index:10;
-  padding: 6px;
+  padding: 4px;
+}
+
+div.browserFileEntryIcon {
+  background: #FFFFFF url('/plugin_assets/cwa/images/file.png') no-repeat center top;
+  background-size: 42px 42px;
+  z-index:10;
+  padding: 12px;
+  float: left;
+  height: 82px;
+  width: 82px;
+  overflow-wrap: break-word;
+}
+
+div.browserFileEntryIconSelected {
+  background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat center top;
+  background-size: 42px 42px;
+  color: #000000;
+  z-index:10;
+  padding: 12px;
+  float: left;
+  height: 82px;
+  width: 82px;
+  overflow-wrap: break-word;
 }
 
 div.browserDirEntry:hover {
+  background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat center;
+  background-size: 42px 42px;
+  z-index:10;
+  padding: 4px;
+}
+}
+
+div.browserDirEntryIcon:hover {
   background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
-  padding: 6px;
+  padding: 4px;
 }
 
 div.browserFileEntry:hover {
   background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
-  padding: 6px;
+  padding: 4px;
 }
 
 table.options {
