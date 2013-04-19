@@ -235,8 +235,8 @@ div.browserFileEntryIconSelected {
 }
 
 div.browserDirEntry:hover {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat center;
-  background-size: 42px 42px;
+  background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
+  background-size: 24px 24px;
   z-index:10;
   padding: 4px;
 }
