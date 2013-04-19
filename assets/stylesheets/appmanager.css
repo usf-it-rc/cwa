@@ -117,11 +117,31 @@ div.browserDirEntry {
   z-index:10;
   padding: 6px;
 }
+
 div.browserDirEntrySelected {
   background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
   padding: 6px;
+}
+
+div.browserContainer {
+  height: 100%; 
+  position:relative; 
+  float:left; 
+  overflow:auto;
+}
+
+p.browserEntry {
+  margin-left: 28px;
+  cursor: default;
+  -webkit-user-select: none; /* Chrome/Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
+
+  /* Rules below not implemented in browsers yet */
+  -o-user-select: none;
+  user-select: none;
 }
 
 div.browserFileEntry {

@@ -25,19 +25,19 @@
 <% end %>
 
 <div class="browserSelector" style="width:100%">
-<div style="height: 100%; width:40%; position:relative; float:left; overflow:auto;">
+<div class="browserContainer" style="width:40%">
 <center><p>Select a directory...</p></center>
 <%= hidden_field_tag :job_dir, browser.current_dir %>
 <% browser.directories.each do |dir| %>
-<div class="browserDirEntry" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p style="margin-left:28px;z-index:-1;"><%= dir %></p></div>
+<div class="browserDirEntry" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
 <% end %>
 </div>
 
-<div style="height: 100%; width:60%; position:relative; float:left; overflow:auto;">
+<div class="browserContainer" style="width:60%">
 <center><p>Select a file...</p></center>
 <%= hidden_field_tag :job_file %>
 <% browser.files.each do |file| %>
-<div class="browserFileEntry" onclick="select_file(this)" id="<%= browser.current_dir + '/' + file %>"><p style="margin-left:28px;z-index:-1;"><%= file %></p></div>
+<div class="browserFileEntry" onclick="select_file(this)" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntry"><%= file %></p></div>
 <% end %>
 </div>
 </div>

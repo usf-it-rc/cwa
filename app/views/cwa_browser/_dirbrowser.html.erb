@@ -27,11 +27,13 @@
   <div class="browserButtonBackInactive">&lt; Back</div>
 <% end %>
 <div class="browserSelector">
+<div class="browserContainer" style="width: 100%">
 <center><p>Select a directory...</p></center>
 <%= hidden_field_tag :job_dir, browser.current_dir %>
 <% browser.directories.each do |dir| %>
-<div class="browserDirEntry" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p style="margin-left:28px;z-index:-1;"><%= dir %></p></div>
+<div class="browserDirEntry" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
 <% end %>
+</div>
 </div>
 </div>
 
