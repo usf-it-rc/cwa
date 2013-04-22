@@ -1,0 +1,40 @@
+<h1>User Stats</h1>
+
+
+<%@top = CwaUserMetrics.limit(7).order('disk_usage_work desc') %> 
+<% @x = CwaUserMetrics.sum('disk_usage_work') %>
+
+<%@toph = CwaUserMetrics.limit(7).order('disk_usage_home desc') %> 
+<% @xh = CwaUserMetrics.sum('disk_usage_home') %>
+
+
+<img id = "work" src = "<%= Gchart.pie(:data => [@top.map{|p| p.disk_usage_work.to_f}[-7],@top.map{|p| p.disk_usage_work.to_f}[-6],
+@top.map{|p| p.disk_usage_work.to_f}[-5],@top.map{|p| p.disk_usage_work.to_f}[-4],@top.map{|p| p.disk_usage_work.to_f}[-3],
+@top.map{|p| p.disk_usage_work.to_f}[-2],@top.map{|p| p.disk_usage_work.to_f}[-1],@x.to_f],  
+:title => 'Hard Disk Utilization /work', 
+:legend => 
+[@top.map{|p| "#{User.find_by_id(p.user_id).login} : #{"%.02f" % p.disk_usage_work.to_f.to_s} GB"}[-7],
+@top.map{|p| "#{User.find_by_id(p.user_id).login}  : #{"%.02f" % p.disk_usage_work.to_f.to_s} GB"}[-6],
+@top.map{|p| "#{User.find_by_id(p.user_id).login}  : #{"%.02f" % p.disk_usage_work.to_f.to_s} GB"}[-5],
+@top.map{|p| "#{User.find_by_id(p.user_id).login}  : #{"%.02f" % p.disk_usage_work.to_f.to_s} GB"}[-4],
+@top.map{|p| "#{User.find_by_id(p.user_id).login}  : #{"%.02f" % p.disk_usage_work.to_f.to_s} GB"}[-3],
+@top.map{|p| "#{User.find_by_id(p.user_id).login}  : #{"%.02f" % p.disk_usage_work.to_f.to_s} GB"}[-2],
+@top.map{|p| "#{User.find_by_id(p.user_id).login}  : #{"%.02f" % p.disk_usage_work.to_f.to_s} GB"}[-1],"Other  :  #@x"],
+:size => '400x400') %>">
+
+
+<img id = "home" src = "<%= Gchart.pie(:data => [@toph.map{|z| z.disk_usage_home.to_f}[-7],@toph.map{|z| z.disk_usage_home.to_f}[-6],
+@toph.map{|z| z.disk_usage_home.to_f}[-5],@toph.map{|z| z.disk_usage_home.to_f}[-4],@toph.map{|z| z.disk_usage_home.to_f}[-3],
+@toph.map{|z| z.disk_usage_home.to_f}[-2],@toph.map{|z| z.disk_usage_home.to_f}[-1],@xh.to_f],  
+:title => 'Hard Disk Utilization /home', 
+:legend => 
+[@toph.map{|z| "#{User.find_by_id(z.user_id).login} : #{"%.02f" % z.disk_usage_home.to_f.to_s} GB"}[-7],
+@toph.map{|z| "#{User.find_by_id(z.user_id).login}  : #{"%.02f" % z.disk_usage_home.to_f.to_s} GB"}[-6],
+@toph.map{|z| "#{User.find_by_id(z.user_id).login}  : #{"%.02f" % z.disk_usage_home.to_f.to_s} GB"}[-5],
+@toph.map{|z| "#{User.find_by_id(z.user_id).login}  : #{"%.02f" % z.disk_usage_home.to_f.to_s} GB"}[-4],
+@toph.map{|z| "#{User.find_by_id(z.user_id).login}  : #{"%.02f" % z.disk_usage_home.to_f.to_s} GB"}[-3],
+@toph.map{|z| "#{User.find_by_id(z.user_id).login}  : #{"%.02f" % z.disk_usage_home.to_f.to_s} GB"}[-2],
+@toph.map{|z| "#{User.find_by_id(z.user_id).login}  : #{"%.02f" % z.disk_usage_home.to_f.to_s} GB"}[-1],"Other  :  #@xh"],
+:size => '400x400') %>">
+
+<%= @toph.map(&:disk_usage_home) %>
