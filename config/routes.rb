@@ -39,6 +39,7 @@ match 'cwa_groupmanager/delete_group', :to => 'cwa_groupmanager#delete_group', :
 match '/cwa_applications/delete/:id', :to => 'cwa_applications#delete', :via => :delete
 match '/cwa_applications/:id', :to => 'cwa_applications#update', :via => :put
 match '/cwa_applications/display/:id', :to => 'cwa_applications#display'
+resources 'cwa_stats', :only => [:index, :new, :edit, :create, :delete, :show, :update]
 resources 'cwa_applications', :only => [:create, :delete, :show, :update]
 match '/cwa_jobmanager/submit', :to => 'cwa_jobmanager#submit', :via => :post
 match 'cwa_jobmanager/delete', :to => 'cwa_jobmanager#delete', :via => :post
