@@ -115,7 +115,7 @@ class CwaJobmanagerController < ApplicationController
       flash[:notice] = "Submitted job"
     end
 
-    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['job_dir']
+    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['job_dir'], :app_id => @app.id, :submit_parameters => params.except("utf8","authenticity_token","commit","action").to_json.to_s
       
     redirect_to :action => 'index'
   end
