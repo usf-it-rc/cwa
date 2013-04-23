@@ -203,6 +203,14 @@ div.browserFileEntry {
   padding: 4px;
 }
 
+div.browserFileEntryDisabled {
+  background: #FFFFFF url('/plugin_assets/cwa/images/file.png') no-repeat left;
+  background-size: 24px 24px;
+  color: #AAAAAA;
+  z-index:10;
+  padding: 4px;
+}
+
 div.browserFileEntrySelected {
   background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat left;
   background-size: 24px 24px;

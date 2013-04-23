@@ -33,6 +33,9 @@
 <% browser.directories.each do |dir| %>
 <div class="browserDirEntry" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
 <% end %>
+<% browser.files.each do |file| %>
+<div class="browserFileEntryDisabled" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntry"><%= file %></p></div>
+ <% end %>
 </div>
 </div>
 </div>
