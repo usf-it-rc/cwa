@@ -2,7 +2,7 @@ class CwaStatsController < ApplicationController
   # GET /cwa_stats
   # GET /cwa_stats.json
   def index
-    @cwa_stats = CwaStat.all
+    @project = Project.find(Redmine::Cwa.project_id)
 
     respond_to do |format|
       format.html # index.html.erb

@@ -1,5 +1,5 @@
 class CwaMailer < ActionMailer::Base
-  default :from => "My RC Site Notifications <no-reply@rc.usf.edu>",
+  default :from => "#{Project.find(Redmine::Cwa.project_id).name} <do-not-reply@rc.usf.edu>",
           :to => "#{User.current.firstname} #{User.current.lastname} <#{User.current.mail}>"
 
   def activation(user)
