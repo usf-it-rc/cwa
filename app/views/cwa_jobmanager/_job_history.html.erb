@@ -6,6 +6,7 @@
     <td><b>Job Name</b></td>
     <td><b>JobID</b></td>
     <td><b>Job Directory</b></td>
+    <td><b>Description</b></td>
     <td><b>Rerun/Review</b></td>
   </tr>
 <% hist_jobs.each do |h| %>
@@ -14,9 +15,16 @@
       <td><%= h.job_name %></td>
       <td><%= h.jobid %></td>
       <td><a href="sftp://<%= User.current.login %>@<%= Redmine::Cwa.output_server %><%= h.workdir %>/"><%= h.workdir %>/</a></td>
-      <% if h.submit_parameters != nil %>
+      <% if h.submit_parameters != nil %> 
+        <% params = JSON.parse(h.submit_parameters).to_hash %>
+        <% if params["description"] != nil %>
+          <td><%= params["description"] %></td>
+        <% else %>
+          <td>N/A</td>
+        <% end %>
         <td><%= link_to "View", :action => 'display', :controller => 'cwa_applications', :id => h.app_id, :params => JSON.parse(h.submit_parameters).to_hash %></td>
       <% else %>
+        <td>N/A</td>
         <td>N/A</td>
       <% end %>
     </tr>
