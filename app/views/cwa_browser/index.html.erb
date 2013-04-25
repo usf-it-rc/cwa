@@ -1,3 +1,21 @@
+<script type="text/javascript">
+  if (document.addEventListener) {
+    document.addEventListener('contextmenu', function(event) {
+      event.preventDefault();
+    }, false);
+    document.addEventListener('click', function() {
+      clearMenu();
+    }, false);
+  } else {
+    document.attachEvent('oncontextmenu', function() {
+      window.event.returnValue = false;
+    });
+    document.attachEvent('onclick', function() {
+      clearMenu();
+    });
+  };
+</script>
+
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
 <% if params[:job_dir] != nil %>
   <% begin %>
@@ -31,16 +49,32 @@
 <%= hidden_field_tag :job_dir, browser.current_dir %>
 
 <% browser.directories.each do |dir| %>
-<div class="browserDirEntryIcon" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntryIcon"><%= dir %></p></div>
+<div class="browserDirEntryIcon" onmouseup="showMenu(event, 'menuDir'); select_directory(this)" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntryIcon"><%= dir %></p></div>
 <% end %>
 <% browser.files.each do |file| %>
-<div class="browserFileEntryIcon" onclick="select_file(this)" ondblclick="download_file(this)" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntryIcon"><%= file %></p></div>
+<div class="browserFileEntryIcon" onmouseup="showMenu(event, 'menuFile'); select_file(this);" onclick="select_file(this)" ondblclick="download_file(this)" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntryIcon"><%= file %></p></div>
 <% end %>
 </div>
 </div>
 <% end %>
 
+<div id="menuDir" class="menu">
+  <div class="menuItem" onclick="doSomething()">Rename...</div>
+  <div class="menuItem" onclick="doSomething()">Delete...</div>
+  <div class="menuItem" onclick="doSomething()">Download as Zip</div>
+  <div class="menuItem" onclick="doSomething()">Properties...</div>
+</div>
+
+<div id="menuFile" class="menu">
+  <div class="menuItem" onclick="doSomething()">Open/View...</div>
+  <div class="menuItem" onclick="doSomething()">Tail...</div>
+  <div class="menuItem" onclick="doSomething()">Rename...</div>
+  <div class="menuItem" onclick="doSomething()">Delete...</div>
+  <div class="menuItem" onclick="doSomething()">Properties...</div>
+</div>
+
 <script>
+
 document.getElementById('goHome').onclick = function(){
   var queryString = $('#app_form').serialize();
   window.location = "<%= request.path %>?" + queryString + "&job_dir=<%= CGI.escape(@user.homedirectory) %>";
@@ -64,31 +98,89 @@ function change_directory(elem){
   window.location = "<%= request.path %>?" + queryString;
 };
 
-function select_directory(elem){
+function clear_selected(){
   var selected = document.getElementsByClassName("browserDirEntryIconSelected"),
-      items = selected.length,
-      element = null;
+    items = selected.length,
+    element = null;
   for (var i = 0; i < items; i++){
     element = selected[i];
     element.className = "browserDirEntryIcon";
   }
+  var selected = document.getElementsByClassName("browserFileEntryIconSelected"),
+    items = selected.length,
+    element = null;
+  for (var i = 0; i < items; i++){
+    element = selected[i];
+    element.className = "browserFileEntryIcon";
+  }
+}
+
+function select_directory(elem){
+  clear_selected();
   elem.className = "browserDirEntryIconSelected";
   document.forms['app_form'].job_dir.value = elem.id;
 }
 
 function select_file(elem){
-  var selected = document.getElementsByClassName("browserFileEntryIconSelected"),
-      items = selected.length,
-      element = null;
-  for (var i = 0; i < items; i++){
-    element = selected[i];
-    element.className = "browserFileEntryIcon";
-  }
+  clear_selected();
   elem.className = "browserFileEntryIconSelected";
   document.forms['app_form'].job_file.value = elem.id;
 }
 
 function download_file(elem){
   window.location.assign("<%= request.path %>/download?browser_file=" + encodeURIComponent(elem.id))
+}
+
+function showMenu(event, elementId) {
+  /*  check whether the event is a right click 
+   *  because different browser (ahem IE) assign different numbers to the keys to
+   *  your mouse buttons and different values to the event, you'll have to do some evaluation
+   */
+  var rightclick; //will be set to true or false
+  if (event.button) {
+    rightclick = (event.button == 2);
+  } else if (e.button) {
+    rightclick = (event.which == 3);
+  }
+ 
+  if(rightclick) { //if the secondary mouse botton was clicked
+    var menu = document.getElementById(elementId);
+    menu.style.display = "block"; //show menu
+
+    var x = event.clientX; //get X and Y coordinance for menu position
+    var y = event.clientY;
+ 
+    //This section is necessary if you click on the far right edge or bottom
+    //The 200 is arbitrary, choose whatever number you want based on how large your menu is
+    if(window.innerWidth) {
+      windowWidth = window.innerWidth;
+      windowHeight = window.innerHeight;
+    } else if(document.documentElement.clientWidth) {
+      windowWidth = document.documentElement.clientWidth;
+      windowHeight = document.documentElement.clientHeight;
+    } else {
+      windowWidth = document.getElementsByTagName('body')[0].clientWidth;
+      windowHeight = document.getElementsByTagName('body')[0].clientHeight;
+    }
+    if(windowWidth < (x + 200)) {
+      x = x - 200;
+    }
+    if(windowHeight < (y + 200)) {
+      y -= 200;
+    }
+ 
+    //position the menu
+    menu.style.position = "fixed"; // use fixed or it will not work when the window is scrolled
+    menu.style.top = y+"px";
+    menu.style.left= x+"px";
+  }
+}
+ 
+function clearMenu() { //used to make the menu disappear
+  //this function should be used at the beginning of any function that is called from the menu
+  var menu = document.getElementById('menuDir');
+  menu.style.display = "none"; //don't show menu
+  var menu = document.getElementById('menuFile');
+  menu.style.display = "none"; //don't show menu
 }
 </script>

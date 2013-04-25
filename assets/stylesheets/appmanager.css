@@ -290,3 +290,23 @@ table.browserTab {
   border: none;
   width: 60%;
 }
+
+div.menu {
+  position: absolute;
+  padding: 8px 8px 8px 8px;
+  border:1px solid #DFDFDF;
+  background: #CDD3D6;
+  z-index: 100;
+  display: none;
+}
+
+div.menuItem {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  cursor: default;
+}
+
+div.menuItem:hover {
+  background: #BCC2C5;
+  cursor: default;
+}
