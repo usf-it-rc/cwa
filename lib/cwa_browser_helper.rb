@@ -46,8 +46,11 @@ module Redmine::CwaBrowserHelper
       end
 
       def each
-        while (data = @stdout.read(1024*128)) != nil
-          self.done if data.length < 1024*128
+        while data = @stdout.read(1024*128)
+          if data.nil?
+            self.done
+            break
+          end
           yield data
         end
       end
