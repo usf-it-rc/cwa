@@ -151,21 +151,26 @@ class CwaIpaUser
 
   # Do the work of adding or removing the user
   def provision(user, password, action)
-    if action == "user_add"
-      raise 'You entered an incorrect password' if !self.valid_passwd?
-    end
-
-    param_list = {
-      'uid'  => user,
-      'homedirectory' => "/home/#{user.each_char.first.downcase}/#{user.downcase}",
-      'userpassword' => password
-    }
-
     Rails.logger.debug "provision() => Current fields: " + @@fields[User.current.login].to_s
 
-    param_list.merge!({ 'uidnumber' => self.namsid }) if self.namsid != nil
-    param_list.merge!({ 'givenname' => User.current.firstname })
-    param_list.merge!({ 'sn' => User.current.lastname })
+    if action == "user_add"
+      raise 'You entered an incorrect password' if !self.valid_passwd?
+      param_list = {
+        'uid'  => user,
+        'homedirectory' => "/home/#{user.each_char.first.downcase}/#{user.downcase}",
+        'userpassword' => password
+      }
+
+      param_list.merge!({ 'uidnumber' => self.namsid }) if self.namsid != nil
+      param_list.merge!({ 'givenname' => User.current.firstname })
+      param_list.merge!({ 'sn' => User.current.lastname })
+    else
+      param_list = {
+        'uid' => user
+      }
+    end
+
+    Rails.logger.debug "provision() => param_list = " + param_list.to_s
 
     # Add the account to IPA
     begin
@@ -181,11 +186,13 @@ class CwaIpaUser
     end
 
     # Force password expiry update
-    pwexp = `/var/lib/redmine/plugins/cwa/support/pwexpupdate.sh #{user}`
-    if $?.success?
-      Rails.logger.info "User password expiry updated. " + pwexp
-    else
-      Rails.logger.info "Failed to update user password expiry! " + pwexp
+    if action == "user_add"
+      pwexp = `/var/lib/redmine/plugins/cwa/support/pwexpupdate.sh #{user}`
+      if $?.success?
+        Rails.logger.info "User password expiry updated. " + pwexp
+      else
+        Rails.logger.info "Failed to update user password expiry! " + pwexp
+      end
     end
 
     # TODO: parse out the details and return appropriate messages 
@@ -205,7 +212,7 @@ class CwaIpaUser
           'createProg' => 'EDU:USF:RC:cwa',
           'messageData' => {
             'host' => 'rc.usf.edu',
-            'username' => User.current.login,
+            'username' => user,
             'accountStatus' => action == "user_add" ? 'active' : 'disabled',
             'accountType' => 'Unix'
           }
