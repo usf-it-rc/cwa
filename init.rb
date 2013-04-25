@@ -3,6 +3,7 @@ require 'simple_cas_validator'
 require 'cwa'
 require 'ipagroup'
 require 'cwa_constants'
+require 'cwa_browser_helper'
 require_dependency 'cwa/hooks'
 require 'googlecharts'
 

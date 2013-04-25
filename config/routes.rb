@@ -22,6 +22,7 @@ get 'cwa_accountsignup/user_info', :to => 'cwa_accountsignup#user_info'
 get 'cwa_default/not_activated', :to => 'cwa_default#not_activated'
 get 'cwa_browser', :to => 'cwa_browser#index'
 get 'cwa_dashboard', :to => 'cwa_dashboard#index'
+get 'cwa_browser/download', :to => 'cwa_browser#get'
 match 'cwa_accountsignup/create', :to => 'cwa_accountsignup#create', :via => :post
 match 'cwa_accountsignup/set_shell', :to => 'cwa_accountsignup#set_shell', :via => :post
 match 'cwa_accountsignup/delete', :to => 'cwa_accountsignup#delete', :via => :post

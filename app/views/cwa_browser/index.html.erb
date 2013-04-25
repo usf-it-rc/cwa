@@ -34,7 +34,7 @@
 <div class="browserDirEntryIcon" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntryIcon"><%= dir %></p></div>
 <% end %>
 <% browser.files.each do |file| %>
-<div class="browserFileEntryIcon" onclick="select_file(this)" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntryIcon"><%= file %></p></div>
+<div class="browserFileEntryIcon" onclick="select_file(this)" ondblclick="download_file(this)" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntryIcon"><%= file %></p></div>
 <% end %>
 </div>
 </div>
@@ -86,5 +86,9 @@ function select_file(elem){
   }
   elem.className = "browserFileEntryIconSelected";
   document.forms['app_form'].job_file.value = elem.id;
+}
+
+function download_file(elem){
+  window.location.assign("<%= request.path %>/download?browser_file=" + encodeURIComponent(elem.id))
 }
 </script>
