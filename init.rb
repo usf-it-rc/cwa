@@ -76,11 +76,11 @@ Redmine::MenuManager.map :top_menu do |menu|
   menu.delete :my_page
   menu.delete :projects
   menu.delete :administration
+  menu.push :start, { :controller => 'projects', :action => 'show', :id => "research-computing" }, :caption => "CWA Home"
   menu.push :rc, "http://rc.usf.edu", :caption => "Research Computing", :html => { :target => "_blank" }
   menu.push :it, "http://www.usf.edu/it", :caption => "Information Technology", :html => { :target => "_blank" }
   menu.push :usf, "http://www.usf.edu", :caption => "USF Home", :html => { :target => "_blank" }
   menu.push :research, "http://www.research.usf.edu", :caption => "Office of Research", :html => { :target => "_blank" }
-  menu.push :start, { :controller => 'projects', :action => 'show', :id => "research-computing" }, :caption => "CWA Home"
   menu.push :administration, { :controller => 'admin', :action => 'index' }, :last => true, 
             :if => Proc.new { |p| User.current.admin? }
   menu.delete :help
