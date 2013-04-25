@@ -44,7 +44,8 @@ class CwaMailer < ActionMailer::Base
   def group_member_request(group_owner, group_name)
     @group_owner = group_owner
     @group_name  = group_name
-    mail(:subject => "RC@USF Group Join Request Notification")
+    mail(:subject => "RC@USF Group Join Request Notification",
+         :to => "#{group_owner.firstname} #{group_owner.lastname} <#{group_owner.mail}>")
   end
 
   def group_add_member(user, group)
