@@ -38,7 +38,7 @@
       </td>
       <td>
         <% if workdir != nil %>
-          <a href="sftp://<%= User.current.login %>@<%= Redmine::Cwa.output_server %><%= workdir %>/"><%= workdir %>/</a>
+          <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :job_dir => workdir %>
         <% else %>
           n/a
         <% end %>

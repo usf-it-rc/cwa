@@ -11,39 +11,89 @@ class CwaBrowserController < ApplicationController
     end
   end
 
-  # Change file mode, name
-  def post
-    case params[:browser_method]
-    when "chmod"
-      Redmine::CwaBrowserHelper.chmod(params[:browser_file], params[:mode]) or
-        flash[:error] = "Could not set mode on file #{params[:browser_file]}"
-    when "rename"
-      Redmine::CwaBrowserHelper.rename(params[:browser_file], params[:new_name]) or
-        flash[:error] = "Could not rename file #{params[:browser_file]} to #{params[:new_name]}"
+  # Change file name
+  def rename
+    Redmine::CwaBrowserHelper.rename(params[:browser_file], params[:new_name]) or
+      flash[:error] = "Could not rename file #{params[:browser_file]} to #{params[:new_name]}"
+    redirect_to :action => "index", :params => params
+  end
+
+  # create a directory
+  def mkdir 
+    if params[:new_dir] =~ /[\x00\/]/
+      flash[:error] = "Invalid directory name specified!"
+    else
+      Redmine::CwaBrowserHelper.mkdir(params[:job_dir] + "/" + params[:new_dir]) or
+        flash[:error] = "Could not make directory #{params[:new_dir]}"
     end
-    redirect_to :action => "index", :params => params[:browser_dir]
+    redirect_to :action => "index", :params => params
+  end
+
+  # Create a text file
+  def create
+    if params[:new_file_content] != nil and params[:new_file_name] != nil
+      upload = params["file"]
+      file = Redmine::CwaBrowserHelper::Put.new(params[:job_dir], params[:new_file_name])
+      if file
+        file.write(params[:new_file_content])
+        file.done
+      else
+        flash[:error] = "Could not store file(s) #{upload.original_filename}"
+      end
+    else
+      flash[:error] = "New document name/content cannot be blank"
+    end
+    redirect_to :action => "index", :params => params
   end
 
   # Delete file/directory from :browse_path
   def delete
+    type = Redmine::CwaBrowserHelper.type(params[:browser_file])
+
+    file_name = params[:browser_file].split("/").last
+    gotopath = params[:browser_file].gsub(/\/#{file_name}$/,"")
+
     Redmine::CwaBrowserHelper.delete(params[:browser_file]) or
       flash[:error] = "Could not delete file #{params[:browser_file]}"
-    redirect_to :action => "index", :params => params[:browser_dir]
+
+    redirect_to :action => "index", :params => { :job_dir => gotopath }
   end
 
   # Upload file and store to :browse_path
-  def put
-    Redmine::CwaBrowserHelper.write(params[:browser_dir], params[:upload_file]) or
-      flash[:error] = "Could not store file(s) #{params[:upload_file]}"
-    redirect_to :action => "index", :params => params[:browser_dir]
+  def upload
+    upload = params["file"]
+    file = Redmine::CwaBrowserHelper::Put.new(params[:job_dir], upload.original_filename) or
+      flash[:error] = "Could not store file(s) #{upload.original_filename}"
+
+    while (data = upload.read(1024*128)) != nil
+      file.write(data)
+    end
+
+    file.done
+
+    redirect_to :action => "index", :params => params
+  end
+
+  def tail
+    type = Redmine::CwaBrowserHelper.type(params[:browser_file])
+    text = ""
+
+    if type !~ /^text\/.*/
+      text = "Cannot tail file!  It is not a text file!"
+    else
+      file = Redmine::CwaBrowserHelper.tail(params[:browser_file])
+      Rails.logger.debug "CwaBrowserController.tail() => Im in here! #{params[:browser_file]}"
+
+      file.each_tail do |data|
+        text += data
+      end
+    end
+
+    render :text => text
   end
 
   # Download file from :browse_path
   def get
-    offset = 0
-    bytes_left = 1
-    data = 1
-
     self.response.headers["Content-Type"] = "application/octet-stream"
     self.response.headers["Content-Disposition"] = "attachment; filename=#{params[:browser_file].split('/').last}"
     self.response.headers["Content-Length"] = Redmine::CwaBrowserHelper.file_size(params[:browser_file]).to_s
@@ -51,6 +101,16 @@ class CwaBrowserController < ApplicationController
     self.response.headers['Accept-Ranges'] = "bytes"
 
     self.response_body = Redmine::CwaBrowserHelper::Retrieve.new(params[:browser_file])
+  end
+  
+  # Download zip file archive of directory
+  def get_zip
+    self.response.headers["Content-Type"] = "application/octet-stream"
+    self.response.headers["Content-Disposition"] = "attachment; filename=#{params[:browser_file].split('/').last}.zip"
+    self.response.headers['Last-Modified'] = Time.now.ctime.to_s
+    self.response.headers['Accept-Ranges'] = "bytes"
+
+    self.response_body = Redmine::CwaBrowserHelper::RetrieveZip.new(params[:browser_file])
   end
 
 end

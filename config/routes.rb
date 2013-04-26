@@ -23,6 +23,13 @@ get 'cwa_default/not_activated', :to => 'cwa_default#not_activated'
 get 'cwa_browser', :to => 'cwa_browser#index'
 get 'cwa_dashboard', :to => 'cwa_dashboard#index'
 get 'cwa_browser/download', :to => 'cwa_browser#get'
+get 'cwa_browser/download_zip', :to => 'cwa_browser#get_zip'
+get 'cwa_browser/rename', :to => 'cwa_browser#rename'
+get 'cwa_browser/delete', :to => 'cwa_browser#delete'
+get 'cwa_browser/tail', :to => 'cwa_browser#tail'
+get 'cwa_browser/mkdir', :to => 'cwa_browser#mkdir'
+match 'cwa_browser/create', :to => 'cwa_browser#create', :via => :post
+match 'cwa_browser/upload', :to => 'cwa_browser#upload', :via => :post
 match 'cwa_accountsignup/create', :to => 'cwa_accountsignup#create', :via => :post
 match 'cwa_accountsignup/set_shell', :to => 'cwa_accountsignup#set_shell', :via => :post
 match 'cwa_accountsignup/delete', :to => 'cwa_accountsignup#delete', :via => :post

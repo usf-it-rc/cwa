@@ -33,9 +33,15 @@
 <% end %>
 
 <%= form_tag '/cwa_browser', :id => 'app_form', :multipart => true do %>
+<%= hidden_field_tag :selected_item, nil %>
 <div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory:</b> <%= browser.current_dir %></div>
 <div id="goHome" class="<%= browser.current_dir.include?(@user.homedirectory) ? "browserButtonSelected" : "browserButton" %>">Home</div>
 <div id="goWork" class="<%= browser.current_dir.include?(@user.workdirectory) ? "browserButtonSelected" : "browserButton" %>">Work</div>
+
+<div class="actionButton" onclick="createDirectory()">New Folder...</div>
+<div class="actionButton" onclick="showTextEditor()">Create File...</div>
+<div class="actionButton" onclick="showUploadFile()">Upload File...</div>
+
 <% if browser.current_dir != browser.home_dir && browser.current_dir != browser.work_dir %>
   <div id="goUpOne" class="browserButtonBack">&lt; Back</div>
 <% else %>
@@ -43,37 +49,111 @@
 <% end %>
 
 <div class="browserSelectorFull">
-<div class="browserBreadcrumbs">
-<!-- Insert Breadcrumbs -->
 
 <%= hidden_field_tag :job_dir, browser.current_dir %>
 
 <% browser.directories.each do |dir| %>
-<div class="browserDirEntryIcon" onmouseup="showMenu(event, 'menuDir'); select_directory(this)" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntryIcon"><%= dir %></p></div>
+<div class="browserDirEntryIcon" onmouseup="showMenu(event, 'menuDir'); select_directory(this);" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntryIcon"><%= dir %></p></div>
 <% end %>
 <% browser.files.each do |file| %>
-<div class="browserFileEntryIcon" onmouseup="showMenu(event, 'menuFile'); select_file(this);" onclick="select_file(this)" ondblclick="download_file(this)" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntryIcon"><%= file %></p></div>
+<div class="browserFileEntryIcon" onmouseup="showMenu(event, 'menuFile'); select_file(this);" onclick="select_file(this)" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntryIcon"><%= file %></p></div>
 <% end %>
-</div>
 </div>
 <% end %>
 
+<div id="upload">
+  <center>
+  <%= form_tag '/cwa_browser/upload', :id => 'upload_form', :multipart => true do %>
+    <b><p>Select file to upload</p></b>
+    <p><%= file_field_tag :file %></p>
+    <%= hidden_field_tag :job_dir, browser.current_dir %>
+    <%= submit_tag "Upload" %><%= button_to_function "Cancel", "hideUploadFile()"%>
+  <% end %>
+  </center>
+</div>
+
+<div id="tail" class="miniapp">
+  <center>
+  <%= form_tag '/cwa_browser/tail', :id => 'tail_box' do %>
+    <%= text_area_tag :tail_content, nil, { :rows => "28", :cols => "86", :readonly => true } %>
+    <%= button_to_function "Close", "hideTail()"%>
+  <% end %>
+  </center>
+</div>
+
+<div id="textEditor" class="miniapp">
+  <center>
+  <%= form_tag '/cwa_browser/create', :id => 'new_file_form', :multipart => true do %>
+    <%= label_tag :new_file_name, "New Text File Name" %>
+    <%= hidden_field_tag :job_dir, browser.current_dir %>
+    <%= text_field_tag :new_file_name, nil, :length => 128 %>
+    <%= text_area_tag :new_file_content, nil, { :rows => "28", :cols => "86" } %>
+    <%= submit_tag "Create" %><%= button_to_function "Cancel", "hideTextEditor()"%>
+  <% end %>
+  </center>
+</div>
+
 <div id="menuDir" class="menu">
-  <div class="menuItem" onclick="doSomething()">Rename...</div>
-  <div class="menuItem" onclick="doSomething()">Delete...</div>
-  <div class="menuItem" onclick="doSomething()">Download as Zip</div>
-  <div class="menuItem" onclick="doSomething()">Properties...</div>
+  <div class="menuItem" onclick="download_zipfile()">Download as Zip</div>
+  <div class="menuItem" onclick="rename()">Rename...</div>
+  <div class="menuItem" onclick="deleteItem()">Delete...</div>
 </div>
 
 <div id="menuFile" class="menu">
-  <div class="menuItem" onclick="doSomething()">Open/View...</div>
-  <div class="menuItem" onclick="doSomething()">Tail...</div>
-  <div class="menuItem" onclick="doSomething()">Rename...</div>
-  <div class="menuItem" onclick="doSomething()">Delete...</div>
-  <div class="menuItem" onclick="doSomething()">Properties...</div>
+  <div class="menuItem" onclick="download_file()">Download</div>
+  <div class="menuItem" onclick="showTail()">Tail...</div>
+  <div class="menuItem" onclick="rename()">Rename...</div>
+  <div class="menuItem" onclick="deleteItem()">Delete...</div>
 </div>
 
 <script>
+
+var tail_handle;
+var my_tail_func = function(){
+  var data = "";
+  $.get(
+    "/cwa_browser/tail", { 
+      browser_file : $('#selected_item').val()
+    }, 
+    function(data){ 
+      $("#tail_content").val('');
+      $("#tail_content").val(data); 
+    }
+  );
+  
+  $("#tail_content").scrollTop($("#tail_content")[0].scrollHeight);
+};
+
+function rename(){
+  var file_name = $('#selected_item').val();
+  var show_name = file_name.split("/");
+  var current_dir = "<%= browser.current_dir %>";
+  var new_name =  current_dir + "/" + prompt("Enter new file/directory name",show_name[show_name.length-1]);
+  var queryString = $('#app_form').serialize();
+  window.location = "<%= request.path %>/rename?browser_file=" + 
+    encodeURIComponent(file_name) + 
+    "&new_name=" + encodeURIComponent(new_name) + "&" +
+    queryString;
+}
+
+function createDirectory(){
+  var current_dir = "<%= browser.current_dir %>";
+  var new_dir = prompt("Enter new directory name");
+  var queryString = $('#app_form').serialize();
+  window.location = "<%= request.path %>/mkdir?new_dir=" + 
+    encodeURIComponent(new_dir) + "&" +
+    queryString;
+}
+
+function deleteItem(){
+  var file_name = $('#selected_item').val();
+  var show_name = file_name.split("/");
+  var queryString = $('#app_form').serialize();
+  if (confirm("Are you sure you want to delete " + show_name[show_name.length-1] + "?")) {
+    window.location = "<%= request.path %>/delete?browser_file=" + 
+      encodeURIComponent(file_name) + "&" + queryString;
+  }
+}
 
 document.getElementById('goHome').onclick = function(){
   var queryString = $('#app_form').serialize();
@@ -118,17 +198,23 @@ function clear_selected(){
 function select_directory(elem){
   clear_selected();
   elem.className = "browserDirEntryIconSelected";
-  document.forms['app_form'].job_dir.value = elem.id;
+  $('#job_dir').val(elem.id);
+  $('#selected_item').val(elem.id);
 }
 
 function select_file(elem){
   clear_selected();
   elem.className = "browserFileEntryIconSelected";
-  document.forms['app_form'].job_file.value = elem.id;
+  $('#job_file').val(elem.id);
+  $('#selected_item').val(elem.id);
 }
 
 function download_file(elem){
-  window.location.assign("<%= request.path %>/download?browser_file=" + encodeURIComponent(elem.id))
+  window.location.assign("<%= request.path %>/download?browser_file=" + encodeURIComponent($('#selected_item').val()));
+}
+
+function download_zipfile(elem){
+  window.location.assign("<%= request.path %>/download_zip?browser_file=" + encodeURIComponent($('#selected_item').val()));
 }
 
 function showMenu(event, elementId) {
@@ -182,5 +268,40 @@ function clearMenu() { //used to make the menu disappear
   menu.style.display = "none"; //don't show menu
   var menu = document.getElementById('menuFile');
   menu.style.display = "none"; //don't show menu
+}
+
+function showUploadFile(){
+  var menu = document.getElementById('upload');
+  menu.style.display = "block"; //don't show menu
+}
+
+function hideUploadFile(){
+  var menu = document.getElementById('upload');
+  menu.style.display = "none"; //don't show menu
+}
+
+function showTextEditor(){
+  var menu = document.getElementById('textEditor');
+  menu.style.display = "block"; //don't show menu
+}
+
+function hideTextEditor(){
+  var menu = document.getElementById('textEditor');
+  menu.style.display = "none"; //don't show menu
+  document.getElementById("new_file_form").reset();
+}
+
+function showTail(){
+  var menu = document.getElementById('tail');
+  menu.style.display = "block"; //don't show menu
+  my_tail_func();
+  tail_handle = setInterval(my_tail_func, 5000);
+}
+
+function hideTail(){
+  var menu = document.getElementById('tail');
+  menu.style.display = "none"; //don't show menu
+  document.getElementById("tail_box").reset();
+  clearInterval(tail_handle);
 }
 </script>

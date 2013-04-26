@@ -61,8 +61,8 @@ Redmine::Plugin.register :cwa do
        :caption => 'My Jobs', :after => :app_manager
   menu :project_menu, :wiki, { :controller => 'wiki', :action => 'show', :id => nil }, :param => :project_id,
        :caption => 'Documentation', :after => :cwa_jobmanager, :if => Proc.new { |p| p.wiki && !p.wiki.new_record? }
-  #menu :project_menu, :my_files, { :controller => 'cwa_browser', :action => 'index' },
-  #     :caption => 'My Files', :after => :wiki
+  menu :project_menu, :my_files, { :controller => 'cwa_browser', :action => 'index' },
+       :caption => 'My Files', :after => :wiki
   menu :project_menu, :cwa_stats, { :controller => 'cwa_stats', :action => 'index' }, 
        :caption => 'User Stats', :after => :wiki, :if => Proc.new { |p| User.current.admin? }
 #  menu :project_menu, :cwa_tutorials, { :controller => 'cwa_tutorials', :action => 'index' }, 
