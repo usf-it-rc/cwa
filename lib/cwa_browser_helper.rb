@@ -18,7 +18,8 @@ module Redmine::CwaBrowserHelper
 
     def delete(file)
       Rails.logger.debug "userexec(rm #{file})"
-      userexec("rm #{file}")[2] == 0 ? true : false
+      # TODO: Make this safer!
+      #userexec("rm #{file}")[2] == 0 ? true : false
     end
 
     def mkdir(file)
