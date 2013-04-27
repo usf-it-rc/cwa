@@ -1,17 +1,10 @@
 class CwaBrowser
   attr_accessor :current_dir
   def initialize(dir)
-    case dir
-    when "HOME"
-      self.current_dir = self.home_dir
-    when "WORK"
-      self.current_dir = self.work_dir
+    if dir !~ /(\/home|\/work)\/#{User.current.login[0,1]}\/#{User.current.login}.*/ and dir !~ /\/shares\/.*/
+      raise ArgumentError, "You cannot browse directories outside of your home, work, or group share paths."
     else
-      if dir.chomp.include?(self.home_dir) || dir.chomp.include?(self.work_dir)
-        self.current_dir = dir.chomp
-      else
-        raise ArgumentError, "Don't play games with me.  You cannot browse directories outside of your home or work paths."
-      end
+      self.current_dir = dir.chomp
     end
   end
 

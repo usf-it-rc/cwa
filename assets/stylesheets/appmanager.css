@@ -6,18 +6,18 @@ div.browserButton {
   background:#BCC2C5;
   float:left;
   position:relative;
-  padding: 3px;
+  padding: 8px 0px;
   text-align:center;
-  max-width:64px;
-  min-width:56px;
+  font-weight: bold;
+  width: 100%;
   border:1px solid #DFDFDF;
   border-bottom: 1px solid #CDD3D6;
   border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  border-bottom-left-radius: 8px;
   -moz-border-top-left-radius: 8px;
-  -moz-border-top-right-radius: 8px;
+  -moz-border-bottom-left-radius: 8px;
   -webkit-border-top-left-radius: 8px;
-  -webkit-border-top-right-radius: 8px;
+  -webkit-border-bottom-left-radius: 8px;
   z-index:2;
   -webkit-user-select: none; /* Chrome/Safari */        
   -moz-user-select: none; /* Firefox */
@@ -32,18 +32,18 @@ div.browserButtonSelected {
   float:left;
   position:relative;
   background:#DEE4E7;
-  padding: 3px;
+  padding: 8px 0px;
   text-align: center;
-  max-width:64px;
-  min-width:56px;
+  font-weight: bold;
+  width:100%;
   border:1px solid #DFDFDF;
   border-bottom: 1px solid #DEE4E7;
   border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  border-bottom-left-radius: 8px;
   -moz-border-top-left-radius: 8px;
-  -moz-border-top-right-radius: 8px;
+  -moz-border-bottom-left-radius: 8px;
   -webkit-border-top-left-radius: 8px;
-  -webkit-border-top-right-radius: 8px;
+  -webkit-border-bottom-left-radius: 8px;
   z-index:2;
   -webkit-user-select: none; /* Chrome/Safari */        
   -moz-user-select: none; /* Firefox */
@@ -57,50 +57,57 @@ div.browserButtonSelected {
 div.browserButtonBack {
   float:right;
   position:relative;
-  color: #FFFFFF;
-  background:#006747;
-  padding: 3px;
-  text-align: center;
-  text-decoration: bold;
-  max-width:64px;
-  min-width:48px;
-  border:1px solid #DFDFDF;
-  border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  z-index:2;
-  -webkit-user-select: none; /* Chrome/Safari */        
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+ */
-
-  /* Rules below not implemented in browsers yet */
-  -o-user-select: none;
-  user-select: none;
   cursor: default;
+  -moz-box-shadow:inset 0px 1px 0px 0px #f7c5c0;
+  -webkit-box-shadow:inset 0px 1px 0px 0px #f7c5c0;
+  box-shadow:inset 0px 1px 0px 0px #f7c5c0;
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fc8d83), color-stop(1, #e4685d) );
+  background:-moz-linear-gradient( center top, #fc8d83 5%, #e4685d 100% );
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fc8d83', endColorstr='#e4685d');
+  background-color:#fc8d83;
+  -moz-border-radius:6px;
+  -webkit-border-radius:6px;
+  border-radius:6px;
+  border:1px solid #d83526;
+  display:inline-block;
+  color:#ffffff;
+  font-family:arial;
+  font-size:15px;
+  font-weight:bold;
+  padding:6px 24px;
+  text-decoration:none;
+  text-shadow:1px 1px 0px #b23e35;
+}.browserButtonBack.hover {
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #e4685d), color-stop(1, #fc8d83) );
+  background:-moz-linear-gradient( center top, #e4685d 5%, #fc8d83 100% );
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#e4685d', endColorstr='#fc8d83');
+  background-color:#e4685d;
+}.browserButtonBack:active {
+  position:relative;
+  top:1px;
 }
 div.browserButtonBackInactive {
   float:right;
   position:relative;
-  color: #AFAFAF;
-  background:#006747;
-  padding: 3px;
-  text-align: center;
-  text-decoration: bold;
-  max-width:64px;
-  min-width:48px;
-  border:1px solid #DFDFDF;
-  border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  z-index:2;
-  -webkit-user-select: none; /* Chrome/Safari */        
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+ */
-
-  /* Rules below not implemented in browsers yet */
-  -o-user-select: none;
-  user-select: none;
   cursor: default;
+  -moz-box-shadow:inset 0px 1px 0px 0px #f7c5c0;
+  -webkit-box-shadow:inset 0px 1px 0px 0px #f7c5c0;
+  box-shadow:inset 0px 1px 0px 0px #f7c5c0;
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fc8d83), color-stop(1, #e4685d) );
+  background:-moz-linear-gradient( center top, #fc8d83 5%, #e4685d 100% );
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fc8d83', endColorstr='#e4685d');
+  background-color:#fc8d83;
+  -moz-border-radius:6px;
+  -webkit-border-radius:6px;
+  border-radius:6px;
+  border:1px solid #d83526;
+  display:inline-block;
+  color:#bbbbbb;
+  font-family:arial;
+  font-size:15px;
+  font-weight:bold;
+  padding:6px 24px;
+  text-decoration:none;
 }
 div.browserSelector {
   float:left;
@@ -114,29 +121,37 @@ div.browserSelector {
 div.browserSelectorFull {
   float:left;
   position:relative;
+  width: 90%;
   padding-top: 18px;
   padding-bottom: 18px;
-  background: #FFFFFF;
+  background: #DEE4E7;
   border-top: 12px solid #DEE4E7;
+  min-height: 550px;
+  margin-top:12px;
+}
+
+div.actionButtons {
+  float: left; 
+  position: relative; 
   width: 100%;
 }
 
 div.browserDirEntry {
-  background: #FFFFFF url('/plugin_assets/cwa/images/folder.png') no-repeat left;
-  background-size: 24px 24px;
-  z-index:10;
-  padding: 4px;
-}
-
-div.browserDirEntrySelected {
   background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
   padding: 4px;
 }
 
+div.browserDirEntrySelected {
+  background: #BCC2C5 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
+  background-size: 24px 24px;
+  z-index:10;
+  padding: 4px;
+}
+
 div.browserDirEntryIcon {
-  background: #FFFFFF url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
+  background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
   background-size: 42px 42px;
   z-index:10;
   padding: 12px;
@@ -152,7 +167,7 @@ div.browserDirEntryIcon {
 }
 
 div.browserDirEntryIconSelected {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
+  background: #BCC2C5 url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
   background-size: 42px 42px;
   z-index:10;
   padding: 12px;
@@ -207,14 +222,14 @@ p.browserEntryIcon {
 }
 
 div.browserFileEntry {
-  background: #FFFFFF url('/plugin_assets/cwa/images/file.png') no-repeat left;
+  background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
   padding: 4px;
 }
 
 div.browserFileEntryDisabled {
-  background: #FFFFFF url('/plugin_assets/cwa/images/file.png') no-repeat left;
+  background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat left;
   background-size: 24px 24px;
   color: #AAAAAA;
   z-index:10;
@@ -222,7 +237,7 @@ div.browserFileEntryDisabled {
 }
 
 div.browserFileEntrySelected {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat left;
+  background: #BCC2C5 url('/plugin_assets/cwa/images/file.png') no-repeat left;
   background-size: 24px 24px;
   color: #000000;
   z-index:10;
@@ -230,7 +245,7 @@ div.browserFileEntrySelected {
 }
 
 div.browserFileEntryIcon {
-  background: #FFFFFF url('/plugin_assets/cwa/images/file.png') no-repeat center top;
+  background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat center top;
   background-size: 42px 42px;
   z-index:10;
   padding: 12px;
@@ -241,7 +256,7 @@ div.browserFileEntryIcon {
 }
 
 div.browserFileEntryIconSelected {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat center top;
+  background: #BCC2C5 url('/plugin_assets/cwa/images/file.png') no-repeat center top;
   background-size: 42px 42px;
   color: #000000;
   z-index:10;
@@ -253,7 +268,7 @@ div.browserFileEntryIconSelected {
 }
 
 div.browserDirEntry:hover {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
+  background: #BCC2C5 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
   padding: 4px;
@@ -261,14 +276,14 @@ div.browserDirEntry:hover {
 }
 
 div.browserDirEntryIcon:hover {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
+  background: #BCC2C5 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
   padding: 4px;
 }
 
 div.browserFileEntry:hover {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat left;
+  background: #BCC2C5 url('/plugin_assets/cwa/images/file.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
   padding: 4px;
@@ -352,14 +367,35 @@ div#upload {
 div.actionButton {
   float: right;
   position: relative;
-  background: #BCC2C5;
-  cursor: default;
-  padding: 3px 3px 3px 3px;
-  margin-left: 8px;
-  border: 1px solid #000000;
-  border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
+  -moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+  -webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+  box-shadow:inset 0px 1px 0px 0px #ffffff;
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+  background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+  background-color:#ededed;
+  -moz-border-radius:6px;
+  -webkit-border-radius:6px;
+  border-radius:6px;
+  border:1px solid #dcdcdc;
+  display:inline-block;
+  color:#777777;
+  font-family:arial;
+  font-size:15px;
+  font-weight:bold;
+  padding:6px 24px;
+  text-decoration:none;
+  text-shadow:1px 1px 0px #ffffff;
+}
+div.actionButton:hover {
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+  background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+  background-color:#dfdfdf;
+}
+div.actionButton:active {
+    position:relative;
+    top:1px;
 }
 
 div.miniapp {
