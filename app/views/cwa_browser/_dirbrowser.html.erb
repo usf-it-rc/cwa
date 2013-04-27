@@ -1,79 +1,47 @@
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
 
-<% if params[:job_dir] != nil %>
+<% if params[:dir] != nil %>
   <% begin %>
-    <% browser = CwaBrowser.new params[:job_dir] %>
+    <% @browser = CwaBrowser.new params[:dir] %>
   <% rescue Exception => e %>
     <% flash[:error] = e.message %>
-    <% browser = CwaBrowser.new @user.homedirectory %>
-    <% params[:job_dir] = @user.homedirectory %>
+    <% @browser = CwaBrowser.new @user.homedirectory %>
+    <% params[:dir] = @user.homedirectory %>
     <script type="text/javascript">
       window.location="<%= request.path %>"
     </script>
   <% end %>
-  <%= hidden_field_tag :current_dir, params[:job_dir] %>
+  <%= hidden_field_tag :current_dir, params[:dir] %>
 <% else %>
-  <% browser = CwaBrowser.new @user.homedirectory %>
+  <% @browser = CwaBrowser.new @user.homedirectory %>
   <%= hidden_field_tag :current_dir, @user.homedirectory %>
 <% end %>
 
-<div>
-<div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory: </b> <%= browser.current_dir %></div>
-<div id="goHome" class="<%= browser.current_dir.include?(@user.homedirectory) ? "browserButtonSelected" : "browserButton" %>">Home</div>
-<div id="goWork" class="<%= browser.current_dir.include?(@user.workdirectory) ? "browserButtonSelected" : "browserButton" %>">Work</div>
-<% if browser.current_dir != browser.home_dir && browser.current_dir != browser.work_dir %>
-  <div id="goUpOne" class="browserButtonBack">&lt; Back</div>
-<% else %>
-  <div class="browserButtonBackInactive">&lt; Back</div>
-<% end %>
-<div class="browserSelector">
-<div class="browserContainer" style="width: 100%">
-<center><p>Select a directory...</p></center>
-<%= hidden_field_tag :job_dir, browser.current_dir %>
-<% browser.directories.each do |dir| %>
-<div class="browserDirEntry" onclick="select_directory(this)" ondblclick="change_directory(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
-<% end %>
-<% browser.files.each do |file| %>
-<div class="browserFileEntryDisabled" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntry"><%= file %></p></div>
- <% end %>
-</div>
-</div>
-</div>
-
 <script>
-document.getElementById('goHome').onclick = function(){
-  var queryString = $('#app_form').serialize();
-  window.location = "<%= request.path %>?" + queryString + "&job_dir=<%= CGI.escape(@user.homedirectory) %>";
-};
-
-document.getElementById('goWork').onclick = function(){
-  var queryString = $('#app_form').serialize();
-  window.location = "<%= request.path %>?" + queryString + "&job_dir=<%= CGI.escape(@user.workdirectory) %>";;
-};
-
-<% if browser.current_dir != browser.home_dir && browser.current_dir != browser.work_dir %>
-document.getElementById('goUpOne').onclick = function(){
-  var queryString = $('#app_form').serialize();
-  window.location = "<%= request.path %>?" + queryString + "&job_dir=<%= CGI.escape(browser.up_dir) %>";
-};
-<% end %>
-
-function change_directory(elem){
-  document.forms['app_form'].job_dir.value = elem.id;
-  var queryString = $('#app_form').serialize();
-  window.location = "<%= request.path %>?" + queryString;
-};
-
-function select_directory(elem){
-  var selected = document.getElementsByClassName("browserDirEntrySelected"),
-      items = selected.length,
-      element = null;
-  for (var i = 0; i < items; i++){
-    element = selected[i];
-    element.className = "browserDirEntry";
-  }
-  elem.className = "browserDirEntrySelected";
-  document.forms['app_form'].job_dir.value = elem.id;
-}
-
+<%= render :partial => 'cwa_browser/browser.js.erb' %>
 </script>
+
+<div>
+  <div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory: </b> <%= @browser.current_dir %></div>
+  <div id="<%= @user.homedirectory %>" onclick="chdir(this)" class="actionButton">Home</div>
+  <div id="<%= @user.workdirectory %>" onclick="chdir(this)" class="actionButton">Work</div>
+
+  <% if @browser.current_dir != @user.homedirectory && @browser.current_dir != @user.workdirectory %>
+    <div class="browserButtonBack" onclick="back()">&lt; Back</div>
+  <% else %>
+    <div class="browserButtonBackInactive">&lt; Back</div>
+  <% end %>
+
+  <div class="browserSelector">
+    <div class="browserContainer" style="width: 100%">
+      <center><p>Select a directory...</p></center>
+      <%= hidden_field_tag :job_dir, @browser.current_dir %>
+      <% @browser.directories.each do |dir| %>
+        <div class="browserDirEntry" onclick="$('#job_dir').val(this.id); select_directory(this)" ondblclick="chdir(this);" id="<%= @browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
+      <% end %>
+      <% @browser.files.each do |file| %>
+        <div class="browserFileEntryDisabled" id="<%= @browser.current_dir + '/' + file %>"><p class="browserEntry"><%= file %></p></div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,36 +1,22 @@
-<script type="text/javascript">
-  if (document.addEventListener) {
-    document.addEventListener('contextmenu', function(event) {
-      event.preventDefault();
-    }, false);
-    document.addEventListener('click', function() {
-      clearMenu();
-    }, false);
-  } else {
-    document.attachEvent('oncontextmenu', function() {
-      window.event.returnValue = false;
-    });
-    document.attachEvent('onclick', function() {
-      clearMenu();
-    });
-  };
-</script>
-
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
 <% if params[:dir] != nil %>
   <% begin %>
-    <% browser = CwaBrowser.new params[:dir] %>
+    <% @browser = CwaBrowser.new params[:dir] %>
   <% rescue Exception => e %>
     <% flash[:error] = e.message %>
-    <% browser = CwaBrowser.new @user.homedirectory %>
+    <% @browser = CwaBrowser.new @user.homedirectory %>
     <% params[:dir] = @user.homedirectory %>
     <script type="text/javascript">
       window.location="<%= request.path %>"
     </script>
   <% end %>
 <% else %>
-  <% browser = CwaBrowser.new @user.homedirectory %>
+  <% @browser = CwaBrowser.new @user.homedirectory %>
 <% end %>
+
+<script>
+<%= render :partial => 'cwa_browser/browser.js.erb' %>
+</script>
 
 <div style="margin: 18px">
 <%= form_tag '/cwa_browser', :id => 'app_form', :multipart => true do %>
@@ -40,32 +26,32 @@
     <div class="actionButton" onclick="showTextEditor()">Create File...</div>
     <div class="actionButton" onclick="showUploadFile()">Upload File...</div>
 
-    <% if browser.current_dir != browser.home_dir && browser.current_dir != browser.work_dir && browser.current_dir !~ /\/shares\/[a-zA-Z0-9_-]+$/ %>
+    <% if @browser.current_dir != @browser.home_dir && @browser.current_dir != @browser.work_dir && @browser.current_dir !~ /\/shares\/[a-zA-Z0-9_-]+$/ %>
       <div class="browserButtonBack" onclick="back()">&lt; Back</div>
     <% else %>
       <div class="browserButtonBackInactive">&lt; Back</div>
     <% end %>
-    <div style="float:left; position:relative; vertical-align:center; text-align:center;"><b>Path:</b> <%= text_field_tag :current_dir, browser.current_dir, :size => browser.current_dir.length < 72 ? browser.current_dir.length : 72, :disabled => true %></div>
+    <div style="float:left; position:relative; vertical-align:center; text-align:center;"><b>Path:</b> <%= text_field_tag :current_dir, @browser.current_dir, :size => @browser.current_dir.length < 72 ? @browser.current_dir.length : 72, :disabled => true %></div>
   </div>
 
   <div id="shares" style="float: left; position:relative; width:10%; margin-top:12px;">
-    <div id="<%= @user.homedirectory %>" onclick="chdir(this)" class="<%= browser.current_dir.include?(@user.homedirectory) ? "browserButtonSelected" : "browserButton" %>">Home</div>
-    <div id="<%= @user.workdirectory %>" onclick="chdir(this)" class="<%= browser.current_dir.include?(@user.workdirectory) ? "browserButtonSelected" : "browserButton" %>">Work</div>
+    <div id="<%= @user.homedirectory %>" onclick="chdir(this)" class="<%= @browser.current_dir.include?(@user.homedirectory) ? "browserButtonSelected" : "browserButton" %>">Home</div>
+    <div id="<%= @user.workdirectory %>" onclick="chdir(this)" class="<%= @browser.current_dir.include?(@user.workdirectory) ? "browserButtonSelected" : "browserButton" %>">Work</div>
 
     <% @group_list.each do |group| %>
-      <div id="/shares/<%= group[:cn] %>" onclick="chdir(this)" class="<%= "/shares/" + browser.current_dir.split("/")[2] == "/shares/" + group[:cn] ? "browserButtonSelected" : "browserButton" %>"><%= group[:cn] %></div>
+      <div id="/shares/<%= group[:cn] %>" onclick="chdir(this)" class="<%= "/shares/" + @browser.current_dir.split("/")[2] == "/shares/" + group[:cn] ? "browserButtonSelected" : "browserButton" %>"><%= group[:cn] %></div>
     <% end %>
   </div>
 
   <div class="browserSelectorFull">
 
-<%= hidden_field_tag :dir, browser.current_dir %>
+<%= hidden_field_tag :dir, @browser.current_dir %>
 
-<% browser.directories.each do |dir| %>
-<div class="browserDirEntryIcon" onmouseup="showMenu(event, 'menuDir'); select_directory(this);" onclick="select_directory(this)" ondblclick="chdir(this)" id="<%= browser.current_dir + '/' + dir %>"><p class="browserEntryIcon"><%= dir %></p></div>
+<% @browser.directories.each do |dir| %>
+<div class="browserDirEntryIcon" onmouseup="showMenu(event, 'menuDir'); select_directory(this);" onclick="select_directory(this)" ondblclick="chdir(this)" id="<%= @browser.current_dir + '/' + dir %>"><p class="browserEntryIcon"><%= dir %></p></div>
 <% end %>
-<% browser.files.each do |file| %>
-<div class="browserFileEntryIcon" onmouseup="showMenu(event, 'menuFile'); select_file(this);" onclick="select_file(this)" id="<%= browser.current_dir + '/' + file %>"><p class="browserEntryIcon"><%= file %></p></div>
+<% @browser.files.each do |file| %>
+<div class="browserFileEntryIcon" onmouseup="showMenu(event, 'menuFile'); select_file(this);" onclick="select_file(this)" id="<%= @browser.current_dir + '/' + file %>"><p class="browserEntryIcon"><%= file %></p></div>
 <% end %>
 </div>
 <% end %>
@@ -76,7 +62,7 @@
   <%= form_tag '/cwa_browser/upload', :id => 'upload_form', :multipart => true do %>
     <b><p>Select file to upload</p></b>
     <p><%= file_field_tag :file %></p>
-    <%= hidden_field_tag :dir, browser.current_dir %>
+    <%= hidden_field_tag :dir, @browser.current_dir %>
     <%= submit_tag "Upload" %><%= button_to_function "Cancel", "hideUploadFile()"%>
   <% end %>
   </center>
@@ -95,7 +81,7 @@
   <center>
   <%= form_tag '/cwa_browser/create', :id => 'new_file_form', :multipart => true do %>
     <%= label_tag :new_file_name, "New Text File Name" %>
-    <%= hidden_field_tag :dir, browser.current_dir %>
+    <%= hidden_field_tag :dir, @browser.current_dir %>
     <%= text_field_tag :new_file_name, nil, :length => 128 %>
     <%= text_area_tag :new_file_content, nil, { :rows => "28", :cols => "86" } %>
     <%= submit_tag "Create" %><%= button_to_function "Cancel", "hideTextEditor()"%>
@@ -115,185 +101,3 @@
   <div class="menuItem" onclick="rename()">Rename...</div>
   <div class="menuItem" onclick="deleteItem()">Delete...</div>
 </div>
-
-<script>
-
-var tail_handle;
-var my_tail_func = function(){
-  var data = "";
-  $.get(
-    "/cwa_browser/tail", { 
-      file : $('#selected_item').val()
-    }, 
-    function(data){ 
-      $("#tail_content").val('');
-      $("#tail_content").val(data); 
-    }
-  );
-  
-  $("#tail_content").scrollTop($("#tail_content")[0].scrollHeight);
-};
-
-function rename(){
-  var file_name = $('#selected_item').val();
-  var show_name = file_name.split("/");
-  var current_dir = "<%= browser.current_dir %>";
-  var new_name =  current_dir + "/" + prompt("Enter new file/directory name",show_name[show_name.length-1]);
-  window.location = "<%= request.path %>/rename?file=" + 
-    encodeURIComponent(file_name) + 
-    "&new_name=" + encodeURIComponent(new_name) + "&dir=" + encodeURIComponent("<%= browser.current_dir %>");
-
-};
-
-function createDirectory(){
-  var current_dir = "<%= browser.current_dir %>";
-  var new_dir = prompt("Enter new directory name");
-  window.location = "<%= request.path %>/mkdir?new_dir=" + 
-    encodeURIComponent(new_dir) + "&dir=" + encodeURIComponent("<%= browser.current_dir %>");
-};
-
-function deleteItem(){
-  var file_name = $('#selected_item').val();
-  var show_name = file_name.split("/");
-  var queryString = $('#app_form').serialize();
-  if (confirm("Are you sure you want to delete " + show_name[show_name.length-1] + "?")) {
-    window.location = "<%= request.path %>/delete?file=" + encodeURIComponent(file_name) + 
-      "&dir=" + encodeURIComponent("<%= browser.current_dir %>");
-  }
-};
-
-function chdir(elem){
-  window.location = "<%= request.path %>?dir=" + encodeURIComponent(elem.id);
-};
-
-function back(){
-  window.location = "<%= request.path %>?dir=" + encodeURIComponent("<%= browser.up_dir %>");
-};
-
-function clear_selected(){
-  var selected = document.getElementsByClassName("browserDirEntryIconSelected"),
-    items = selected.length,
-    element = null;
-  for (var i = 0; i < items; i++){
-    element = selected[i];
-    element.className = "browserDirEntryIcon";
-  }
-  var selected = document.getElementsByClassName("browserFileEntryIconSelected"),
-    items = selected.length,
-    element = null;
-  for (var i = 0; i < items; i++){
-    element = selected[i];
-    element.className = "browserFileEntryIcon";
-  }
-}
-
-function select_directory(elem){
-  clear_selected();
-  elem.className = "browserDirEntryIconSelected";
-  $('#dir').val(elem.id);
-  $('#selected_item').val(elem.id);
-}
-
-function select_file(elem){
-  clear_selected();
-  elem.className = "browserFileEntryIconSelected";
-  $('#job_file').val(elem.id);
-  $('#selected_item').val(elem.id);
-}
-
-function download_file(elem){
-  window.location.assign("<%= request.path %>/download?file=" + encodeURIComponent($('#selected_item').val()));
-}
-
-function download_zipfile(elem){
-  window.location.assign("<%= request.path %>/download_zip?file=" + encodeURIComponent($('#selected_item').val()));
-}
-
-function showMenu(event, elementId) {
-  /*  check whether the event is a right click 
-   *  because different browser (ahem IE) assign different numbers to the keys to
-   *  your mouse buttons and different values to the event, you'll have to do some evaluation
-   */
-  var rightclick; //will be set to true or false
-  if (event.button) {
-    rightclick = (event.button == 2);
-  } else if (e.button) {
-    rightclick = (event.which == 3);
-  }
- 
-  if(rightclick) { //if the secondary mouse botton was clicked
-    var menu = document.getElementById(elementId);
-    menu.style.display = "block"; //show menu
-
-    var x = event.clientX; //get X and Y coordinance for menu position
-    var y = event.clientY;
- 
-    //This section is necessary if you click on the far right edge or bottom
-    //The 200 is arbitrary, choose whatever number you want based on how large your menu is
-    if(window.innerWidth) {
-      windowWidth = window.innerWidth;
-      windowHeight = window.innerHeight;
-    } else if(document.documentElement.clientWidth) {
-      windowWidth = document.documentElement.clientWidth;
-      windowHeight = document.documentElement.clientHeight;
-    } else {
-      windowWidth = document.getElementsByTagName('body')[0].clientWidth;
-      windowHeight = document.getElementsByTagName('body')[0].clientHeight;
-    }
-    if(windowWidth < (x + 200)) {
-      x = x - 200;
-    }
-    if(windowHeight < (y + 200)) {
-      y -= 200;
-    }
- 
-    //position the menu
-    menu.style.position = "fixed"; // use fixed or it will not work when the window is scrolled
-    menu.style.top = y+"px";
-    menu.style.left= x+"px";
-  }
-}
- 
-function clearMenu() { //used to make the menu disappear
-  //this function should be used at the beginning of any function that is called from the menu
-  var menu = document.getElementById('menuDir');
-  menu.style.display = "none"; //don't show menu
-  var menu = document.getElementById('menuFile');
-  menu.style.display = "none"; //don't show menu
-}
-
-function showUploadFile(){
-  var menu = document.getElementById('upload');
-  menu.style.display = "block"; //don't show menu
-}
-
-function hideUploadFile(){
-  var menu = document.getElementById('upload');
-  menu.style.display = "none"; //don't show menu
-}
-
-function showTextEditor(){
-  var menu = document.getElementById('textEditor');
-  menu.style.display = "block"; //don't show menu
-}
-
-function hideTextEditor(){
-  var menu = document.getElementById('textEditor');
-  menu.style.display = "none"; //don't show menu
-  document.getElementById("new_file_form").reset();
-}
-
-function showTail(){
-  var menu = document.getElementById('tail');
-  menu.style.display = "block"; //don't show menu
-  my_tail_func();
-  tail_handle = setInterval(my_tail_func, 5000);
-}
-
-function hideTail(){
-  var menu = document.getElementById('tail');
-  menu.style.display = "none"; //don't show menu
-  document.getElementById("tail_box").reset();
-  clearInterval(tail_handle);
-}
-</script>
