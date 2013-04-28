@@ -1,24 +1,5 @@
-<%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
-
-<% if params[:dir] != nil %>
-  <% begin %>
-    <% @browser = CwaBrowser.new params[:dir] %>
-  <% rescue Exception => e %>
-    <% flash[:error] = e.message %>
-    <% @browser = CwaBrowser.new @user.homedirectory %>
-    <% params[:dir] = @user.homedirectory %>
-    <script type="text/javascript">
-      window.location="<%= request.path %>"
-    </script>
-  <% end %>
-  <%= hidden_field_tag :current_dir, params[:dir] %>
-<% else %>
-  <% @browser = CwaBrowser.new @user.homedirectory %>
-  <%= hidden_field_tag :current_dir, @user.homedirectory %>
-<% end %>
-
 <script>
-<%= render :partial => 'cwa_browser/browser.js.erb' %>
+  <%= render :partial => 'cwa_browser/browser.js.erb' %>
 </script>
 
 <div>
@@ -35,9 +16,9 @@
   <div class="browserSelector">
     <div class="browserContainer" style="width: 100%">
       <center><p>Select a directory...</p></center>
-      <%= hidden_field_tag :job_dir, @browser.current_dir %>
+      <%= hidden_field_tag :selected_dir, @browser.current_dir %>
       <% @browser.directories.each do |dir| %>
-        <div class="browserDirEntry" onclick="$('#job_dir').val(this.id); select_directory(this)" ondblclick="chdir(this);" id="<%= @browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
+        <div class="browserDirEntry" onclick="select_directory(this)" ondblclick="chdir(this);" id="<%= @browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
       <% end %>
       <% @browser.files.each do |file| %>
         <div class="browserFileEntryDisabled" id="<%= @browser.current_dir + '/' + file %>"><p class="browserEntry"><%= file %></p></div>

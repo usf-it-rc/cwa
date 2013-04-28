@@ -38,7 +38,7 @@
       </td>
       <td>
         <% if workdir != nil %>
-          <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :job_dir => workdir %>
+          <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :dir => workdir %>
         <% else %>
           n/a
         <% end %>

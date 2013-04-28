@@ -1,26 +1,13 @@
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
-<% if params[:dir] != nil %>
-  <% begin %>
-    <% @browser = CwaBrowser.new params[:dir] %>
-  <% rescue Exception => e %>
-    <% flash[:error] = e.message %>
-    <% @browser = CwaBrowser.new @user.homedirectory %>
-    <% params[:dir] = @user.homedirectory %>
-    <script type="text/javascript">
-      window.location="<%= request.path %>"
-    </script>
-  <% end %>
-<% else %>
-  <% @browser = CwaBrowser.new @user.homedirectory %>
-<% end %>
-
 <script>
-<%= render :partial => 'cwa_browser/browser.js.erb' %>
+  <%= render :partial => 'cwa_browser/browser.js.erb' %>
 </script>
 
 <div style="margin: 18px">
 <%= form_tag '/cwa_browser', :id => 'app_form', :multipart => true do %>
 <%= hidden_field_tag :selected_item, nil %>
+<%= hidden_field_tag :selected_dir, nil %>
+<%= hidden_field_tag :selected_file, nil %>
   <div class="actionButtons">
     <div class="actionButton" onclick="createDirectory()">New Folder...</div>
     <div class="actionButton" onclick="showTextEditor()">Create File...</div>
@@ -44,8 +31,6 @@
   </div>
 
   <div class="browserSelectorFull">
-
-<%= hidden_field_tag :dir, @browser.current_dir %>
 
 <% @browser.directories.each do |dir| %>
 <div class="browserDirEntryIcon" onmouseup="showMenu(event, 'menuDir'); select_directory(this);" onclick="select_directory(this)" ondblclick="chdir(this)" id="<%= @browser.current_dir + '/' + dir %>"><p class="browserEntryIcon"><%= dir %></p></div>

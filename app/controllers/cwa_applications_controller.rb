@@ -52,6 +52,7 @@ class CwaApplicationsController < ApplicationController
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     @project = Project.find(Redmine::Cwa.project_id)
     @apps = CwaApplication.all.sort_by &:name
+
     respond_to do |format|
       format.html
     end
@@ -64,6 +65,20 @@ class CwaApplicationsController < ApplicationController
     @app = CwaApplication.find(params[:id])
     @job = RsgeJob.new
     @times = Array.new
+    @browser = nil
+
+    if params[:dir] != nil
+      begin 
+        @browser = CwaBrowser.new params[:dir]
+      rescue Exception => e
+        flash[:error] = e.message
+        @browser = CwaBrowser.new @user.homedirectory
+        redirect_to :action => 'display', params => { :dir => @user.homedirectory }
+        return
+      end
+    else
+      @browser = CwaBrowser.new @user.homedirectory
+    end 
 
     (1..168).to_a.each { |t| @times << t.to_s + ":00:00" }
 

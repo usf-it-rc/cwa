@@ -19,11 +19,11 @@ var my_tail_func = function(){
   var data = "";
   $.get(
     "/cwa_browser/tail", { 
-      file : $('#selected_item').val()
+      file : $('#selected_file').val()
     }, 
     function(data){ 
-      $("#tail_content").val('');
-      $("#tail_content").val(data); 
+      $('#tail_content').val('');
+      $('#tail_content').val(data);
     }
   );
   
@@ -59,7 +59,6 @@ function deleteItem(){
 };
 
 function chdir(elem){
-  select_directory(elem);
   window.location = "<%= request.path %>?dir=" + encodeURIComponent(elem.id);
 };
 
@@ -67,51 +66,56 @@ function back(){
   window.location = "<%= request.path %>?dir=" + encodeURIComponent("<%= @browser.up_dir %>");
 };
 
+// Dustin Diaz's getElementsByClass to search for elements by class name regex
+function getElementsByClass(searchClass,node,tag) {
+  var classElements = new Array();
+  if ( node == null )
+    node = document;
+  if ( tag == null )
+    tag = '*';
+  var els = node.getElementsByTagName(tag);
+  var elsLen = els.length;
+  var pattern = new RegExp(searchClass);
+  for (i = 0, j = 0; i < elsLen; i++) {
+    if ( pattern.test(els[i].className) ) {
+      classElements[j] = els[i];
+      j++;
+    }
+  }
+  return classElements;
+}
+
 function clear_selected(){
-  var selected = document.getElementsByClassName("browserDirEntrySelected"),
+  var selected = getElementsByClass("^.*(File|Dir).*Selected$"),
     items = selected.length,
     element = null;
   for (var i = 0; i < items; i++){
     element = selected[i];
-    element.className = "browserDirEntry";
-  }
-  var selected = document.getElementsByClassName("browserFileEntryIcon"),
-    items = selected.length,
-    element = null;
-  for (var i = 0; i < items; i++){
-    element = selected[i];
-    element.className = "browserFileEntry";
-  }
-  var selected = document.getElementsByClassName("browserDirEntryIconSelected"),
-    items = selected.length,
-    element = null;
-  for (var i = 0; i < items; i++){
-    element = selected[i];
-    element.className = "browserDirEntryIcon";
-  }
-  var selected = document.getElementsByClassName("browserFileEntryIconSelected"),
-    items = selected.length,
-    element = null;
-  for (var i = 0; i < items; i++){
-    element = selected[i];
-    element.className = "browserFileEntryIcon";
+    new_name = element.className.replace("Selected","");
+    element.className = new_name;
   }
 }
 
 function select_directory(elem){
   var className = elem.className;
-  clear_selected();
-  elem.className = className + "Selected";
-  $('#dir').val(elem.id);
-  $('#selected_item').val(elem.id);
+  var re = new RegExp(".*Selected$");
+  if (!elem.className.match(re)){
+    clear_selected();
+    elem.className = className + "Selected";
+  }
+  $("#selected_dir").val(elem.id);
+  $("#selected_item").val(elem.id);
 }
 
 function select_file(elem) {
   var className = elem.className;
-  clear_selected();
-  elem.className = className + "Selected";
-  $('#file').val(elem.id);
-  $('#selected_item').val(elem.id);
+  var re = new RegExp(".*Selected$");
+  if (!elem.className.match(re)){
+    clear_selected();
+    elem.className = className + "Selected";
+  }
+  $("#selected_file").val(elem.id);
+  $("#selected_item").val(elem.id);
 }
 
 function download_file(elem){
@@ -201,15 +205,13 @@ function hideTextEditor(){
 }
 
 function showTail(){
-  var menu = document.getElementById('tail');
-  menu.style.display = "block"; //don't show menu
+  $('#tail').css('display', "block"); // show tail box
   my_tail_func();
   tail_handle = setInterval(my_tail_func, 5000);
 }
 
 function hideTail(){
-  var menu = document.getElementById('tail');
-  menu.style.display = "none"; //don't show menu
-  document.getElementById("tail_box").reset();
+  $('#tail').css('display', "none"); //don't show tail box
+  document.getElementById("tail_box").reset;
   clearInterval(tail_handle);
 }

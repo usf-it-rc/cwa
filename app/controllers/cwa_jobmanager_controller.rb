@@ -70,30 +70,24 @@ class CwaJobmanagerController < ApplicationController
       @job.job_name = params[:job_name]
     end
 
-    if params[:job_file] != nil
-      if params[:job_file] !~ ::CwaConstants::JOBPATH_REGEX
+    if params[:selected_file] != nil
+      if params[:selected_file] !~ ::CwaConstants::JOBPATH_REGEX
         flash[:error] = "Invalid job file specified! Make sure you're using forward-slash \"/\"!"
         redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id]
         return
       end
-      params[:job_dir] = params[:job_file].gsub(/(.*)\/.*$/, '\1')
+      params[:selected_dir] = params[:selected_file].gsub(/(.*)\/.*$/, '\1')
     end
 
-    if params[:job_dir] == nil && params[:current_dir] != nil
-      params[:job_dir] = params[:current_dir]
+    if params[:selected_dir] == nil && params[:current_dir] != nil
+      params[:selected_dir] = params[:current_dir]
     end
 
-    if params[:job_dir] !~ ::CwaConstants::JOBPATH_REGEX
+    if params[:selected_dir] !~ ::CwaConstants::JOBPATH_REGEX
       flash[:error] = "Invalid job directory specified! Make sure you're using forward-slash \"/\"!"
       redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id]
       return
     end
-
-#    if params[:testing]
-#      ENV['SGE_CELL'] = Redmine::Cwa.testing_cell_name
-#    else
-#      ENV['SGE_CELL'] = Redmine::Cwa.production_cell_name
-#    end
 
     script = @app.exec.gsub(/\r\n/, "\n")
 
@@ -115,7 +109,7 @@ class CwaJobmanagerController < ApplicationController
       flash[:notice] = "Submitted job"
     end
 
-    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['job_dir'], :app_id => @app.id, :submit_parameters => params.except("utf8","authenticity_token","commit","action").to_json.to_s
+    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['selected_dir'], :app_id => @app.id, :submit_parameters => params.except("utf8","authenticity_token","commit","action").to_json.to_s
       
     redirect_to :action => 'index'
   end

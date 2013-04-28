@@ -8,6 +8,19 @@ class CwaBrowserController < ApplicationController
     @groups = CwaGroups.new
     @group_list = @groups.that_i_manage + @groups.member_of
 
+    if params[:dir] != nil 
+      begin 
+        @browser = CwaBrowser.new params[:dir]
+      rescue Exception => e
+        flash[:error] = e.message
+        @browser = CwaBrowser.new @user.homedirectory
+        redirect_to :action => 'display', params => { :dir => @user.homedirectory }
+        return
+      end 
+    else
+      @browser = CwaBrowser.new @user.homedirectory
+    end
+
     respond_to do |format|
       format.html
     end

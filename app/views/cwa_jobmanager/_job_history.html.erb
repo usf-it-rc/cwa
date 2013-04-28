@@ -14,7 +14,7 @@
     <tr>
       <td><%= h.job_name %></td>
       <td><%= h.jobid %></td>
-      <td><%= link_to "View", :controller => 'cwa_browser', :action => 'index', :job_dir => h.workdir %></td>
+      <td><%= link_to "View", :controller => 'cwa_browser', :action => 'index', :dir => h.workdir %></td>
       <% if h.submit_parameters != nil %> 
         <% params = JSON.parse(h.submit_parameters).to_hash %>
         <% if params["description"] != nil %>
