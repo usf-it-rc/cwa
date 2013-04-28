@@ -34,18 +34,22 @@ function rename(){
   var file_name = $('#selected_item').val();
   var show_name = file_name.split("/");
   var current_dir = "<%= @browser.current_dir %>";
-  var new_name =  current_dir + "/" + prompt("Enter new file/directory name",show_name[show_name.length-1]);
-  window.location = "<%= request.path %>/rename?file=" + 
-    encodeURIComponent(file_name) + 
-    "&new_name=" + encodeURIComponent(new_name) + "&dir=" + encodeURIComponent("<%= @browser.current_dir %>");
-
+  var input = prompt("Enter new file/directory name",show_name[show_name.length-1]);
+  if (input != null && input != show_name){
+    var new_name =  current_dir + "/" + input;
+    window.location = "<%= request.path %>/rename?file=" + 
+      encodeURIComponent(file_name) + 
+      "&new_name=" + encodeURIComponent(new_name) + "&dir=" + encodeURIComponent("<%= @browser.current_dir %>");
+  }
 };
 
 function createDirectory(){
   var current_dir = "<%= @browser.current_dir %>";
   var new_dir = prompt("Enter new directory name");
-  window.location = "<%= request.path %>/mkdir?new_dir=" + 
-    encodeURIComponent(new_dir) + "&dir=" + encodeURIComponent("<%= @browser.current_dir %>");
+  if (new_dir){
+    window.location = "<%= request.path %>/mkdir?new_dir=" + 
+      encodeURIComponent(new_dir) + "&dir=" + encodeURIComponent("<%= @browser.current_dir %>");
+  }
 };
 
 function deleteItem(){
@@ -134,8 +138,6 @@ function showMenu(event, elementId) {
   var rightclick; //will be set to true or false
   if (event.button) {
     rightclick = (event.button == 2);
-  } else if (e.button) {
-    rightclick = (event.which == 3);
   }
  
   if(rightclick) { //if the secondary mouse botton was clicked
