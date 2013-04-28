@@ -3,9 +3,9 @@ require "base64"
 
 module Redmine::CwaBrowserHelper
   class << self
-    def chmod(file, mode)
-      userexec("chmod #{mode} #{file}")[2] == 0 ? true : false
-    end
+    #def chmod(file, mode)
+    #  userexec("chmod #{mode} #{file}")[2] == 0 ? true : false
+    #end
 
     def type(file)
       return userexec("type #{file}")[0].chomp
@@ -13,7 +13,7 @@ module Redmine::CwaBrowserHelper
 
     def rename(file, new_name)
       Rails.logger.debug "userexec(rename #{file} -- #{new_name})"
-      return userexec("rename #{file} -- #{new_name}")[2] == 0 ? true : false
+      #return userexec("rename #{file} -- #{new_name}")[2] == 0 ? true : false
     end
 
     def delete(file)
@@ -24,7 +24,7 @@ module Redmine::CwaBrowserHelper
 
     def mkdir(file)
       Rails.logger.debug "userexec(mkdir #{file})"
-      userexec("mkdir #{file}")[2] == 0 ? true : false
+    #  userexec("mkdir #{file}")[2] == 0 ? true : false
     end
 
     def file_size(file)
