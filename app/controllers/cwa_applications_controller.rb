@@ -67,6 +67,10 @@ class CwaApplicationsController < ApplicationController
     @times = Array.new
     @browser = nil
 
+    if params[:dir] == nil and params[:selected_dir] != nil
+      params.merge!({ :dir => params[:selected_dir] })
+    end
+
     if params[:dir] != nil
       begin 
         @browser = CwaBrowser.new params[:dir]

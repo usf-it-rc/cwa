@@ -22,7 +22,7 @@
         <% else %>
           <td>N/A</td>
         <% end %>
-        <td><%= link_to "View", :action => 'display', :controller => 'cwa_applications', :id => h.app_id, :params => JSON.parse(h.submit_parameters).to_hash %></td>
+        <td><%= link_to "View", :action => 'display', :controller => 'cwa_applications', :id => h.app_id, :params => params %></td>
       <% else %>
         <td>N/A</td>
         <td>N/A</td>
