@@ -5,16 +5,15 @@
   <tr>
     <td><b>Job Name</b></td>
     <td><b>JobID</b></td>
-    <td><b>Job Directory</b></td>
     <td><b>Description</b></td>
     <td><b>Rerun/Review</b></td>
+    <td><b>Job Directory</b></td>
   </tr>
 <% hist_jobs.each do |h| %>
   <% if @jobs.where_id_is(h.jobid) == nil %>
     <tr>
       <td><%= h.job_name %></td>
       <td><%= h.jobid %></td>
-      <td><%= link_to "View", :controller => 'cwa_browser', :action => 'index', :dir => h.workdir %></td>
       <% if h.submit_parameters != nil %> 
         <% params = JSON.parse(h.submit_parameters).to_hash %>
         <% if params["description"] != nil %>
@@ -27,6 +26,7 @@
         <td>N/A</td>
         <td>N/A</td>
       <% end %>
+      <td><%= link_to "View", :controller => 'cwa_browser', :action => 'index', :dir => h.workdir %></td>
     </tr>
   <% end %>
 <% end %>
