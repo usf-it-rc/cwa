@@ -5,6 +5,7 @@ class CwaBrowserController < ApplicationController
   def index
     @project = Project.find(Redmine::Cwa.project_id)
     @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     @groups = CwaGroups.new
     @group_list = @groups.that_i_manage + @groups.member_of
 
@@ -28,6 +29,8 @@ class CwaBrowserController < ApplicationController
 
   # Change file name
   def rename
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     Redmine::CwaBrowserHelper.rename(params[:file], params[:new_name]) or
       flash[:error] = "Could not rename file #{params[:file]} to #{params[:new_name]}"
     redirect_to :action => "index", :params => params
@@ -35,6 +38,8 @@ class CwaBrowserController < ApplicationController
 
   # create a directory
   def mkdir 
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     if params[:new_dir] =~ /[\x00\/]/
       flash[:error] = "Invalid directory name specified!"
     else
@@ -46,6 +51,8 @@ class CwaBrowserController < ApplicationController
 
   # Create a text file
   def create
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     if params[:new_file_content] != nil and params[:new_file_name] != nil
       upload = params["file"]
       file = Redmine::CwaBrowserHelper::Put.new(params[:dir], params[:new_file_name])
@@ -63,6 +70,8 @@ class CwaBrowserController < ApplicationController
 
   # Delete file/directory from :browse_path
   def delete
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     Redmine::CwaBrowserHelper.delete(params[:file]) or
       flash[:error] = "Could not delete file #{params[:file]}"
 
@@ -71,6 +80,8 @@ class CwaBrowserController < ApplicationController
 
   # Upload file and store to :browse_path
   def upload
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     upload = params["file"]
     file = Redmine::CwaBrowserHelper::Put.new(params[:dir], upload.original_filename) or
       flash[:error] = "Could not store file(s) #{upload.original_filename}"
@@ -85,6 +96,8 @@ class CwaBrowserController < ApplicationController
   end
 
   def tail
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     type = Redmine::CwaBrowserHelper.type(params[:file])
     text = ""
 
@@ -104,6 +117,8 @@ class CwaBrowserController < ApplicationController
 
   # Download file from :browse_path
   def get
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     self.response.headers["Content-Type"] = "application/octet-stream"
     self.response.headers["Content-Disposition"] = "attachment; filename=#{params[:file].split('/').last}"
     self.response.headers["Content-Length"] = Redmine::CwaBrowserHelper.file_size(params[:file]).to_s
@@ -115,6 +130,8 @@ class CwaBrowserController < ApplicationController
   
   # Download zip file archive of directory
   def get_zip
+    @user = CwaIpaUser.new
+    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     self.response.headers["Content-Type"] = "application/octet-stream"
     self.response.headers["Content-Disposition"] = "attachment; filename=#{params[:file].split('/').last}.zip"
     self.response.headers['Last-Modified'] = Time.now.ctime.to_s

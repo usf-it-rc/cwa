@@ -13,18 +13,18 @@ module Redmine::CwaBrowserHelper
 
     def rename(file, new_name)
       Rails.logger.debug "userexec(rename #{file} -- #{new_name})"
-      #return userexec("rename #{file} -- #{new_name}")[2] == 0 ? true : false
+      return userexec("rename #{file} -- #{new_name}")[2] == 0 ? true : false
     end
 
     def delete(file)
       Rails.logger.debug "userexec(rm #{file})"
       # TODO: Make this safer!
-      #userexec("rm #{file}")[2] == 0 ? true : false
+      userexec("rm #{file}")[2] == 0 ? true : false
     end
 
     def mkdir(file)
       Rails.logger.debug "userexec(mkdir #{file})"
-    #  userexec("mkdir #{file}")[2] == 0 ? true : false
+      userexec("mkdir #{file}")[2] == 0 ? true : false
     end
 
     def file_size(file)
@@ -150,7 +150,6 @@ module Redmine::CwaBrowserHelper
       return file
     end
 
-    private
     def userexec(cmd)
       output = ""
       error  = ""

@@ -23,18 +23,30 @@ class CwaBrowser
 
   def directories
     dirs = Array.new
-    pipe = IO.popen("sudo -u #{User.current.login} find #{self.current_dir} ! -path #{self.current_dir} ! -type l ! -iname '.*' -maxdepth 1 -type d -printf \"%f\\n\" | sort -f")
-    pipe.each_line{|line| dirs.push line.chomp }
-    pipe.close
+    lines = Redmine::CwaBrowserHelper.userexec("list #{self.current_dir} -- d")[0]
+    #pipe = IO.popen("sudo -u #{User.current.login} find #{self.current_dir} ! -path #{self.current_dir} ! -type l ! -iname '.*' -maxdepth 1 -type d -printf \"%f\\n\" | sort -f")
+
+    lines.each_line do |line| 
+      entry = line.chomp.gsub("\"","")
+      dirs.push entry if entry != ""
+    end
+
+    #pipe.close
     Rails.logger.debug "directories() => " + self.current_dir
     Rails.logger.debug "directories() => " + dirs.to_s
     return dirs
   end
   def files
     fs = Array.new
-    pipe = IO.popen("sudo -u #{User.current.login} find #{self.current_dir} ! -path #{self.current_dir} ! -type l ! -iname '.*' -maxdepth 1 -type f -printf \"%f\\n\" | sort -f")
-    pipe.each_line{|line| fs.push line.chomp }
-    pipe.close
+    lines = Redmine::CwaBrowserHelper.userexec("list #{self.current_dir} -- f")[0]
+    #pipe = IO.popen("sudo -u #{User.current.login} find #{self.current_dir} ! -path #{self.current_dir} ! -type l ! -iname '.*' -maxdepth 1 -type f -printf \"%f\\n\" | sort -f")
+
+    lines.each_line do |line| 
+      entry = line.chomp.gsub("\"","")
+      fs.push entry if entry != ""
+    end
+
+    #pipe.close
     Rails.logger.debug "files() => " + self.current_dir
     Rails.logger.debug "files() => " + fs.to_s
     return fs
