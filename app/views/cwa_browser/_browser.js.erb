@@ -35,7 +35,8 @@ function rename(){
   var show_name = file_name.split("/");
   var current_dir = "<%= @browser.current_dir %>";
   var input = prompt("Enter new file/directory name",show_name[show_name.length-1]);
-  if (input != null && input != show_name){
+  alert(input);
+  if (input && input != show_name){
     var new_name =  current_dir + "/" + input;
     window.location = "<%= request.path %>/rename?file=" + 
       encodeURIComponent(file_name) + 
