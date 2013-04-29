@@ -29,10 +29,16 @@ class CwaApplicationsController < ApplicationController
   end
 
   def create
-    if CwaApplication.create(params[:cwa_application])
+    app = CwaApplication.create(params[:cwa_application])
+    if app.valid?
       flash[:notice] = "Application successfully defined!"
     else
       flash[:error] = "Problem adding application!"
+      app.errors.keys.each do |attrib|
+        app.errors[attrib].each do |str|
+          flash[:error] += " #{attrib.to_s} " + str
+        end
+      end
     end
     redirect_to :action => 'index'
   end
