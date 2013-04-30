@@ -39,15 +39,17 @@ Redmine::Plugin.register :cwa do
   }, :partial => 'settings/cwa_settings'
 
   # TODO: Get permissions nailed down
-  permission :cwa_accountsignup, { :cwa_accountsignup => [:index] }, :public => true
-  permission :cwa_groupmanager, { :cwa_groupmanager => [:index] }, :public => true
-  permission :cwa_jobmanager, { :cwa_jobmanager => [:index] }, :public => true
-  permission :cwa_tutorials, { :cwa_tutorials => [:index] }, :public => true
-  permission :cwa_allocations, { :cwa_allocations => [:index] }, :public => true
-  permission :cwa_applications, { :cwa_applications => [:index] }, :public => true
-  permission :cwa_browser, { :cwa_browser => [:index] }, :public => true
-  permission :cwa_stats, { :cwa_stats => [:index] }, :public => true
+  project_module :cwa do
+    permission :cwa_accountsignup, { :cwa_accountsignup => [:index] }, :public => true
+    permission :cwa_groupmanager, { :cwa_groupmanager => [:index] }, :public => true
+    permission :cwa_jobmanager, { :cwa_jobmanager => [:index] }, :public => true
+    permission :cwa_tutorials, { :cwa_tutorials => [:index] }, :public => true
+    permission :cwa_allocations, { :cwa_allocations => [:index] }, :public => true
+    permission :cwa_applications, { :cwa_applications => [:index] }, :public => true
+    permission :cwa_browser, { :cwa_browser => [:index] }, :public => true
+    permission :cwa_stats, { :cwa_stats => [:index] }, :public => true
 #  permission :cwa_dashboard, { :cwa_dashboard => [:index] }, :public => true
+  end
 
   menu :project_menu, :cwa_accountsignup, { :controller => 'cwa_accountsignup', :action => 'index' }, 
        :caption => 'My Access', :after => :activity
@@ -77,6 +79,7 @@ Redmine::MenuManager.map :top_menu do |menu|
   menu.delete :projects
   menu.delete :administration
   menu.push :start, { :controller => 'projects', :action => 'show', :id => "research-computing" }, :caption => "CWA Home"
+  menu.push :projects, { :controller => 'projects', :action => 'index' }, :caption => "My Projects"
   menu.push :rc, "http://rc.usf.edu", :caption => "Research Computing", :html => { :target => "_blank" }
   menu.push :it, "http://www.usf.edu/it", :caption => "Information Technology", :html => { :target => "_blank" }
   menu.push :usf, "http://www.usf.edu", :caption => "USF Home", :html => { :target => "_blank" }
