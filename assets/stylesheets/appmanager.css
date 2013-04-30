@@ -10,8 +10,7 @@ div.browserButton {
   text-align:center;
   font-weight: bold;
   width: 100%;
-  border:1px solid #DFDFDF;
-  border-bottom: 1px solid #CDD3D6;
+  border:1px solid #444444;
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
   -moz-border-top-left-radius: 8px;
@@ -36,8 +35,8 @@ div.browserButtonSelected {
   text-align: center;
   font-weight: bold;
   width:100%;
-  border:1px solid #DFDFDF;
-  border-bottom: 1px solid #DEE4E7;
+  border:1px solid #444444;
+  border-right: 0px;
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
   -moz-border-top-left-radius: 8px;
@@ -121,13 +120,22 @@ div.browserSelector {
 div.browserSelectorFull {
   float:left;
   position:relative;
-  width: 90%;
+  width: 85%;
   padding-top: 18px;
   padding-bottom: 18px;
   background: #DEE4E7;
-  border-top: 12px solid #DEE4E7;
+  z-index: 5;
+  /* border-top: 12px solid #DEE4E7; */
   min-height: 550px;
   margin-top:12px;
+  border:1px solid #444444;
+  /*border-left: 0px;*/
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  -moz-border-top-right-radius: 8px;
+  -moz-border-bottom-right-radius: 8px;
+  -webkit-border-top-right-radius: 8px;
+  -webkit-border-bottom-right-radius: 8px;
 }
 
 div.actionButtons {
