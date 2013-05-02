@@ -44,6 +44,7 @@ class CwaMailer < ActionMailer::Base
   def group_member_request(group_owner, group_name)
     @group_owner = group_owner
     @group_name  = group_name
+    @project = Project.find(Redmine::Cwa.project_id)
     mail(:subject => "RC@USF Group Join Request Notification",
          :to => "#{group_owner.firstname} #{group_owner.lastname} <#{group_owner.mail}>")
   end
@@ -51,6 +52,7 @@ class CwaMailer < ActionMailer::Base
   def group_add_member(user, group)
     @user = User.find_by_login(user)
     @group = group
+    @project = Project.find(Redmine::Cwa.project_id)
     mail(:to => "#{@user.firstname} #{@user.lastname} <#{@user.mail}>",
          :subject => "RC@USF You've been added to a group!")
   end
