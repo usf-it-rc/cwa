@@ -75,6 +75,10 @@ function back(){
   window.location = "<%= request.path %>?dir=" + encodeURIComponent("<%= @browser.up_dir %>");
 };
 
+function backAppMgr(){
+  window.location = "<%= request.path %>?dir=" + encodeURIComponent("<%= @browser.up_dir %>") + "&" + $('#app_form').serialize();
+};
+
 // Dustin Diaz's getElementsByClass to search for elements by class name regex
 function getElementsByClass(searchClass,node,tag) {
   var classElements = new Array();

@@ -6,7 +6,7 @@
     <div id="<%= @user.homedirectory %>" onclick="chdirAppMgr(this)" class="actionButton">Home</div>
     <div id="<%= @user.workdirectory %>" onclick="chdirAppMgr(this)" class="actionButton">Work</div>
     <% if @browser.current_dir != @user.homedirectory && @browser.current_dir != @user.workdirectory %>
-      <div class="browserButtonBack" onclick="back()">&lt; Back</div>
+      <div class="browserButtonBack" onclick="backAppMgr()">&lt; Back</div>
     <% else %>
       <div class="browserButtonBackInactive">&lt; Back</div>
     <% end %>
