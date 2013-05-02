@@ -98,9 +98,11 @@ class CwaApplicationsController < ApplicationController
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     @project = Project.find(params[:project_id])
     @app = CwaApplication.find(params[:id])
+    grp = CwaGroups.new
     @job = RsgeJob.new
     @times = Array.new
     @browser = nil
+    @groups = Array.new
 
     if params[:dir] == nil and params[:selected_dir] != nil
       params.merge!({ :dir => params[:selected_dir] })
@@ -120,6 +122,8 @@ class CwaApplicationsController < ApplicationController
     end 
 
     (1..168).to_a.each { |t| @times << t.to_s + ":00:00" }
+
+    (grp.that_i_manage + grp.member_of).each {|g| @groups << g[:cn]}
 
     # Render haml from the database, include nice header
     haml = <<EOF
