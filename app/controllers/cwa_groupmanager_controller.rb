@@ -3,7 +3,13 @@ class CwaGroupmanagerController < ApplicationController
 
   # Load the default view
   def index
-    @project = Project.find(Redmine::Cwa.project_id)
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
+
+    @project = Project.find(params[:project_id])
     @groups = CwaGroups.new
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
@@ -13,7 +19,13 @@ class CwaGroupmanagerController < ApplicationController
   end
 
   def groups
-    @project = Project.find(Redmine::Cwa.project_id)
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
+
+    @project = Project.find(params[:project_id])
     @gs = CwaGroups.new
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
@@ -23,7 +35,13 @@ class CwaGroupmanagerController < ApplicationController
   end
 
   def show
-    @project = Project.find(Redmine::Cwa.project_id)
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
+
+    @project = Project.find(params[:project_id])
     @gs = CwaGroups.new
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
@@ -33,7 +51,7 @@ class CwaGroupmanagerController < ApplicationController
   end
 
   def create 
-    @project = Project.find(Redmine::Cwa.project_id)
+    @project = Project.find(params[:project_id])
     respond_to do |format|
       format.html
     end
@@ -41,7 +59,13 @@ class CwaGroupmanagerController < ApplicationController
 
   # Create group
   def create_group
-    @project = Project.find(Redmine::Cwa.project_id)
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
+
+    @project = Project.find(params[:project_id])
     @groups = CwaGroups.new
 
     Rails.logger.debug "create_group() => " + @groups.that_i_manage.length.to_s
@@ -63,21 +87,32 @@ class CwaGroupmanagerController < ApplicationController
     else
       flash[:error] = "You've reached the maximum #{::CwaConstants::GROUP_MAX} group limitation.  You can't have any more!"
     end
-    redirect_to :action => :index
+    redirect_to :action => :index, :project_id => params[:project_id]
   end
 
   def delete_group
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
     @groups = CwaGroups.new
     if @groups.delete params[:group_name]
       flash[:notice] = "Group \"#{params[:group_name]}\" deleted!"
     else
       flash[:error] = "Unable to delete group \"#{params[:group_name]}\"!"
     end
-    redirect_to :action => :index
+    redirect_to :action => :index, :project_id => params[:project_id]
   end
 
   # Add a user to a group
   def add
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
+
     @groups = CwaGroups.new
 
     user_name_regex = /^[a-zA-Z0-9-]{3,20}$/
@@ -94,11 +129,17 @@ class CwaGroupmanagerController < ApplicationController
     else
       flash[:error] = "There was a problem adding \"#{params[:user_name]}\" to \"#{params[:group_name]}\".  The user probably does not exist."
     end
-    redirect_to :action => :show, :group_name => params[:group_name]
+    redirect_to :action => :show, :group_name => params[:group_name], :project_id => params[:project_id]
   end
 
   # Delete a user from a group
   def delete
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
+
     @groups = CwaGroups.new
 
     if params[:user_name]
@@ -115,10 +156,16 @@ class CwaGroupmanagerController < ApplicationController
         flash[:error] = "There was a problem removing you from group \"#{params[:group_name]}\""
       end
     end
-    redirect_to :action => :show, :group_name => params[:group_name]
+    redirect_to :action => :show, :group_name => params[:group_name], :project_id => params[:project_id]
   end
 
   def disband
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
+
     groups = CwaGroups.new
 
     if groups.delete(params[:group_name])
@@ -126,10 +173,16 @@ class CwaGroupmanagerController < ApplicationController
     else
       flash[:error] = "Problem disbanding \"#{params[:group_name]}\""
     end
-    redirect_to :action => :index
+    redirect_to :action => :index, :project_id => params[:project_id]
   end
 
   def delete_request
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
+
     groups = CwaGroups.new
     request = CwaGroupRequests.find_by_id(params[:request_id])
     group_name = groups.by_id(request.group_id)[:cn]
@@ -139,10 +192,16 @@ class CwaGroupmanagerController < ApplicationController
     else
       flash[:error] = "There was a problem removing your request to join \"#{group_name}\""
     end
-    redirect_to :action => :index
+    redirect_to :action => :index, :project_id => params[:project_id]
   end
 
   def allow_join
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
+
     groups = CwaGroups.new
     request = CwaGroupRequests.find_by_id(params[:request_id])
     group_name = groups.by_id(request.group_id)[:cn]
@@ -155,11 +214,16 @@ class CwaGroupmanagerController < ApplicationController
     else
       flash[:error] = "Problem adding #{user_name} to group #{group_name}!"
     end
-    redirect_to :action => :index
+    redirect_to :action => :index, :project_id => params[:project_id]
   end
       
   # store request to join group
   def save_request
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end 
     @groups = CwaGroups.new
     if CwaGroupRequests.find(:first, :conditions => ["group_id = ? and user_id = ?", params[:gidnumber], User.current.id])
       flash[:error] = "You've already requested to join this group!"
@@ -179,6 +243,6 @@ class CwaGroupmanagerController < ApplicationController
         flash[:error] = "There was a problem registering your request to join  #{params[:group_name]}!"
       end
     end
-    redirect_to :action => :index
+    redirect_to :action => 'index', :project_id => params[:project_id]
   end
 end

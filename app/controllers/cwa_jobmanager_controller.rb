@@ -8,7 +8,7 @@ class CwaJobmanagerController < ApplicationController
   @@joblist = {}
 
   def index
-    @project = Project.find(Redmine::Cwa.project_id)
+    @project = Project.find(params[:project_id])
     @jobs = RsgeJobs.new User.current.login
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
@@ -52,7 +52,7 @@ class CwaJobmanagerController < ApplicationController
     else
       flash[:error] = "Problem deleting job #{params[:jobid]}!"
     end
-    redirect_to :action => 'index'
+    redirect_to :action => 'index', :project_id => params[:project_id]
   end
 
   def submit
@@ -64,7 +64,7 @@ class CwaJobmanagerController < ApplicationController
     if params.has_key?(:job_name)
       if params[:job_name] !~ ::CwaConstants::JOBNAME_REGEX
         flash[:error] = "Invalid job name specified!"
-        redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id]
+        redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id], :project_id => params[:project_id]
         return
       end
       @job.job_name = params[:job_name]
@@ -73,7 +73,7 @@ class CwaJobmanagerController < ApplicationController
     if params[:selected_file] != nil
       if params[:selected_file] !~ ::CwaConstants::JOBPATH_REGEX
         flash[:error] = "Invalid job file specified! Make sure you're using forward-slash \"/\"!"
-        redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id]
+        redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id], :project_id => params[:project_id]
         return
       end
       params[:selected_dir] = params[:selected_file].gsub(/(.*)\/.*$/, '\1')
@@ -85,7 +85,7 @@ class CwaJobmanagerController < ApplicationController
 
     if params[:selected_dir] !~ ::CwaConstants::JOBPATH_REGEX
       flash[:error] = "Invalid job directory specified! Make sure you're using forward-slash \"/\"!"
-      redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id]
+      redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id], :project_id => params[:project_id]
       return
     end
 
@@ -111,7 +111,7 @@ class CwaJobmanagerController < ApplicationController
 
     CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['selected_dir'], :app_id => @app.id, :submit_parameters => params.except("utf8","authenticity_token","commit","action").to_json.to_s
       
-    redirect_to :action => 'index'
+    redirect_to :action => 'index', :project_id => params[:project_id]
   end
 
 end

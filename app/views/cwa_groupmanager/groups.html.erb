@@ -17,7 +17,7 @@
   <% group_list.each do |g| %>
   <% next if g[:owner] == User.current.login %>
   <tr>
-    <td><a href="/cwa_groupmanager/show?group_name=<%= g[:cn] %>"><div style="height:100%;width=100%"><%= g[:cn] %></div></a></td>
+    <td><%= link_to g[:cn], :action => 'show', :group_name => g[:cn] %></td>
     <td><%= g[:owner] %></td>
     <td><%= g[:desc] %></td>
   </tr>

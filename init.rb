@@ -48,29 +48,29 @@ Redmine::Plugin.register :cwa do
     permission :cwa_applications, { :cwa_applications => [:index] }, :public => true
     permission :cwa_browser, { :cwa_browser => [:index] }, :public => true
     permission :cwa_stats, { :cwa_stats => [:index] }, :public => true
-#  permission :cwa_dashboard, { :cwa_dashboard => [:index] }, :public => true
   end
 
-  menu :project_menu, :cwa_accountsignup, { :controller => 'cwa_accountsignup', :action => 'index' }, 
-       :caption => 'My Access', :after => :activity
-  menu :project_menu, :cwa_allocations, { :controller => 'cwa_allocations', :action => 'index' }, 
-       :caption => 'Allocations', :after => :cwa_accountsignup
-  menu :project_menu, :cwa_groupmanager, { :controller => 'cwa_groupmanager', :action => 'index' }, 
-       :caption => 'Groups', :after => :cwa_allocations
-  menu :project_menu, :cwa_applications, { :controller => 'cwa_applications', :action => 'index' }, 
-       :caption => 'Web Apps', :after => :cwa_groupmanager
-  menu :project_menu, :cwa_jobmanager, { :controller => 'cwa_jobmanager', :action => 'index' }, 
-       :caption => 'My Jobs', :after => :app_manager
-  menu :project_menu, :wiki, { :controller => 'wiki', :action => 'show', :id => nil }, :param => :project_id,
+end
+
+proj_proc = Proc.new { |p| p.identifier == Setting.plugin_cwa[:project_id] }
+
+Redmine::MenuManager.map :project_menu do |menu|
+  menu.push :cwa_accountsignup, { :controller => 'cwa_accountsignup', :action => 'index' }, 
+       :caption => 'My Access', :after => :activity, :param => :project_id, :if => proj_proc
+  menu.push :cwa_allocations, { :controller => 'cwa_allocations', :action => 'index' }, 
+       :caption => 'Allocations', :after => :cwa_accountsignup, :param => :project_id, :if => proj_proc
+  menu.push :cwa_groupmanager, { :controller => 'cwa_groupmanager', :action => 'index' }, 
+       :caption => 'Groups', :after => :cwa_allocations, :param => :project_id, :if => proj_proc
+  menu.push :cwa_applications, { :controller => 'cwa_applications', :action => 'index' }, 
+       :caption => 'Web Apps', :after => :cwa_groupmanager, :param => :project_id
+  menu.push :cwa_jobmanager, { :controller => 'cwa_jobmanager', :action => 'index' }, 
+       :caption => 'My Jobs', :after => :app_manager, :param => :project_id
+  menu.push :wiki, { :controller => 'wiki', :action => 'show', :id => nil }, :param => :project_id,
        :caption => 'Documentation', :after => :cwa_jobmanager, :if => Proc.new { |p| p.wiki && !p.wiki.new_record? }
-  menu :project_menu, :my_files, { :controller => 'cwa_browser', :action => 'index' },
-       :caption => 'My Files', :after => :wiki
-  menu :project_menu, :cwa_stats, { :controller => 'cwa_stats', :action => 'index' }, 
-       :caption => 'User Stats', :after => :wiki, :if => Proc.new { |p| User.current.admin? }
-#  menu :project_menu, :cwa_tutorials, { :controller => 'cwa_tutorials', :action => 'index' }, 
-#       :caption => 'Tutorials', :after => :cwa_jobmanager
-#  menu :project_menu, :cwa_dashboard, { :controller => 'cwa_dashboard', :action => 'index' }, 
-#       :caption => 'Dashboard', :after => :app_manager
+  menu.push :my_files, { :controller => 'cwa_browser', :action => 'index' },
+       :caption => 'My Files', :after => :wiki, :param => :project_id
+  menu.push :cwa_stats, { :controller => 'cwa_stats', :action => 'index' }, 
+       :caption => 'User Stats', :after => :wiki, :param => :project_id, :if => Proc.new { |p| User.current.admin? }
 end
 
 Redmine::MenuManager.map :top_menu do |menu|

@@ -17,11 +17,11 @@
  <% @allocations.each do |allocation| %>
    <tr>
      <% if allocation.approved == false || allocation.approved == nil %>
-       <td><%= button_to "Delete", { :action => "delete", :allocation_id => allocation.id } %></td>
-       <td><%= button_to "Approve", { :action => "update", :cwa_allocation => { :approved => true }, :allocation_id => allocation.id } %></td>
+       <td><%= button_to "Delete", { :action => "delete", :allocation_id => allocation.id, :project_id => @project.identifier } %></td>
+       <td><%= button_to "Approve", { :action => "update", :cwa_allocation => { :approved => true }, :allocation_id => allocation.id, :project_id => @project.identifier } %></td>
      <% else %> 
        <td> </td>
-       <td><%= button_to "Unapprove", { :action => "update", :cwa_allocation => { :approved => false }, :allocation_id => allocation.id } %></td>
+       <td><%= button_to "Unapprove", { :action => "update", :cwa_allocation => { :approved => false }, :allocation_id => allocation.id, :project_id => @project.identifier } %></td>
      <% end %>
 
      <td><%= User.find_by_id(allocation.user_id).login %></td>

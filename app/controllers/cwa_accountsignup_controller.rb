@@ -2,10 +2,21 @@ class CwaAccountsignupController < ApplicationController
   unloadable
 
   def index
-    @user = CwaIpaUser.new
-    @project = Project.find(Redmine::Cwa.project_id)
+    Rails.logger.debug _user_not_anonymous.to_s
 
-    _user_not_anonymous
+    _user_not_anonymous || return
+
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable', :project_id => params[:project_id]
+      return
+    end
+
+    # Are we an IPA user?
+    @user = CwaIpaUser.new
+    @project = Project.find_by_identifier(params[:project_id])
+
+    Rails.logger.debug "CwaASC#index() " + @project.to_s
 
     if flash[:notice] != nil
       s = flash[:notice]
@@ -25,9 +36,15 @@ class CwaAccountsignupController < ApplicationController
   end
 
   def set_shell
-    @user = CwaIpaUser.new
+    _user_not_anonymous || return
 
-    _user_not_anonymous
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end
+
+    @user = CwaIpaUser.new
 
     if params[:loginshell]
       s = @user.available_shells.invert
@@ -35,7 +52,7 @@ class CwaAccountsignupController < ApplicationController
       login_shell = s[p.to_i]
       logger.debug "Setting user shell to #{login_shell} from param #{p}"
     else
-      redirect_to :action => :user_info
+      redirect_to :action => :user_info, :project_id => params[:project_id]
       return
     end
 
@@ -46,14 +63,20 @@ class CwaAccountsignupController < ApplicationController
       flash[:error] = "There was a problem saving your options!"
     end
 
-    redirect_to :action => :user_info
+    redirect_to :action => :user_info, :project_id => params[:project_id]
   end
 
   def user_info
-    @user = CwaIpaUser.new
-    @project = Project.find(Redmine::Cwa.project_id)
+    _user_not_anonymous || return
 
-    _user_not_anonymous
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end
+
+    @user = CwaIpaUser.new
+    @project = Project.find_by_identifier(params[:project_id])
 
     respond_to do |format|
       format.html
@@ -63,19 +86,25 @@ class CwaAccountsignupController < ApplicationController
   # Create user by calling the private _provision method, handling errors
   # and returning to the index
   def create
-    _user_not_anonymous
+    _user_not_anonymous || return
+
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable', :project_id => params[:project_id]
+      return
+    end
+
     @user = CwaIpaUser.new
-    @project = Project.find(Redmine::Cwa.project_id)
 
     if !params[:saa] 
       flash[:error] = "Please indicate that you accept the system access agreement"
-      redirect_to :action => :index
+      redirect_to :action => :index, :project_id => params[:project_id]
       return
     end
 
     if !params[:tos]
       flash[:error] = "Please indicate that you accept the terms of service"
-      redirect_to :action => :index
+      redirect_to :action => :index, :project_id => params[:project_id]
       return
     end
 
@@ -98,11 +127,16 @@ class CwaAccountsignupController < ApplicationController
 
       flash[:notice] = 'You are now successfully registered!'
     end
-    redirect_to :action => :index
+    redirect_to :action => :index, :project_id => params[:project_id]
   end
 
   def delete
-    _user_not_anonymous
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable'
+      return
+    end
+    _user_not_anonymous || return
 
     @user = CwaIpaUser.new
     @project = Project.find(Redmine::Cwa.project_id)
@@ -133,14 +167,15 @@ class CwaAccountsignupController < ApplicationController
       redirect_to :action => :user_info
       return
     end
-    redirect_to :action => :index
+    redirect_to :action => :index, :project_id => params[:project_id]
   end
 
   private
   def _user_not_anonymous
     if (User.current.lastname.downcase == "anonymous")
-      redirect_to :action => 'no_auth'
-      return
+      redirect_to :controller => 'cwa_default', :action => 'authorization'
+      return false
     end
+    return true
   end
 end

@@ -1,6 +1,4 @@
 class CwaBrowserController < ApplicationController
-  Mime::Type.register "application/octet-stream", :plist_binary, [], ["binary.plist"]
-  respond_to :plist_binary
 
   def index
     @project = Project.find(Redmine::Cwa.project_id)

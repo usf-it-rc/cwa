@@ -1,5 +1,6 @@
 <h2>Web Apps</h2>
-<% if User.current.admin? %>
+<% if User.current.roles_for_project(@project).map{|r| r.name }.include?("Manager") %>
+
 <div class="box">
   <h3>Configured Applications</h3>
   <table class="list">
@@ -12,9 +13,9 @@
   </tr>
   <% @apps.each do |app| %>
     <tr>
-      <td><%= button_to "X", { :action => 'delete', :id => app.id }, :confirm => "Are you sure you want to delete #{app.name} v#{app.version}?", :method => :delete %></td>
+      <td><%= button_to "X", { :action => 'delete', :project_id => @project.identifier, :id => app.id }, :confirm => "Are you sure you want to delete #{app.name} v#{app.version}?", :method => :delete %></td>
       <td><%= link_to app.name, :action => 'show', :id => app.id %></td>
-      <td><%= link_to "Run", :action => 'display', :id => app.id %></td>
+      <td><%= link_to "Run", :action => 'display', :id => app.id, :project_id => @project.identifier %></td>
       <td><%= app.version %></td>
       <td><%= textilizable "[[#{app.name}|Documentation]]" %></td>
     </tr>
@@ -25,7 +26,7 @@
 <div class="box">
   <h3>Options</h3>
   <p>
-    <%= link_to "Add new application", :action => 'new' %>
+    <%= link_to "Add new application", :action => 'new', :project_id => @project.identifier %>
   </p>
 </div>
 

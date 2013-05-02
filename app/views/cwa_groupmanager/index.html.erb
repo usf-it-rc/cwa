@@ -12,7 +12,7 @@
   <% @groups.that_i_manage.each do |g| %>
     <% my_gidnumbers << g[:gidnumber] %>
     <tr>
-      <td><a href="/cwa_groupmanager/show?group_name=<%= g[:cn] %>"><div style="height:100%;width=100%"><%= g[:cn] %></a></div></td>
+      <td><%= link_to g[:cn], :action => 'show', :group_name => g[:cn], :project_id => @project.identifier %></td>
       <td><%= g[:desc] %></td>
     </tr>
   <% end %>
@@ -31,8 +31,8 @@
   <tr><td><b>Approve</b></td><td><b>Reject</b></td><td><b>User Name</b></td><td><b>Group Name</b></td></tr>
     <% requests.each do |r| %>
     <tr>
-      <td><%= button_to "Approve", { :action => :allow_join, :request_id => r.id } %> </td>
-      <td><%= button_to "Reject", { :action => :delete_request, :request_id => r.id, :group_name => @groups.by_id(r.group_id)[:cn] } %> </td>
+      <td><%= button_to "Approve", { :action => :allow_join, :request_id => r.id, :project_id => @project.identifier } %> </td>
+      <td><%= button_to "Reject", { :action => :delete_request, :request_id => r.id, :group_name => @groups.by_id(r.group_id)[:cn], :project_id => @project.identifier } %> </td>
       <td><%= User.find_by_id(r.user_id).login %></td>
       <td><%= @groups.by_id(r.group_id)[:cn] %></td>
     </tr>
@@ -52,7 +52,7 @@
   <tr><td><b>Delete</b></td><td><b>Group Name</b></td></tr>
     <% requests.each do |r| %>
     <tr>
-      <td><%= button_to "Delete", { :action => :delete_request, :request_id => r.id, :group_name => @groups.from_all_by_id(r.group_id)[:cn] } %></td>
+      <td><%= button_to "Delete", { :action => :delete_request, :request_id => r.id, :group_name => @groups.from_all_by_id(r.group_id)[:cn], :project_id => @project.identifier } %></td>
       <td><%= @groups.from_all_by_id(r.group_id)[:cn] %></td>
     </tr>
     <% end %>
@@ -76,7 +76,7 @@
   <% @groups.member_of.each do |g| %>
     <% if g[:owner] != User.current.login %>
       <tr>
-        <td><a href="/cwa_groupmanager/show?group_name=<%= g[:cn] %>"><div style="height:100%;width=100%"><%= g[:cn] %></a></div></td>
+        <td><%= link_to g[:cn], :action => 'show', :group_name => g[:cn], :project_id => @project.identifier %></td>
         <td><%= g[:desc] %></td>
         <td><%= g[:owner] %></td>
         <td><%= g[:members].reject {|m| m == User.current.login} * ", " %></td>

@@ -5,15 +5,17 @@ class CwaApplicationsController < ApplicationController
 
   def new
     @app = CwaApplication.new
-    @project = Project.find(Redmine::Cwa.project_id)
-    render :action => 'show'
+    @project = Project.find(params[:project_id])
+
+    render :action => 'show', :project_id => params[:project_id]
   end
 
   def show
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-    @project = Project.find(Redmine::Cwa.project_id)
+    @project = Project.find(params[:project_id])
     @app = CwaApplication.find(params[:id])
+    Rails.logger.debug "Apps::Show => #{@app.to_s}"
     respond_to do |format|
       format.html
     end
@@ -25,22 +27,31 @@ class CwaApplicationsController < ApplicationController
     else
       flash[:error] = "Problem adding application!"
     end
-    redirect_to :action => 'index'
+    redirect_to :action => 'index', :project_id => params[:project_id]
   end
 
-  def create
-    app = CwaApplication.create(params[:cwa_application])
-    if app.valid?
-      flash[:notice] = "Application successfully defined!"
+  def new
+    @project = Project.find(params[:project_id])
+
+    if params[:cwa_application].nil?
+      @app = CwaApplication.new
+      render :action => 'show', :project_id => params[:project_id]
+      return 
     else
-      flash[:error] = "Problem adding application!"
-      app.errors.keys.each do |attrib|
-        app.errors[attrib].each do |str|
-          flash[:error] += " #{attrib.to_s} " + str
+      app = CwaApplication.create(params[:cwa_application])
+      if app.valid?
+        flash[:notice] = "Application successfully defined!"
+      else
+        flash[:error] = "Problem adding application!"
+        app.errors.keys.each do |attrib|
+          app.errors[attrib].each do |str|
+            flash[:error] += " #{attrib.to_s} " + str
+          end
         end
       end
+      redirect_to :action => 'index', :project_id => params[:project_id]
+      return
     end
-    redirect_to :action => 'index'
   end
 
   def delete
@@ -50,14 +61,14 @@ class CwaApplicationsController < ApplicationController
     else 
       flash[:error] = "Problem deleting application!"
     end
-    redirect_to :action => 'index'
+    redirect_to :action => 'index', :project_id => params[:project_id]
   end
 
   def index
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-    @project = Project.find(Redmine::Cwa.project_id)
-    @apps = CwaApplication.all.sort_by &:name
+    @project = Project.find(params[:project_id])
+    @apps = CwaApplication.find_all_by_project_id(@project.id).sort_by &:name
 
     respond_to do |format|
       format.html
@@ -67,7 +78,7 @@ class CwaApplicationsController < ApplicationController
   def display
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-    @project = Project.find(Redmine::Cwa.project_id)
+    @project = Project.find(params[:project_id])
     @app = CwaApplication.find(params[:id])
     @job = RsgeJob.new
     @times = Array.new
@@ -83,7 +94,7 @@ class CwaApplicationsController < ApplicationController
       rescue Exception => e
         flash[:error] = e.message
         @browser = CwaBrowser.new @user.homedirectory
-        redirect_to :action => 'display', params => { :dir => @user.homedirectory }
+        redirect_to :action => 'display', :dir => @user.homedirectory, :project_id => params[:project_id]
         return
       end
     else

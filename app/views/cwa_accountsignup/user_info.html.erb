@@ -27,7 +27,7 @@
 <div class="box">
   <h3>Advanced Options</h3>
   <p><b>Please only change these options if you know what you are doing!</b></p>
-  <%= form_tag :action => :set_shell do %>
+  <%= form_tag :action => :set_shell, :projet_id => @project.identifier do %>
     <% shell = @user.loginshell %>
     <% shell_id = @user.available_shells[shell] %>
   <p>
@@ -45,7 +45,7 @@
 
 <div class="box">
 <h3>Disable My System Access</h3>
-  <%= form_tag :action => :delete do %>
+  <%= form_tag :action => :delete, :project_id => @project.identifier do %>
   <div style="text-align: left">
     <%= textilizable Redmine::Cwa.delete_saa, :options => { } %>
   </div>

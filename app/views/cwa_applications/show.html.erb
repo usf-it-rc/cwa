@@ -1,6 +1,7 @@
 <h2>App Manager</h2>
 <center>
-<%= form_for @app do |a| %>
+<%= form_for @app, :url => { :project_id => @project.identifier } do |a| %>
+ <%= a.hidden_field :project_id, :value => @project.id %>
  <div class="box" style="width:800px; text-align:left;">
   <h3>Basic Information</h3>
   <table>

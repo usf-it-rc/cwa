@@ -3,7 +3,7 @@
 <div class="box">
 <h3>Request Allocation</h3>
 
-<%= form_for @allocation, :url => { :action => "submit" }  do |a|%>
+<%= form_for @allocation, :url => { :action => "submit", :project_id => @project.identifier }  do |a|%>
   <table>
    <tr>
     <td style="text-align:right"><b><%= a.label :summary, "Summary: " %></b></td>

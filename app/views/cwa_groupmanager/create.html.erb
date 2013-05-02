@@ -7,7 +7,7 @@
 <center>
 <div class="box">
  <h3>Create Group</h3>
-  <%= form_tag :action => :create_group do %>
+  <%= form_tag :action => :create_group, :project_id => @project.identifier do %>
   <table>
     <tr>
     <td>
