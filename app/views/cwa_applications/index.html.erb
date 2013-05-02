@@ -1,5 +1,5 @@
 <h2>Web Apps</h2>
-<% if User.current.roles_for_project(@project).map{|r| r.name }.include?("Manager") %>
+<% if User.current.roles_for_project(@project).map{|r| r.name }.include?("Manager") || User.current.admin? %>
 
 <div class="box">
   <h3>Configured Applications</h3>

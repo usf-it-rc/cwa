@@ -2,9 +2,9 @@
 $(document).ready(
   function(){
     setInterval(function(){
-      $('#currentJobs').load('/cwa_jobmanager/current_jobs');
-      $('#currentQueue').load('/cwa_jobmanager/queue_status');
-      $('#jobHistory').load('/cwa_jobmanager/job_history');
+      $('#currentJobs').load("/cwa_jobmanager/<%= @project.identifier %>/current_jobs");
+      $('#currentQueue').load("/cwa_jobmanager/<%= @project.identifier %>/queue_status");
+      $('#jobHistory').load("/cwa_jobmanager/<%= @project.identifier %>/job_history");
     }, 10000);
   });
 </script>

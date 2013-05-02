@@ -18,7 +18,7 @@ var tail_handle;
 var my_tail_func = function(){
   var data = "";
   $.get(
-    "/cwa_browser/tail", { 
+    "/cwa_browser/<%= @project.identifier %>/tail", { 
       file : $('#selected_file').val()
     }, 
     function(data){ 

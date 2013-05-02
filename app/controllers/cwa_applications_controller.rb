@@ -22,6 +22,16 @@ class CwaApplicationsController < ApplicationController
   end
 
   def update
+    @project = Project.find(params[:project_id])
+    # Look for CamelCase declarations and squash them
+    haml_form = params[:cwa_application][:haml_form]
+    if haml_form =~ /\=\W*[A-Z]([A-Z0-9]*[a-z][a-z0-9]*[A-Z]|[a-z0-9]*[A-Z][A-Z0-9]*[a-z])[A-Za-z0-9]\.*/
+      flash[:error] = "Parse error: Do not instantiate or attempt to use outside classes (CamelCase)"
+      @app = CwaApplication.find(params[:id])
+      render :action => 'show', :params => params
+      return
+    end
+      
     if CwaApplication.update(params[:id], params[:cwa_application])
       flash[:notice] = "Application successfully defined!"
     else
@@ -38,6 +48,14 @@ class CwaApplicationsController < ApplicationController
       render :action => 'show', :project_id => params[:project_id]
       return 
     else
+      haml_form = params[:cwa_application][:haml_form]
+      if haml_form =~ /\=\W*[A-Z]([A-Z0-9]*[a-z][a-z0-9]*[A-Z]|[a-z0-9]*[A-Z][A-Z0-9]*[a-z])[A-Za-z0-9]\.*/
+        flash[:error] = "Parse error: Do not instantiate or attempt to use outside classes (CamelCase)"
+        @app = CwaApplication.new(params[:cwa_application])
+        render :action => 'show', :params => params
+        return
+      end
+      
       app = CwaApplication.create(params[:cwa_application])
       if app.valid?
         flash[:notice] = "Application successfully defined!"
