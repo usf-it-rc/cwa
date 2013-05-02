@@ -67,6 +67,10 @@ function chdir(elem){
   window.location = "<%= request.path %>?dir=" + encodeURIComponent(elem.id);
 };
 
+function chdirAppMgr(elem){
+  window.location = "<%= request.path %>?dir=" + encodeURIComponent(elem.id) + "&" + $('#app_form').serialize();
+};
+
 function back(){
   window.location = "<%= request.path %>?dir=" + encodeURIComponent("<%= @browser.up_dir %>");
 };

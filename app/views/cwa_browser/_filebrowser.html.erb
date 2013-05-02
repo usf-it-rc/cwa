@@ -3,8 +3,8 @@
 </script>
 <div>
   <div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory:</b> <%= @browser.current_dir %></div>
-    <div id="<%= @user.homedirectory %>" onclick="chdir(this)" class="actionButton">Home</div>
-    <div id="<%= @user.workdirectory %>" onclick="chdir(this)" class="actionButton">Work</div>
+    <div id="<%= @user.homedirectory %>" onclick="chdirAppMgr(this)" class="actionButton">Home</div>
+    <div id="<%= @user.workdirectory %>" onclick="chdirAppMgr(this)" class="actionButton">Work</div>
     <% if @browser.current_dir != @user.homedirectory && @browser.current_dir != @user.workdirectory %>
       <div class="browserButtonBack" onclick="back()">&lt; Back</div>
     <% else %>
@@ -16,7 +16,7 @@
         <center><p>Select a directory...</p></center>
         <%= hidden_field_tag :selected_dir, @browser.current_dir %>
         <% @browser.directories.each do |dir| %>
-          <div class="browserDirEntry" onclick="select_directory(this)" ondblclick="chdir(this)" id="<%= @browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
+          <div class="browserDirEntry" onclick="select_directory(this)" ondblclick="chdirAppMgr(this)" id="<%= @browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
         <% end %>
       </div>
 
