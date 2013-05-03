@@ -1,7 +1,7 @@
 class CwaBrowserController < ApplicationController
 
   def index
-    @project = Project.find(Redmine::Cwa.project_id)
+    @project = Project.find(params[:project_id])
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     @groups = CwaGroups.new
