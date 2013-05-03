@@ -8,5 +8,5 @@ class CwaConstants
   JOBNAME_REGEX = /^[a-zA-Z0-9\-_\.]{1,128}$/
   JOBPATH_REGEX = /^[\/a-zA-Z0-9\-_\.]{1,4096}$/
   # number of groups that can be associated to a single user
-  GROUP_MAX = 5
+  GROUP_MAX = 10
 end

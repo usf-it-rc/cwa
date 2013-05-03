@@ -60,7 +60,7 @@ module Redmine::IPAGroup
         return false    
       end
 
-      Rails.logger.debug "create_new_group() => " + resp.to_s + " ==> " + resp['result']['completed'].to_s
+      Rails.logger.debug "create_new_group() => " + resp.to_s
       if resp['result']['completed'] != 0
         # Add owner
         add_user group_info[:owner], group_info[:group_name]
