@@ -2,7 +2,13 @@ class CwaStatsController < ApplicationController
   # GET /cwa_stats
   # GET /cwa_stats.json
   def index
-    @project = Project.find(Redmine::Cwa.project_id)
+    # Re-direct to unavailable page
+    if params[:project_id] != Redmine::Cwa.project_id 
+      redirect_to :controller => 'cwa_default', :action => 'unavailable', :project_id => params[:project_id]
+      return
+    end
+
+    @project = Project.find(params[:project_id])
 
     respond_to do |format|
       format.html # index.html.erb

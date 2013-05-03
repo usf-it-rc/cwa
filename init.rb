@@ -9,8 +9,8 @@ require 'googlecharts'
 
 Redmine::MenuManager.map :project_menu do |menu|
   menu.delete :wiki if menu.exists? :wiki
-  menu.delete :activity if menu.exists? :activity
-  menu.delete :calendar if menu.exists? :calendar
+#  menu.delete :activity if menu.exists? :activity
+#  menu.delete :calendar if menu.exists? :calendar
 end
 
 Redmine::Plugin.register :cwa do
