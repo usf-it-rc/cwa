@@ -44,7 +44,7 @@
 
 <div id="upload">
   <center>
-  <%= form_tag '/cwa_browser/upload', :id => 'upload_form', :multipart => true do %>
+  <%= form_tag "/cwa_browser/#{@project.identifier}/upload", :id => 'upload_form', :multipart => true do %>
     <b><p>Select file to upload</p></b>
     <p><%= file_field_tag :file %></p>
     <%= hidden_field_tag :dir, @browser.current_dir %>
@@ -55,7 +55,7 @@
 
 <div id="tail" class="miniapp">
   <center>
-  <%= form_tag '/cwa_browser/tail', :id => 'tail_box' do %>
+  <%= form_tag "/cwa_browser/#{@project.identifier}/tail", :id => 'tail_box' do %>
     <%= text_area_tag :tail_content, nil, { :rows => "28", :cols => "96", :readonly => true } %>
     <br/>
     <%= button_to_function "Close", "hideTail()"%>
@@ -65,7 +65,7 @@
 
 <div id="textEditor" class="miniapp">
   <center>
-  <%= form_tag '/cwa_browser/create', :id => 'new_file_form', :multipart => true do %>
+  <%= form_tag "/cwa_browser/#{@project.identifier}/create", :id => 'new_file_form', :multipart => true do %>
     <%= label_tag :new_file_name, "New Text File Name" %>
     <%= hidden_field_tag :dir, @browser.current_dir %>
     <%= text_field_tag :new_file_name, nil, :length => 128 %>
