@@ -4,6 +4,7 @@ require 'cwa'
 require 'ipagroup'
 require 'cwa_constants'
 require 'cwa_browser_helper'
+require 'cwa_stats_application_helper'
 require_dependency 'cwa/hooks'
 require 'googlecharts'
 

@@ -427,3 +427,17 @@ div.miniapp {
   /* For IE 5.5 - 7 */
   filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#333333');
 }
+
+table.sortableList th .current {
+  padding-right: 30px;
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 20px 20px;
+}
+table.sortableList th .asc { 
+  background-image: url(/plugin_assets/cwa/images/arrow-up.png); 
+}
+
+table.sortableList th .desc { 
+  background-image: url(/plugin_assets/cwa/images/arrow-dn.png);
+}
