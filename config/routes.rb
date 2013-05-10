@@ -11,7 +11,7 @@ match 'cwa_accountsignup/:project_id/delete', :to => 'cwa_accountsignup#delete',
 # Group Manager
 get 'cwa_groupmanager/:project_id', :to => 'cwa_groupmanager#index'
 get 'cwa_groupmanager/:project_id/all', :to => 'cwa_groupmanager#groups'
-get 'cwa_groupmanager/:project_id/show/:group_name', :to => 'cwa_groupmanager#show'
+get 'cwa_groupmanager/:project_id/show/:group_name', :to => 'cwa_groupmanager#show', group_name: /[a-zA-Z0-9\-\._]{3,20}/
 get 'cwa_groupmanager/:project_id/create', :to => 'cwa_groupmanager#create'
 match 'cwa_groupmanager/:project_id/add', :to => 'cwa_groupmanager#add', :via => :post
 match 'cwa_groupmanager/:project_id/delete', :to => 'cwa_groupmanager#delete', :via => :post
