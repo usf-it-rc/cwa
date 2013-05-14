@@ -9,23 +9,31 @@ class CwaIpaUser
   attr_accessor :passwd
 
   def initialize
-    make_user_fields
-    ipa_query
+    user = User.current
+    make_user_fields(user)
+    ipa_query(user.login)
   end
 
+  # this exposes ldap attributes and custom fields as methods
   def method_missing(name, *args, &blk)
     # If its an option in the settings hash, return it
     if args.empty? && blk.nil?
-      make_user_fields
-      if @@fields != nil && @@fields[User.current.login].has_key?(name)
-        return @@fields[User.current.login][name.to_sym]
+      user = User.current
+
+      # Populate custom fields for user
+      make_user_fields(user)
+
+      if @@fields != nil && @@fields[user.login].has_key?(name)
+        return @@fields[user.login][name.to_sym]
       end
 
-      ipa_query
-      if @@ipa_result.has_key?(User.current.login) &&
-        @@ipa_result[User.current.login].try(:[], :result) &&
-        @@ipa_result[User.current.login][:result].try(:[], name.to_s)
-        return @@ipa_result[User.current.login][:result][name.to_s].first
+      # Query IPA server or return cached values
+      ipa_query(user.login)
+
+      if @@ipa_result.has_key?(user.login) &&
+        @@ipa_result[user.login].try(:[], :result) &&
+        @@ipa_result[user.login][:result].try(:[], name.to_s)
+        return @@ipa_result[user.login][:result][name.to_s].first
       end
       super
     else
@@ -44,13 +52,14 @@ class CwaIpaUser
 
   # Force a full query on the next ipa_query run
   def refresh
-    if @@ipa_result.has_key?(User.current.login) && @@ipa_result[User.current.login] != nil
-      if @@ipa_result[User.current.login].has_key?(:timestamp)
-        @@ipa_result[User.current.login][:timestamp] -= 60.seconds
+    user = User.current
+    if @@ipa_result.has_key?(user.loggin) && @@ipa_result[user.login] != nil
+      if @@ipa_result[user.login].has_key?(:timestamp)
+        @@ipa_result[user.login][:timestamp] -= 60.seconds
       end
     end
-    ipa_query
-    make_user_fields
+    ipa_query(user.login)
+    make_user_fields(user)
   end
 
   # 
@@ -110,12 +119,12 @@ class CwaIpaUser
 
   # Get wonderful attributes from IPA server
   private
-  def ipa_query
-    if @@ipa_result[User.current.login].try(:[], :timestamp) && (Time.now - @@ipa_result[User.current.login][:timestamp]) <= 30.seconds
+  def ipa_query(uid)
+    if @@ipa_result[uid].try(:[], :timestamp) && (Time.now - @@ipa_result[uid][:timestamp]) <= 30.seconds
       return
     end
       
-    Rails.logger.debug "ipa_query() => " + @@ipa_result[User.current.login].to_s
+    Rails.logger.debug "ipa_query() => " + @@ipa_result[uid].to_s
 
     begin 
       r = CwaRest.client({
@@ -125,7 +134,7 @@ class CwaIpaUser
         :password => Redmine::Cwa.ipa_password,
         :json => {
           'method' => 'user_show',
-          'params' => [ [], { 'uid' => User.current.login } ]
+          'params' => [ [], { 'uid' => uid } ]
         }
       })
     rescue Exception => e
@@ -134,17 +143,17 @@ class CwaIpaUser
  
     Rails.logger.debug "ipa_query() => " + r.to_s
     if r != nil && r['result'] != nil 
-      @@ipa_result = { User.current.login => { :timestamp => Time.now, :result => r['result']['result'] } }
+      @@ipa_result = { uid => { :timestamp => Time.now, :result => r['result']['result'] } }
     else
-      @@ipa_result = { User.current.login => nil }
+      @@ipa_result = { uid => nil }
     end
   end
 
   # Populate custom_fields as accessible attributes
-  def make_user_fields
-    @@fields[User.current.login] = Hash.new
-    User.current.available_custom_fields.each do |field|
-      @@fields[User.current.login][field.name.to_sym] = User.current.custom_field_value(field.id)
+  def make_user_fields(user)
+    @@fields[user.login] = Hash.new
+    user.available_custom_fields.each do |field|
+      @@fields[user.login][field.name.to_sym] = user.custom_field_value(field.id)
     end
     @@fields
   end
