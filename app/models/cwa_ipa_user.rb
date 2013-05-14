@@ -53,7 +53,7 @@ class CwaIpaUser
   # Force a full query on the next ipa_query run
   def refresh
     user = User.current
-    if @@ipa_result.has_key?(user.loggin) && @@ipa_result[user.login] != nil
+    if @@ipa_result.has_key?(user.login) && @@ipa_result[user.login] != nil
       if @@ipa_result[user.login].has_key?(:timestamp)
         @@ipa_result[user.login][:timestamp] -= 60.seconds
       end
