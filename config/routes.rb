@@ -65,4 +65,5 @@ match 'cwa_browser/:project_id/upload', :to => 'cwa_browser#upload', :via => :po
 
 # Stats browser
 get 'cwa_stats/:project_id', :to => 'cwa_stats#index'
+#get 'cwa_stats/system/:project_id', :to => 'cwa_stats#ganglia'
 #resources 'cwa_stats/:project_id', :only => [:index, :new, :edit, :create, :delete, :show, :update]
