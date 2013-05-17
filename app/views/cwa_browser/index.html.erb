@@ -13,7 +13,7 @@
     <div class="actionButton" onclick="showTextEditor()">Create File...</div>
     <div class="actionButton" onclick="showUploadFile()">Upload File...</div>
 
-    <% if @browser.current_dir != @browser.home_dir && @browser.current_dir != @browser.work_dir && @browser.current_dir !~ /\/shares\/[a-zA-Z0-9_-]+$/ %>
+    <% if @browser.current_dir != @user.homedirectory && @browser.current_dir != @user.workdirectory && @browser.current_dir !~ /\/shares\/[a-zA-Z0-9_-]+$/ %>
       <div class="browserButtonBack" onclick="back()">&lt; Back</div>
     <% else %>
       <div class="browserButtonBackInactive">&lt; Back</div>

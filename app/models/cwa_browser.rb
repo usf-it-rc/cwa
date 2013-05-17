@@ -1,19 +1,13 @@
 class CwaBrowser
   attr_accessor :current_dir
   def initialize(dir)
-    if dir !~ /(\/home|\/work)\/#{User.current.login[0,1]}\/#{User.current.login}.*/ and dir !~ /\/shares\/.*/
+    user = CwaIpaUser.new
+
+    if dir !~ /#{user.homedirectory}/ and dir !~ /#{user.workdirectory}/ and dir !~ /\/shares\/.*/
       raise ArgumentError, "You cannot browse directories outside of your home, work, or group share paths."
     else
       self.current_dir = dir.chomp
     end
-  end
-
-  def home_dir
-    "/home/#{User.current.login[0,1]}/#{User.current.login}"
-  end
-
-  def work_dir
-    "/work/#{User.current.login[0,1]}/#{User.current.login}"
   end
 
   def up_dir
