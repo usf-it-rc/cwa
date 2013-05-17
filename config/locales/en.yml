@@ -14,4 +14,4 @@ en:
   permission_view_account_signup: "View Sign-up Page"
   permission_account_create: "Create account"
   label_project_id: "The project under which this plugin will appear"
-  enable_acct_activation: "Allow users to activate/add their account to your IPA realm (Requires messaging and CAS)"
+  label_enable_acct_activation: "Allow users to activate/add their account to your IPA realm (Requires messaging and CAS)"
