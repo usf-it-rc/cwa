@@ -37,6 +37,7 @@ Redmine::Plugin.register :cwa do
     'output_server' => "sftp.example.com",
     'production_cell_name' => "default",
     'testing_cell_name' => "testing",
+    'enable_acct_activation' => "off",
   }, :partial => 'settings/cwa_settings'
 
   # TODO: Get permissions nailed down
@@ -57,7 +58,7 @@ proj_proc = Proc.new { |p| p.identifier == Setting.plugin_cwa[:project_id] }
 
 Redmine::MenuManager.map :project_menu do |menu|
   menu.push :cwa_accountsignup, { :controller => 'cwa_accountsignup', :action => 'index' }, 
-       :caption => 'My Access', :after => :activity, :param => :project_id, :if => proj_proc
+       :caption => 'My Access', :after => :activity, :param => :project_id, :if => Proc.new { |p| p.identifier == Setting.plugin_cwa[:project_id] and Setting.plugin_cwa[:enable_acct_activation] == "on" }
   menu.push :cwa_allocations, { :controller => 'cwa_allocations', :action => 'index' }, 
        :caption => 'Allocations', :after => :cwa_accountsignup, :param => :project_id, :if => proj_proc
   menu.push :cwa_groupmanager, { :controller => 'cwa_groupmanager', :action => 'index' }, 

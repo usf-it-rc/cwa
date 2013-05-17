@@ -36,6 +36,11 @@
   <br />
 </p>
 <p>
+  <label><%= l(:label_enable_acct_activation) %> :</label>
+  <%= check_box_tag 'settings[enable_acct_activation]', 'on', @settings['enable_acct_activation'] %>
+  <br />
+</p>
+<p>
   <label><%= l(:label_msg_url) %> :</label>
   <%= text_field_tag 'settings[msg_url]', @settings['msg_url'] %>
   <br />
@@ -53,11 +58,6 @@
 <p>
   <label><%= l(:label_project_id) %> :</label>
   <%= text_field_tag 'settings[project_id]', @settings['project_id'] %>
-  <br />
-</p>
-<p>
-  <label><%= l(:label_output_server) %> :</label>
-  <%= text_field_tag 'settings[output_server]', @settings['output_server'] %>
   <br />
 </p>
 <p>
