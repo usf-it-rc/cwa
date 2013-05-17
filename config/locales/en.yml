@@ -1,7 +1,8 @@
 # English strings go here for Rails i18n
 en:
-  label_tos: "Terms of Service (What we provide and do not provide)"
-  label_saa: "System Access Agreement (User responsibilities)"
+  label_tos: "Terms of Service (What we provide and do not provide. Only used if Account activation is enabled)"
+  label_saa: "System Access Agreement (User responsibilities. Only used if Account activation is enabled)"
+  label_delete_saa: "Terms of service upon account deletion (Only used if Account activation is enabled)"
   label_ipa_server: "FreeIPA Server Hostname"
   label_ipa_account: "FreeIPA Service Account"
   label_ipa_password: "FreeIPA Service Account Password"
