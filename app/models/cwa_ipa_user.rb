@@ -99,7 +99,7 @@ class CwaIpaUser
   end
 
   def create
-    Rails.logger.debug "provision() => { " + User.current.login + ", " + self.passwd.to_s + ", user_add }"
+    Rails.logger.debug "create() => { " + User.current.login + ", " + self.passwd.to_s + ", user_add }"
     begin
       provision User.current.login, self.passwd, "user_add"
     rescue Exception => e
@@ -198,13 +198,14 @@ class CwaIpaUser
     if action == "user_add"
       pwexp = `/var/lib/redmine/plugins/cwa/support/pwexpupdate.sh #{user}`
       if $?.success?
-        Rails.logger.info "User password expiry updated. " + pwexp
+        Rails.logger.info "User password expiry updated. " + pwexp.to_s
       else
-        Rails.logger.info "Failed to update user password expiry! " + pwexp
+        Rails.logger.info "Failed to update user password expiry! " + pwexp.to_s
       end
     end
 
     # TODO: parse out the details and return appropriate messages 
+    Rails.logger.debug "provision() => " + r.to_s
     if r['error'] != nil
       raise r['error']['message']
     end

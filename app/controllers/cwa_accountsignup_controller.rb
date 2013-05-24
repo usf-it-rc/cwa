@@ -18,14 +18,13 @@ class CwaAccountsignupController < ApplicationController
 
     Rails.logger.debug "CwaASC#index() " + @project.to_s
 
-    if flash[:notice] != nil
-      s = flash[:notice]
-    end
+    n = flash[:notice] if flash[:notice] != nil
+    e = flash[:error] if flash[:error] != nil
 
     if @user.provisioned?
-      if s != nil
-        flash[:notice] = s.to_s
-      end
+      flash[:notice] = n.to_s if n != nil
+      flash[:error] = e.to_s if e != nil
+
       redirect_to :action => :user_info
       return
     end
@@ -94,6 +93,7 @@ class CwaAccountsignupController < ApplicationController
       return
     end
 
+    @project = Project.find_by_identifier(params[:project_id])
     @user = CwaIpaUser.new
 
     if !params[:saa] 
@@ -117,16 +117,21 @@ class CwaAccountsignupController < ApplicationController
       @user.create
     rescue Exception => e
       flash[:error] = "Registration failed: " + e.to_s
-    else
-      logger.info "Account #{@user.uid.first} provisioned in FreeIPA"
-
-      # Add them to the project... allows notifications
-      @project.members << Member.new(:user => User.current, :roles => [Role.find_by_name("Watcher")])
-
-      CwaMailer.activation(@user).deliver
-
-      flash[:notice] = 'You are now successfully registered!'
+      redirect_to :action => :index, :project_id => params[:project_id]
+      return
     end
+
+    logger.info "Account #{@user.uid.first} provisioned in FreeIPA"
+
+    # Add them to the project... allows notifications
+    member = Member.create(:user => User.current, :roles => [Role.find_by_name("Watcher")])
+    logger.debug "cwa_accountsignup_controller::create() " + member.to_s
+    @project.members << member
+    @project.save
+
+    CwaMailer.activation(@user).deliver
+
+    flash[:notice] = 'You are now successfully registered!'
     redirect_to :action => :index, :project_id => params[:project_id]
   end
 
