@@ -16,8 +16,6 @@ class CwaAccountsignupController < ApplicationController
     @user = CwaIpaUser.new
     @project = Project.find_by_identifier(params[:project_id])
 
-    Rails.logger.debug "CwaASC#index() " + @project.to_s
-
     n = flash[:notice] if flash[:notice] != nil
     e = flash[:error] if flash[:error] != nil
 
@@ -56,7 +54,7 @@ class CwaAccountsignupController < ApplicationController
     end
 
     if @user.update :loginshell => login_shell
-      CwaMailer.shell_change(@user).deliver
+      CwaMailer.shell_change(User.current).deliver
       flash[:notice] = "Options saved!"
     else
       flash[:error] = "There was a problem saving your options!"
@@ -129,7 +127,7 @@ class CwaAccountsignupController < ApplicationController
     @project.members << member
     @project.save
 
-    CwaMailer.activation(@user).deliver
+    CwaMailer.activation(User.current).deliver
 
     flash[:notice] = 'You are now successfully registered!'
     redirect_to :action => :index, :project_id => params[:project_id]
@@ -164,7 +162,7 @@ class CwaAccountsignupController < ApplicationController
       end
       @project.members = members
       logger.debug "Account #{User.current.login.downcase} de-provisioned in FreeIPA"
-      CwaMailer.deactivation(@user).deliver
+      CwaMailer.deactivation(User.current).deliver
       flash[:notice] = 'Your account has been deactivated!'
     else
       logger.debug "Account #{User.current.login.downcase} failed to be de-provisioned in FreeIPA!"
