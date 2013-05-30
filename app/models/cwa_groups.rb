@@ -2,18 +2,26 @@ require 'cwa_rest'
 include ::CwaRest
 
 class CwaGroups
-  @@groups = nil
-  @@allGroups = nil
+  attr_accessor :user
 
   def initialize(&block)
+    self.user = User.current
+
+    # initialize the cache
+    all_groups
+    user_groups
     yield self if block !=nil
   end
+
+  #
+  # QUERY-ONLY METHODS
+  # 
 
   # Get list of groups I manage from JSON-RPC
   def that_i_manage
     group_list = Array.new
-    get_groups.each do |g|
-      group_list << g if g[:owner] == User.current.login
+    user_groups.each do |g|
+      group_list << g if g[:owner] == self.user.login.downcase
     end
     group_list
   end 
@@ -21,100 +29,98 @@ class CwaGroups
   # Get list of groups I belong to from JSON-RPC, not groups I manage
   def member_of
     group_list = Array.new
-    get_groups.each do |g|
-      group_list << g if g[:owner] != User.current.login
+    user_groups.each do |g|
+      group_list << g if g[:owner] != self.user.login.downcase
     end
     group_list
   end
 
+  # Get group by name
   def by_name(name)
-    get_all_groups.each do |g| 
-      return g if g[:cn].first.to_s == name
+    all_groups.each do |g| 
+      Rails.logger.debug "by_name() => #{g.to_s}"
+      return g if g[:cn].to_s == name
     end
   end
 
+  # get group by gidnumber
   def by_id(id)
     group = {}
-    get_all_groups.each do |g| 
+    all_groups.each do |g| 
       next if g[:gidnumber] == nil
-      group = g if g[:gidnumber].first.to_i == id.to_i
-    end
-    return group
-  end
-
-  # TODO: Remove the from_all methods
-  def from_all_by_id(id)
-    group = {}
-    get_all_groups.each do |g| 
-      next if g[:gidnumber] == nil
-      group = g if g[:gidnumber].first.to_i == id.to_i
-    end
-    return group
-  end
-
-  def from_all_by_name(name)
-    get_all_groups.each do |g| 
-      return g if g[:cn] == name
+      return g if g[:gidnumber].first.to_i == id.to_i
     end
   end
 
+  #
+  # VOLATILE METHODS
+  #
+
+  # Remove self.user from group membership of specified group
   def delete_me_from_group(group)
-    res = Redmine::IPAGroup.remove_user User.current.login, group
-    refresh_groups
+    res = Redmine::IPAGroup.remove_user self.user.login, group
+    refresh
     res
   end
 
+  # Add a user to self.user's group
+  # TODO: Validate that self.user is owner of group
   def add_to_my_group(user, group)
     res = Redmine::IPAGroup.add_user user, group
-    refresh_groups
+    refresh
     res
   end
  
+  # Create a new group
   def create(group_info)
     res = Redmine::IPAGroup.create_new_group(group_info)
-    refresh_groups
+    refresh
     res
   end
 
+  # Delete a group
   def delete(name)
     res = Redmine::IPAGroup.delete_group(name)
-    refresh_groups
+    refresh
     res
   end
 
+  # Delete a user from self.user's group
+  # TODO: Validate that self.user is owner of group
   def delete_from_my_group(user, group)
     res = Redmine::IPAGroup.remove_user user, group
-    refresh_groups
+    refresh
     res
   end
 
+  # Retrieve array of all groups w/ caching
   def all_groups
-    get_all_groups
+    groups = Rails.cache.fetch("all_groups", :expires_in => 60.seconds) do
+      get_all_groups
+    end
+    return groups
+  end
+
+  # TODO: refactor method to use map() to filter out non-member groups from "all_groups" cache
+  #       eliminating  extra IPA query
+  #
+  # Retrieve array of groups to which self.user belongs w/ caching
+  def user_groups
+    groups = Rails.cache.fetch("user_groups_#{self.user.login.downcase}", :expires_in => 60.seconds) do
+      get_user_groups
+    end
+    return groups
   end
 
   private
-  def refresh_groups
-    if @@allGroups != nil
-      @@allGroups[:timestamp] -= 60.seconds
-    end
-
-    if @@groups != nil && @@groups[User.current.login] != nil
-      @@groups[User.current.login][:timestamp] -= 60.seconds
-    end
-    get_groups
-    get_all_groups
+  # clear our caches (usually called after volatile methods)
+  def refresh
+    Rails.cache.clear("all_groups")
+    Rails.cache.clear("user_groups_#{self.user.login.downcase}")
   end
 
   def get_all_groups
-    # Caching, baby
-    @@allGroups = { :timestamp => Time.now, :groups => Array.new } if @@allGroups == nil
-
-    if (Time.now - @@allGroups[:timestamp]) <= 30.seconds && @@allGroups[:groups] != []
-      return @@allGroups[:groups] 
-    else
-      @@allGroups = { :timestamp => Time.now, :groups => Array.new }
-    end
-
+    allgroups = Array.new
     response = Redmine::IPAGroup.find_all['result']['result']
     response.each do |r|
       next if r['cn'].first == "ipausers"
@@ -138,24 +144,16 @@ class CwaGroups
         g[:desc] = r['description'].first
         g[:owner] = "admins"
       end
-      @@allGroups[:groups] << g
+
+      allgroups << g
     end
-    @@allGroups[:groups]
+   return allgroups
   end
 
-  def get_groups
-    # Caching, baby
-    @@groups = { User.current.login => { :timestamp => Time.now, :groups => Array.new }} if @@groups == nil
-    @@groups = { User.current.login => { :timestamp => Time.now, :groups => Array.new }} if !@@groups.has_key?(User.current.login)
-
-    if ((Time.now - @@groups[User.current.login][:timestamp]) <= 30.seconds) && (@@groups[User.current.login][:groups] != [])
-      return @@groups[User.current.login][:groups] 
-    else
-      @@groups = { User.current.login => {:timestamp => Time.now, :groups => Array.new }}
-    end
-
-    response = Redmine::IPAGroup.find_by_user(User.current.login)['result']['result']
-
+  # TODO: This method should be deprecated soon
+  def get_user_groups
+    groups = Array.new
+    response = Redmine::IPAGroup.find_by_user(self.user.login.downcase)['result']['result']
     response.each do |r|
       next if r['cn'].first == "ipausers"
 
@@ -178,8 +176,8 @@ class CwaGroups
         g[:desc] = r['description'].first
         g[:owner] = "admins"
       end
-      @@groups[User.current.login][:groups] << g
+      groups << g
     end
-    @@groups[User.current.login][:groups]
+    return groups
   end
 end

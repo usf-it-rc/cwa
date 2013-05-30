@@ -6,7 +6,7 @@
 
 <div class="box">
 <h3>Group Information</h3>
-<% g = @gs.from_all_by_name(params[:group_name]) %>
+<% g = @gs.by_name(params[:group_name]) %>
 <p><%= g[:cn] %> group information</p>
 
 <table>
