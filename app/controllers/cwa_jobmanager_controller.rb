@@ -5,8 +5,6 @@ require 'rsgehost.rb'
 class CwaJobmanagerController < ApplicationController
   unloadable
 
-  @@joblist = {}
-
   def index
     @project = Project.find(params[:project_id])
     @jobs = RsgeJobs.new User.current.login
@@ -19,12 +17,9 @@ class CwaJobmanagerController < ApplicationController
 
   def current_jobs
     user = User.current.login
-    if !@@joblist.has_key?(user.to_sym)
-      @@joblist[user.to_sym] = { :jobs => RsgeJobs.new(user), :timestamp => Time.now }
-    elsif @@joblist[user.to_sym][:timestamp] < (Time.now - 5.seconds)
-      @@joblist[user.to_sym] = { :jobs => RsgeJobs.new(user), :timestamp => Time.now }
-    end 
-    @jobs = @@joblist[user.to_sym][:jobs]
+    @jobs = Rails.cache.fetch("cached_job_list_#{user}", :expires_in => 5.seconds) do
+      RsgeJobs.new(user)
+    end
     render :partial => 'cwa_jobmanager/current_jobs'
   end
 
@@ -34,12 +29,9 @@ class CwaJobmanagerController < ApplicationController
 
   def job_history
     user = User.current.login
-    if !@@joblist.has_key?(user.to_sym)
-      @@joblist[user.to_sym] = { :jobs => RsgeJobs.new(user), :timestamp => Time.now }
-    elsif @@joblist[user.to_sym][:timestamp] < (Time.now - 5.seconds)
-      @@joblist[user.to_sym] = { :jobs => RsgeJobs.new(user), :timestamp => Time.now }
-    end 
-    @jobs = @@joblist[user.to_sym][:jobs]
+    @jobs = Rails.cache.fetch("cached_job_list_#{user}", :expires_in => 5.seconds) do
+      RsgeJobs.new(user)
+    end
     render :partial => 'cwa_jobmanager/job_history'
   end
 
