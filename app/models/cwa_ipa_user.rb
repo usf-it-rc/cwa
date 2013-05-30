@@ -4,36 +4,43 @@ include ::CwaRest
 class CwaIpaUser
   # This gets us all of our accessor methods for plugin settings
   # and ipa-based attributes
-  @@ipa_result = Hash.new
-  @@fields = Hash.new
-  attr_accessor :passwd
+  attr_accessor :passwd, :user
 
   def initialize
-    user = User.current
-    make_user_fields(user)
-    ipa_query(user.login)
+    self.user = User.current
+
+    Rails.cache.fetch("cached_user_fields_#{self.user.login}", :expires_in => 60.seconds) do
+      make_user_fields
+    end
+
+    Rails.cache.fetch("cached_ipa_result_#{self.user.login}", :expires_in => 60.seconds) do
+      ipa_query
+    end
   end
 
   # this exposes ldap attributes and custom fields as methods
   def method_missing(name, *args, &blk)
-    # If its an option in the settings hash, return it
+    # If its an option in the fields hash, return it
     if args.empty? && blk.nil?
-      user = User.current
+      fields = Rails.cache.fetch("cached_user_fields_#{self.user.login}", :expires_in => 60.seconds) do
+        make_user_fields
+      end
 
-      # Populate custom fields for user
-      make_user_fields(user)
+      Rails.logger.debug "MM() => #{fields.to_s}"
 
-      if @@fields != nil && @@fields[user.login].has_key?(name)
-        return @@fields[user.login][name.to_sym]
+      if fields != nil && fields.has_key?(name)
+        return fields[name.to_sym]
       end
 
       # Query IPA server or return cached values
-      ipa_query(user.login)
+      result = Rails.cache.fetch("cached_ipa_result_#{self.user.login}", :expires_in => 60.seconds) do
+        ipa_query
+      end
 
-      if @@ipa_result.has_key?(user.login) &&
-        @@ipa_result[user.login].try(:[], :result) &&
-        @@ipa_result[user.login][:result].try(:[], name.to_s)
-        return @@ipa_result[user.login][:result][name.to_s].first
+      Rails.logger.debug "MM() => #{result.to_s}"
+
+      if result != nil && result.has_key?(name.to_s)
+        return result[name.to_s].first
       end
       super
     else
@@ -47,19 +54,16 @@ class CwaIpaUser
   end
 
   def provisioned?
-    @@ipa_result[User.current.login] != nil
+    result = Rails.cache.fetch("cached_ipa_result_#{self.user.login}", :expires_in => 60.seconds) do
+      ipa_query
+    end
+    result != nil
   end
 
   # Force a full query on the next ipa_query run
   def refresh
-    user = User.current
-    if @@ipa_result.has_key?(user.login) && @@ipa_result[user.login] != nil
-      if @@ipa_result[user.login].has_key?(:timestamp)
-        @@ipa_result[user.login][:timestamp] -= 60.seconds
-      end
-    end
-    ipa_query(user.login)
-    make_user_fields(user)
+    Rails.cache.clear("cached_ipa_result_#{self.user.login}") and 
+      Rails.cache.clear("cached_user_fields_#{self.user.login}")
   end
 
   # 
@@ -101,7 +105,7 @@ class CwaIpaUser
   def create
     Rails.logger.debug "create() => { " + User.current.login + ", " + self.passwd.to_s + ", user_add }"
     begin
-      provision User.current.login, self.passwd, "user_add"
+      provision self.passwd, "user_add"
     rescue Exception => e
       raise e.message
     end
@@ -110,7 +114,7 @@ class CwaIpaUser
 
   def destroy
     begin
-      provision User.current.login, nil, "user_del"
+      provision nil, "user_del"
     rescue Exception => e
       raise e.message
     end
@@ -119,13 +123,7 @@ class CwaIpaUser
 
   # Get wonderful attributes from IPA server
   private
-  def ipa_query(uid)
-    if @@ipa_result[uid].try(:[], :timestamp) && (Time.now - @@ipa_result[uid][:timestamp]) <= 30.seconds
-      return
-    end
-      
-    Rails.logger.debug "ipa_query() => " + @@ipa_result[uid].to_s
-
+  def ipa_query
     begin 
       r = CwaRest.client({
         :verb => :POST,
@@ -134,7 +132,7 @@ class CwaIpaUser
         :password => Redmine::Cwa.ipa_password,
         :json => {
           'method' => 'user_show',
-          'params' => [ [], { 'uid' => uid } ]
+          'params' => [ [], { 'uid' => self.user.login } ]
         }
       })
     rescue Exception => e
@@ -143,39 +141,37 @@ class CwaIpaUser
  
     Rails.logger.debug "ipa_query() => " + r.to_s
     if r != nil && r['result'] != nil 
-      @@ipa_result = { uid => { :timestamp => Time.now, :result => r['result']['result'] } }
+      r['result']['result']
     else
-      @@ipa_result = { uid => nil }
+      nil
     end
   end
 
   # Populate custom_fields as accessible attributes
-  def make_user_fields(user)
-    @@fields[user.login] = Hash.new
-    user.available_custom_fields.each do |field|
-      @@fields[user.login][field.name.to_sym] = user.custom_field_value(field.id)
+  def make_user_fields
+    fields = Hash.new
+    self.user.available_custom_fields.each do |field|
+      fields[field.name.to_sym] = self.user.custom_field_value(field.id)
     end
-    @@fields
+    fields
   end
 
   # Do the work of adding or removing the user
-  def provision(user, password, action)
-    Rails.logger.debug "provision() => Current fields: " + @@fields[User.current.login].to_s
-
+  def provision(password, action)
     if action == "user_add"
       raise 'You entered an incorrect password' if !self.valid_passwd?
       param_list = {
-        'uid'  => user,
-        'homedirectory' => "/home/#{user.each_char.first.downcase}/#{user.downcase}",
+        'uid'  => self.user.login.downcase,
+        'homedirectory' => "/home/#{self.user.login.each_char.first.downcase}/#{self.user.login.downcase}",
         'userpassword' => password
       }
 
       param_list.merge!({ 'uidnumber' => self.namsid }) if self.namsid != nil
-      param_list.merge!({ 'givenname' => User.current.firstname })
-      param_list.merge!({ 'sn' => User.current.lastname })
+      param_list.merge!({ 'givenname' => self.user.firstname })
+      param_list.merge!({ 'sn' => self.user.lastname })
     else
       param_list = {
-        'uid' => user
+        'uid' => self.user.login.downcase
       }
     end
 
@@ -196,7 +192,7 @@ class CwaIpaUser
 
     # Force password expiry update
     if action == "user_add"
-      pwexp = `/var/lib/redmine/plugins/cwa/support/pwexpupdate.sh #{user}`
+      pwexp = `/var/lib/redmine/plugins/cwa/support/pwexpupdate.sh #{self.user.login.downcase}`
       if $?.success?
         Rails.logger.info "User password expiry updated. " + pwexp.to_s
       else
@@ -222,7 +218,7 @@ class CwaIpaUser
           'createProg' => 'EDU:USF:RC:cwa',
           'messageData' => {
             'host' => 'rc.usf.edu',
-            'username' => user,
+            'username' => self.user.login,
             'accountStatus' => action == "user_add" ? 'active' : 'disabled',
             'accountType' => 'Unix'
           }

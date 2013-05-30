@@ -119,7 +119,7 @@ class CwaAccountsignupController < ApplicationController
       return
     end
 
-    logger.info "Account #{@user.uid.first} provisioned in FreeIPA"
+    logger.info "Account #{@user.uid} provisioned in FreeIPA"
 
     # Add them to the project... allows notifications
     member = Member.create(:user => User.current, :roles => [Role.find_by_name("Watcher")])
@@ -127,7 +127,7 @@ class CwaAccountsignupController < ApplicationController
     @project.members << member
     @project.save
 
-    CwaMailer.activation(User.current).deliver
+    CwaMailer.activation(@user.user).deliver
 
     flash[:notice] = 'You are now successfully registered!'
     redirect_to :action => :index, :project_id => params[:project_id]
@@ -145,7 +145,7 @@ class CwaAccountsignupController < ApplicationController
     @project = Project.find(Redmine::Cwa.project_id)
 
     # some sanity checks
-    if (User.current.login.downcase == "admin")
+    if (@user.user.login.downcase == "admin")
       flash[:error] = "You cannot delete the admin user!"
       redirect_to :action => :user_info
       return
@@ -158,14 +158,14 @@ class CwaAccountsignupController < ApplicationController
       members = @project.members
 
       members.each do |member|
-        member.destroy if member.user_id == User.current.id
+        member.destroy if member.user_id == @user.user.id
       end
       @project.members = members
-      logger.debug "Account #{User.current.login.downcase} de-provisioned in FreeIPA"
-      CwaMailer.deactivation(User.current).deliver
+      logger.debug "Account #{@user.user.login.downcase} de-provisioned in FreeIPA"
+      CwaMailer.deactivation(@user.user).deliver
       flash[:notice] = 'Your account has been deactivated!'
     else
-      logger.debug "Account #{User.current.login.downcase} failed to be de-provisioned in FreeIPA!"
+      logger.debug "Account #{@user.user.login.downcase} failed to be de-provisioned in FreeIPA!"
       flash[:error] = "Deactivation failed!"
       redirect_to :action => :user_info
       return
