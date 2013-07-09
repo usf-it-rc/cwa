@@ -56,12 +56,39 @@ get 'cwa_default/:project_id/authorization', :to => 'cwa_default#authorization'
 get 'cwa_browser/:project_id', :to => 'cwa_browser#index'
 get 'cwa_browser/:project_id/download', :to => 'cwa_browser#get'
 get 'cwa_browser/:project_id/download_zip', :to => 'cwa_browser#get_zip'
-get 'cwa_browser/:project_id/rename', :to => 'cwa_browser#rename'
+#get 'cwa_browser/:project_id/rename', :to => 'cwa_browser#rename'
 get 'cwa_browser/:project_id/delete', :to => 'cwa_browser#delete'
-get 'cwa_browser/:project_id/tail', :to => 'cwa_browser#tail'
+#get 'cwa_browser/:project_id/tail', :to => 'cwa_browser#tail'
 get 'cwa_browser/:project_id/mkdir', :to => 'cwa_browser#mkdir'
 match 'cwa_browser/:project_id/create', :to => 'cwa_browser#create', :via => :post
 match 'cwa_browser/:project_id/upload', :to => 'cwa_browser#upload', :via => :post
+#match 'cwa_browser/:project_id/*', :to => 'cwa_browser#handler'
+#
+# Try to define REST api like so:
+#
+# ./<home|shares|work>/path/to/file/<method>
+#match 'cwa_browser/:project_id/*/mkdir', :via => :post, :to => 'cwa_browser#mkdir'
+#match 'cwa_browser/:project_id/*/content', :via => :post, :to => 'cwa_browser#get'
+#match 'cwa_browser/:project_id/*/rename', :via => :post, :to => 'cwa_browser#rename'
+post 'cwa_browser/:project_id/*share/*file/rename/*new_name', 
+  :to => 'cwa_browser#rename',
+  :file => /[^\0]+/,
+  :new_name => /[^\0]+/,
+  :share => /(home|shares|work)/
+post 'cwa_browser/:project_id/*share/*file/tail', 
+  :to => 'cwa_browser#tail',
+  :file => /[^\0]+/,
+  :share => /(home|shares|work)/
+#match 'cwa_browser/:project_id/*/zip', :via => :post, :to => 'cwa_browser#get_zip'
+#match 'cwa_browser/:project_id/*/mkdir', :via => :post, :to => 'cwa_browser#mkdir'
+#match 'cwa_browser/:project_id/*/create', :via => :post, :to => 'cwa_browser#create'
+#match 'cwa_browser/:project_id/*', :via => :put, :to => 'cwa_browser#upload'
+#match 'cwa_browser/:project_id/*', :via => :delete, :to => 'cwa_browser#delete'
+get 'cwa_browser/:project_id/*share/*dir', :to => 'cwa_browser#index',
+  :share => /(home|shares|work)/,
+  :dir => /[^\0]+/
+get 'cwa_browser/:project_id/*share', :to => 'cwa_browser#index',
+  :share => /(home|shares|work)/
 
 # Stats browser
 get 'cwa_stats/:project_id', :to => 'cwa_stats#index'

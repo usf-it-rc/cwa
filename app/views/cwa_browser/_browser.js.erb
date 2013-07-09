@@ -17,10 +17,7 @@ if (document.addEventListener) {
 var tail_handle;
 var my_tail_func = function(){
   var data = "";
-  $.get(
-    "/cwa_browser/<%= @project.identifier %>/tail", { 
-      file : $('#selected_file').val()
-    }, 
+  $.post("/cwa_browser/<%= @project.identifier %>/" + $('#selected_file').val() + "/tail",
     function(data){ 
       $('#tail_content').val('');
       $('#tail_content').val(data);
@@ -35,12 +32,17 @@ function rename(){
   var show_name = file_name.split("/");
   var current_dir = "<%= @browser.current_dir %>";
   var input = prompt("Enter new file/directory name",show_name[show_name.length-1]);
-  alert(input);
   if (input && input != show_name){
-    var new_name =  current_dir + "/" + input;
-    window.location = "<%= request.path %>/rename?file=" + 
-      encodeURIComponent(file_name) + 
-      "&new_name=" + encodeURIComponent(new_name) + "&dir=" + encodeURIComponent("<%= @browser.current_dir %>");
+    alert("/cwa_browser/<%= @project.identifier %>/" + file_name + "/rename/" + input);
+    var r = $.post("/cwa_browser/<%= @project.identifier %>/" + file_name + "/rename/" + input, null,
+      function(data){
+        var response = $.parseJSON(data);
+        return response.result;
+      }
+    );
+    alert(r);
+    
+    //window.location = "/cwa_browser/<%= @project.identifier %>/<%= @browser.current_share %>/" + current_dir;
   }
 };
 
@@ -64,7 +66,9 @@ function deleteItem(){
 };
 
 function chdir(elem){
-  window.location = "<%= request.path %>?dir=" + encodeURIComponent(elem.id);
+  var share = elem.id.split("#")[0];
+  var path = elem.id.split("#")[1];
+  window.location = "/cwa_browser/<%= @project.identifier %>/" + share + "/" + path;
 };
 
 function chdirAppMgr(elem){
@@ -127,8 +131,14 @@ function select_file(elem) {
     clear_selected();
     elem.className = className + "Selected";
   }
-  $("#selected_file").val(elem.id);
-  $("#selected_item").val(elem.id);
+
+  var share = elem.id.split("#")[0];
+  var path = elem.id.split("#")[1];
+
+  
+
+  $("#selected_file").val(share + "/" + path);
+  $("#selected_item").val(share + "/" + path);
 }
 
 function download_file(elem){

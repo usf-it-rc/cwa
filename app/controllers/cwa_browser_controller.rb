@@ -7,18 +7,16 @@ class CwaBrowserController < ApplicationController
     @groups = CwaGroups.new
     @group_list = @groups.that_i_manage + @groups.member_of
 
-    if params[:dir] != nil 
-      begin 
-        @browser = CwaBrowser.new params[:dir]
-      rescue Exception => e
-        flash[:error] = e.message
-        @browser = CwaBrowser.new @user.homedirectory
-        redirect_to :action => 'display', params => { :dir => @user.homedirectory }
-        return
-      end 
-    else
-      @browser = CwaBrowser.new @user.homedirectory
-    end
+    Rails.logger.debug "CwaBrowserController::index() => #{params[:share]} #{params[:dir]}"
+
+    begin 
+      @browser = CwaBrowser.new params[:share], params[:dir]
+    rescue Exception => e
+      flash[:error] = e.message
+      @browser = CwaBrowser.new "home", nil
+      #redirect_to :action => 'display', params => { :dir => @user.homedirectory }
+      #return
+    end 
 
     respond_to do |format|
       format.html
@@ -28,10 +26,21 @@ class CwaBrowserController < ApplicationController
   # Change file name
   def rename
     @user = CwaIpaUser.new
+    file = resolve_path(params[:share], params[:file])
+    new_file = resolve_path(params[:share], params[:new_name])
+    Rails.logger.debug "Redmine::CwaBrowserHelper.rename() => #{file} #{new_file}"
+
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-    Redmine::CwaBrowserHelper.rename(params[:file], params[:new_name]) or
-      flash[:error] = "Could not rename file #{params[:file]} to #{params[:new_name]}"
-    redirect_to :action => "index", :params => params
+
+    respond_to do |format|
+      format.json do
+        render :json => { :result => 'success' }.to_json
+      end
+    end
+
+    #Redmine::CwaBrowserHelper.rename(file, new_file) or
+    #  flash[:error] = "Could not rename file #{file} to #{new_file}"
+    #redirect_to :action => "index", :params => params
   end
 
   # create a directory
@@ -96,14 +105,19 @@ class CwaBrowserController < ApplicationController
   def tail
     @user = CwaIpaUser.new
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-    type = Redmine::CwaBrowserHelper.type(params[:file])
     text = ""
+
+    file = resolve_path(params[:share], params[:file])
+
+    Rails.logger.debug "CwaBrowserController::tail() => #{file}"
+
+    type = Redmine::CwaBrowserHelper.type(file)
 
     if type !~ /^text\/.*/
       text = "Cannot tail file!  It is not a text file!"
     else
-      file = Redmine::CwaBrowserHelper.tail(params[:file])
-      Rails.logger.debug "CwaBrowserController.tail() => Im in here! #{params[:file]}"
+      file = Redmine::CwaBrowserHelper.tail(file)
+      Rails.logger.debug "CwaBrowserController.tail() => Im in here! #{file}"
 
       file.each_tail do |data|
         text += data
@@ -137,5 +151,20 @@ class CwaBrowserController < ApplicationController
 
     self.response_body = Redmine::CwaBrowserHelper::RetrieveZip.new(params[:file])
   end
+
+  private
+  def resolve_path(share,path)
+    case share
+    when "home"
+      file = @user.homedirectory + "/" + path
+    when "work"
+      file = @user.workdirectory + "/" + path
+    when "shares"
+      file = "/shares/" + path
+    end
+    file
+  end
+    
+    
 
 end
