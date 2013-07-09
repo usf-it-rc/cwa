@@ -19,7 +19,7 @@ Redmine::Plugin.register :cwa do
   author 'Brian Smith'
   description 'This plugin provides tools and features useful for HPC' 
   version '0.0.1'
-  url 'https://redmine.rc.usf.edu/projects/jobman'
+  url 'https://redmine.rc.usf.edu/projects/2012-jobman'
   author_url 'http://blah'
 
   settings :default => { 
@@ -75,17 +75,18 @@ Redmine::MenuManager.map :project_menu do |menu|
        :caption => 'User Stats', :after => :wiki, :param => :project_id, :if => Proc.new { |p| User.current.admin? }
 end
 
+# Put links in the top menu... configurable
 Redmine::MenuManager.map :top_menu do |menu|
   menu.delete :home if menu.exists? :home
   menu.delete :my_page
   menu.delete :projects
   menu.delete :administration
-  menu.push :start, { :controller => 'projects', :action => 'show', :id => "research-computing" }, :caption => "CWA Home"
+  menu.push :start, { :controller => 'projects', :action => 'show', :id => "default" }, :caption => "CWA Home"
   menu.push :projects, { :controller => 'projects', :action => 'index' }, :caption => "My Projects"
-  menu.push :rc, "http://rc.usf.edu", :caption => "Research Computing", :html => { :target => "_blank" }
-  menu.push :it, "http://www.usf.edu/it", :caption => "Information Technology", :html => { :target => "_blank" }
-  menu.push :usf, "http://www.usf.edu", :caption => "USF Home", :html => { :target => "_blank" }
-  menu.push :research, "http://www.research.usf.edu", :caption => "Office of Research", :html => { :target => "_blank" }
+#  menu.push :rc, "http://rc.usf.edu", :caption => "Research Computing", :html => { :target => "_blank" }
+#  menu.push :it, "http://www.usf.edu/it", :caption => "Information Technology", :html => { :target => "_blank" }
+#  menu.push :usf, "http://www.usf.edu", :caption => "USF Home", :html => { :target => "_blank" }
+#  menu.push :research, "http://www.research.usf.edu", :caption => "Office of Research", :html => { :target => "_blank" }
   menu.push :administration, { :controller => 'admin', :action => 'index' }, :last => true, 
             :if => Proc.new { |p| User.current.admin? }
   menu.delete :help
