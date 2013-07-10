@@ -7,7 +7,7 @@
   <div id="<%= @user.homedirectory %>" onclick="chdirAppMgr(this)" class="actionButton">Home</div>
   <div id="<%= @user.workdirectory %>" onclick="chdirAppMgr(this)" class="actionButton">Work</div>
 
-  <% if @browser.current_dir != @user.homedirectory && @browser.current_dir != @user.workdirectory %>
+  <% if @browser.current_dir != nil %>
     <div class="browserButtonBack" onclick="backAppMgr()">&lt; Back</div>
   <% else %>
     <div class="browserButtonBackInactive">&lt; Back</div>
@@ -18,10 +18,11 @@
       <center><p>Select a directory...</p></center>
       <%= hidden_field_tag :selected_dir, @browser.current_dir %>
       <% @browser.directories.each do |dir| %>
-        <div class="browserDirEntry" onclick="select_directory(this)" ondblclick="chdirAppMgr(this);" id="<%= @browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
+        <% dir = @browser.current_dir != "" ? @browser.current_dir + "/" + dir : dir %>
+        <div class="browserDirEntry" onclick="select_directory(this)" ondblclick="chdirAppMgr(this);" id="<%= @browser.current_share + '#' + dir %>"><p class="browserEntry"><%= dir %></p></div>
       <% end %>
       <% @browser.files.each do |file| %>
-        <div class="browserFileEntryDisabled" id="<%= @browser.current_dir + '/' + file %>"><p class="browserEntry"><%= file %></p></div>
+        <div class="browserFileEntryDisabled" id="<%= @browser.current_share + "#" + @browser.current_dir + "/" + file %>"><p class="browserEntry"><%= file %></p></div>
       <% end %>
     </div>
   </div>

@@ -54,39 +54,86 @@ get 'cwa_default/:project_id/authorization', :to => 'cwa_default#authorization'
 
 # Browser
 get 'cwa_browser/:project_id', :to => 'cwa_browser#index'
-get 'cwa_browser/:project_id/download', :to => 'cwa_browser#get'
-get 'cwa_browser/:project_id/download_zip', :to => 'cwa_browser#get_zip'
-#get 'cwa_browser/:project_id/rename', :to => 'cwa_browser#rename'
-get 'cwa_browser/:project_id/delete', :to => 'cwa_browser#delete'
-#get 'cwa_browser/:project_id/tail', :to => 'cwa_browser#tail'
-get 'cwa_browser/:project_id/mkdir', :to => 'cwa_browser#mkdir'
-match 'cwa_browser/:project_id/create', :to => 'cwa_browser#create', :via => :post
-match 'cwa_browser/:project_id/upload', :to => 'cwa_browser#upload', :via => :post
-#match 'cwa_browser/:project_id/*', :to => 'cwa_browser#handler'
+
 #
 # Try to define REST api like so:
 #
 # ./<home|shares|work>/path/to/file/<method>
-#match 'cwa_browser/:project_id/*/mkdir', :via => :post, :to => 'cwa_browser#mkdir'
-#match 'cwa_browser/:project_id/*/content', :via => :post, :to => 'cwa_browser#get'
-#match 'cwa_browser/:project_id/*/rename', :via => :post, :to => 'cwa_browser#rename'
+#
+get 'cwa_browser/:project_id/download/:fid',
+  :to => 'cwa_browser#get'
+
+get 'cwa_browser/:project_id/downloadzip/:fid',
+  :to => 'cwa_browser#get_zip'
+
+# Creating new text files
+post 'cwa_browser/:project_id/*share/create',
+  :to => 'cwa_browser#create',
+  :share => /(home|shares|work)/
+
+post 'cwa_browser/:project_id/*share/*path/create',
+  :to => 'cwa_browser#create',
+  :share => /(home|shares|work)/,
+  :path => /[^\0]+/
+
+# Download methods
+get 'cwa_browser/:project_id/download/:fid',
+  :to => 'cwa_browser#get'
+
+get 'cwa_browser/:project_id/downloadzip/:fid',
+  :to => 'cwa_browser#get_zip'
+
+post 'cwa_browser/:project_id/*share/*path/download',
+  :to => 'cwa_browser#download',
+  :share => /(home|shares|work)/
+
+# Upload methods
+post 'cwa_browser/:project_id/*share/upload',
+  :to => 'cwa_browser#upload',
+  :share => /(home|shares|work)/
+
+post 'cwa_browser/:project_id/*share/*path/upload',
+  :to => 'cwa_browser#upload',
+  #:path => /[^\0]+/,
+  :share => /(home|shares|work)/
+
+# Make directories
+post 'cwa_browser/:project_id/*share/mkdir/*new_dir',
+  :to => 'cwa_browser#mkdir',
+  :new_dir => /[^\0]+/,
+  :share => /(home|shares|work)/
+
+post 'cwa_browser/:project_id/*share/*path/mkdir/*new_dir',
+  :to => 'cwa_browser#mkdir',
+#  :path => /[^\0]+/,
+  :new_dir => /[^\0]+/,
+  :share => /(home|shares|work)/
+
+# Delete a file
+post 'cwa_browser/:project_id/*share/*path/delete',
+  :to => 'cwa_browser#delete',
+  #:path => /[^\0]+/,
+  :share => /(home|shares|work)/
+
+# Rename a file
 post 'cwa_browser/:project_id/*share/*file/rename/*new_name', 
   :to => 'cwa_browser#rename',
   :file => /[^\0]+/,
   :new_name => /[^\0]+/,
   :share => /(home|shares|work)/
+
+# Tail a file
 post 'cwa_browser/:project_id/*share/*file/tail', 
   :to => 'cwa_browser#tail',
   :file => /[^\0]+/,
   :share => /(home|shares|work)/
-#match 'cwa_browser/:project_id/*/zip', :via => :post, :to => 'cwa_browser#get_zip'
-#match 'cwa_browser/:project_id/*/mkdir', :via => :post, :to => 'cwa_browser#mkdir'
-#match 'cwa_browser/:project_id/*/create', :via => :post, :to => 'cwa_browser#create'
-#match 'cwa_browser/:project_id/*', :via => :put, :to => 'cwa_browser#upload'
-#match 'cwa_browser/:project_id/*', :via => :delete, :to => 'cwa_browser#delete'
+
+# Display a path
 get 'cwa_browser/:project_id/*share/*dir', :to => 'cwa_browser#index',
   :share => /(home|shares|work)/,
   :dir => /[^\0]+/
+
+# Display a path at the base of a share
 get 'cwa_browser/:project_id/*share', :to => 'cwa_browser#index',
   :share => /(home|shares|work)/
 

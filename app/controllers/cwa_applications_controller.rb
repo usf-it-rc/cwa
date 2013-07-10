@@ -104,22 +104,21 @@ class CwaApplicationsController < ApplicationController
     @browser = nil
     @groups = Array.new
 
+    
+
+    Rails.logger.debug "APPLICATIONS DISPLAY => #{params[:share]} #{params[:dir]}"
+
     if params[:dir] == nil and params[:selected_dir] != nil
       params.merge!({ :dir => params[:selected_dir] })
     end
 
-    if params[:dir] != nil
-      begin 
-        @browser = CwaBrowser.new params[:dir]
-      rescue Exception => e
-        flash[:error] = e.message
-        @browser = CwaBrowser.new @user.homedirectory
-        redirect_to :action => 'display', :dir => @user.homedirectory, :project_id => params[:project_id]
-        return
-      end
-    else
-      @browser = CwaBrowser.new @user.homedirectory
-    end 
+    begin 
+      @browser = CwaBrowser.new params[:share], params[:dir]
+    rescue Exception => e
+      flash[:error] = e.message
+      redirect_to :action => 'display', :project_id => params[:project_id]
+      return
+    end
 
     (1..168).to_a.each { |t| @times << t.to_s + ":00:00" }
 

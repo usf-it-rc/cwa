@@ -27,41 +27,70 @@ var my_tail_func = function(){
   $("#tail_content").scrollTop($("#tail_content")[0].scrollHeight);
 };
 
-function rename(){
-  var file_name = $('#selected_item').val();
-  var show_name = file_name.split("/");
-  var current_dir = "<%= @browser.current_dir %>";
-  var input = prompt("Enter new file/directory name",show_name[show_name.length-1]);
-  if (input && input != show_name){
-    alert("/cwa_browser/<%= @project.identifier %>/" + file_name + "/rename/" + input);
-    var r = $.post("/cwa_browser/<%= @project.identifier %>/" + file_name + "/rename/" + input, null,
-      function(data){
-        var response = $.parseJSON(data);
-        return response.result;
-      }
-    );
-    alert(r);
-    
-    //window.location = "/cwa_browser/<%= @project.identifier %>/<%= @browser.current_share %>/" + current_dir;
-  }
-};
+function cwaAction(action, promptString, confirmBool){
+  var item = $('#selected_item').val();
+  item = item.split("/");
+  item = item[item.length-1];
 
-function createDirectory(){
-  var current_dir = "<%= @browser.current_dir %>";
-  var new_dir = prompt("Enter new directory name");
-  if (new_dir){
-    window.location = "<%= request.path %>/mkdir?new_dir=" + 
-      encodeURIComponent(new_dir) + "&dir=" + encodeURIComponent("<%= @browser.current_dir %>");
-  }
-};
+  var path = "<%= @browser.current_dir %>";
+  var share = "<%= @browser.current_share %>";
+  var proj = "<%= @project.identifier %>";
+  var argument;
+  var continuation = false;
 
-function deleteItem(){
-  var file_name = $('#selected_item').val();
-  var show_name = file_name.split("/");
-  var queryString = $('#app_form').serialize();
-  if (confirm("Are you sure you want to delete " + show_name[show_name.length-1] + "?")) {
-    window.location = "<%= request.path %>/delete?file=" + encodeURIComponent(file_name) + 
-      "&dir=" + encodeURIComponent("<%= @browser.current_dir %>");
+  if (promptString){
+    argument = prompt(promptString);
+
+    url = "/cwa_browser/" + proj + "/";
+    url += share + "/";
+    if (path)
+      url += path + "/"; 
+    url += item + "/";
+    url += action + "/";
+    url += argument;
+
+    errorString = "Failed to " + action + " \"" + argument + "\"!";
+  } else {
+    url = "/cwa_browser/" + proj + "/";
+    url += share + "/";
+    if (path)
+      url += path + "/";
+    url += item + "/";
+    url += action;
+
+    errorString = "Failed to " + action + " \"" + item + "\"!";
+  }
+
+  if (confirmBool) {
+    if (confirm("Are you sure you want to " + action + " " + item + " ?")){
+      continuation = true;
+    }
+  } else {
+    continuation = true;
+  }
+      
+
+  if ((promptString && argument && continuation == true) || 
+      (!promptString && !argument && continuation == true)){
+    $.ajax({
+      type: "POST",
+      url: url,
+      success: function(data){ 
+        if (data.fid != null){
+          switch (data.type){
+            case "application/x-directory; charset=binary":
+              method = "downloadzip";
+              break;
+            default:
+              method = "download";
+          }
+          window.location.assign("/cwa_browser/<%= @project.identifier %>/" + method + "/" + data.fid);
+        } else {
+          location.reload(); 
+        }
+      },
+      error: function(data){ alert(errorString); }
+    });
   }
 };
 
@@ -72,11 +101,19 @@ function chdir(elem){
 };
 
 function chdirAppMgr(elem){
-  window.location = "<%= request.path %>?dir=" + encodeURIComponent(elem.id) + "&" + $('#app_form').serialize();
+  var share = elem.id.split("#")[0];
+  var path = elem.id.split("#")[1];
+  alert("Changing to " + share + "/" + path);
+  if (path != null){
+    url_path = "share=" + share + "&dir=" + encodeURIComponent(path);
+  } else {
+    url_path = "share=" + share;
+  }
+  window.location = "<%= request.path %>?" + url_path + "&" + $('#app_form').serialize();
 };
 
 function back(){
-  window.location = "<%= request.path %>?dir=" + encodeURIComponent("<%= @browser.up_dir %>");
+  window.location = "/cwa_browser/<%= @project.identifier %>/<%= @browser.current_share %>/<%= @browser.up_dir %>";
 };
 
 function backAppMgr(){
@@ -120,8 +157,11 @@ function select_directory(elem){
     clear_selected();
     elem.className = className + "Selected";
   }
-  $("#selected_dir").val(elem.id);
-  $("#selected_item").val(elem.id);
+  var share = elem.id.split("#")[0];
+  var path = elem.id.split("#")[1];
+
+  $("#selected_dir").val(share + "/" + path);
+  $("#selected_item").val(share + "/" + path);
 }
 
 function select_file(elem) {
@@ -135,18 +175,8 @@ function select_file(elem) {
   var share = elem.id.split("#")[0];
   var path = elem.id.split("#")[1];
 
-  
-
   $("#selected_file").val(share + "/" + path);
   $("#selected_item").val(share + "/" + path);
-}
-
-function download_file(elem){
-  window.location.assign("<%= request.path %>/download?file=" + encodeURIComponent($('#selected_item').val()));
-}
-
-function download_zipfile(elem){
-  window.location.assign("<%= request.path %>/download_zip?file=" + encodeURIComponent($('#selected_item').val()));
 }
 
 function showMenu(event, elementId) {

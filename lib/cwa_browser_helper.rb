@@ -12,19 +12,25 @@ module Redmine::CwaBrowserHelper
     end
 
     def rename(file, new_name)
-      Rails.logger.debug "userexec(rename #{file} -- #{new_name})"
-      return userexec("rename #{file} -- #{new_name}")[2] == 0 ? true : false
+      Rails.logger.debug "userexec rename #{file} -- #{new_name}"
+      result = userexec "rename #{file} -- #{new_name}"
+      Rails.logger.debug "Redmine::CwaBrowserHelper.rename() #{result.to_s}"
+      return result[2] == 0 ? true : false
     end
 
     def delete(file)
-      Rails.logger.debug "userexec(rm #{file})"
+      Rails.logger.debug "userexec rm #{file}"
       # TODO: Make this safer!
-      userexec("rm #{file}")[2] == 0 ? true : false
+      result = userexec "rm #{file}"
+      Rails.logger.debug "Redmine::CwaBrowserHelper.delete() #{result.to_s}"
+      return result[2] == 0 ? true : false
     end
 
     def mkdir(file)
-      Rails.logger.debug "userexec(mkdir #{file})"
-      userexec("mkdir #{file}")[2] == 0 ? true : false
+      Rails.logger.debug "userexec mkdir #{file}"
+      result = userexec "mkdir #{file}"
+      Rails.logger.debug "Redmine::CwaBrowserHelper.mkdir() #{result.to_s}"
+      return result[2] == 0 ? true : false
     end
 
     def file_size(file)
@@ -44,10 +50,10 @@ module Redmine::CwaBrowserHelper
       @desc = nil
       @remote_file = nil
       
-      def initialize(dir, file)
+      def initialize(file)
         @remote_file = file
-        Rails.logger.debug "Redmine::CwaBrowserHelper::Put => sudo -u #{User.current.login} /usr/bin/cwabrowserhelper.sh write #{dir}/#{file}"
-        @desc = IO.popen("sudo -u #{User.current.login} /usr/bin/cwabrowserhelper.sh write #{dir}/#{file}", "wb")
+        Rails.logger.debug "Redmine::CwaBrowserHelper::Put => sudo -u #{User.current.login} /usr/bin/cwabrowserhelper.sh write #{file}"
+        @desc = IO.popen("sudo -u #{User.current.login} /usr/bin/cwabrowserhelper.sh write #{file}", "wb")
       end
 
       def write(data)

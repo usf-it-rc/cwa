@@ -5,12 +5,15 @@
 
 <div style="margin: 18px">
 <%= form_tag '/cwa_browser', :id => 'app_form', :multipart => true do %>
+
 <%= hidden_field_tag :selected_item, nil %>
 <%= hidden_field_tag :selected_dir, nil %>
 <%= hidden_field_tag :selected_file, nil %>
 <%= hidden_field_tag :selected_share, @browser.current_share %>
+
   <div class="actionButtons">
-    <div class="actionButton" onclick="createDirectory()">New Folder...</div>
+    <!-- Action buttons -->
+    <div class="actionButton" onclick="cwaAction('mkdir','Specify directory name to be created:',false)">New Folder...</div>
     <div class="actionButton" onclick="showTextEditor()">Create File...</div>
     <div class="actionButton" onclick="showUploadFile()">Upload File...</div>
 
@@ -19,9 +22,14 @@
     <% else %>
       <div class="browserButtonBackInactive">&lt; Back</div>
     <% end %>
-    <div style="float:left; position:relative; vertical-align:center; text-align:center;"><b>Path:</b> <%= text_field_tag :current_dir, @browser.current_path, :size => @browser.current_path.length < 72 ? @browser.current_path.length : 72, :disabled => true %></div>
+
+    <!-- Current directory window -->
+    <div style="float:left; position:relative; vertical-align:center; text-align:center;">
+      <b>Path:</b> <%= text_field_tag :current_dir, @browser.current_path, :size => @browser.current_path.length < 72 ? @browser.current_path.length : 72, :disabled => true %>
+    </div>
   </div>
 
+  <!-- File store tabs -->
   <div id="stores" style="float: left; position:relative; width:10%; margin-top:12px; margin-right:0px; z-index:10;">
     <div id="home#" onclick="chdir(this)" class="<%= @browser.current_share == "home" ? "browserButtonSelected" : "browserButton" %>">Home</div>
     <div id="work#" onclick="chdir(this)" class="<%= @browser.current_share == "work" ? "browserButtonSelected" : "browserButton" %>">Work</div>
@@ -58,10 +66,12 @@
 
 <div id="upload">
   <center>
-  <%= form_tag "/cwa_browser/#{@project.identifier}/upload", :id => 'upload_form', :multipart => true do %>
+  <% form_url = "/cwa_browser/#{@project.identifier}/#{@browser.current_share}" %>
+  <% form_url += "/#{@browser.current_dir}" if @browser.current_dir != nil %>
+  <% form_url += "/upload" %>
+  <%= form_tag form_url, :id => 'upload_form', :multipart => true do %>
     <b><p>Select file to upload</p></b>
     <p><%= file_field_tag :file %></p>
-    <%= hidden_field_tag :dir, @browser.current_dir %>
     <%= submit_tag "Upload" %><%= button_to_function "Cancel", "hideUploadFile()"%>
   <% end %>
   </center>
@@ -79,7 +89,10 @@
 
 <div id="textEditor" class="miniapp">
   <center>
-  <%= form_tag "/cwa_browser/#{@project.identifier}/create", :id => 'new_file_form', :multipart => true do %>
+  <% form_url = "/cwa_browser/#{@project.identifier}" %>
+  <% form_url += "/#{@browser.current_share}" %>
+  <% form_url += "/#{@browser.current_dir}" if @browser.current_dir != nil %>
+  <%= form_tag "#{form_url}/create", :id => 'new_file_form', :multipart => true do %>
     <%= label_tag :new_file_name, "New Text File Name" %>
     <%= hidden_field_tag :dir, @browser.current_dir %>
     <%= text_field_tag :new_file_name, nil, :length => 128 %>
@@ -92,14 +105,14 @@
 </div>
 
 <div id="menuDir" class="menu">
-  <div class="menuItem" onclick="download_zipfile()">Download as Zip</div>
-  <div class="menuItem" onclick="rename()">Rename...</div>
-  <div class="menuItem" onclick="deleteItem()">Delete...</div>
+  <div class="menuItem" onclick="cwaAction('download', null, false)">Download as Zip</div>
+  <div class="menuItem" onclick="cwaAction('rename','Enter new name for directory:', false)">Rename...</div>
+  <div class="menuItem" onclick="cwaAction('delete',null, true)">Delete...</div>
 </div>
 
 <div id="menuFile" class="menu">
-  <div class="menuItem" onclick="download_file()">Download</div>
+  <div class="menuItem" onclick="cwaAction('download', null, false)">Download</div>
   <div class="menuItem" onclick="showTail()">Tail...</div>
-  <div class="menuItem" onclick="rename()">Rename...</div>
-  <div class="menuItem" onclick="deleteItem()">Delete...</div>
+  <div class="menuItem" onclick="cwaAction('rename', 'Enter new name for file:', false)">Rename...</div>
+  <div class="menuItem" onclick="cwaAction('delete',null, true)">Delete...</div>
 </div>

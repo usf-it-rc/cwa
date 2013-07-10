@@ -3,15 +3,31 @@ class CwaBrowser
   def initialize(share, dir)
     user = CwaIpaUser.new
 
-    case share
-    when "home"
-      path = user.homedirectory + "/" + dir.to_s
-    when "shares"
-      path = "/shares/" + dir
-    when "work"
-      path = user.workdirectory + "/" + dir.to_s
+    if dir != nil
+      case share
+      when "home"
+        path = user.homedirectory + "/" + dir.to_s
+      when "shares"
+        path = "/shares/" + dir
+      when "work"
+        path = user.workdirectory + "/" + dir.to_s
+      else
+        raise ArgumentError, "You cannot browse directories outside of your home, work, or group share paths."
+      end
     else
-      raise ArgumentError, "You cannot browse directories outside of your home, work, or group share paths."
+      case share
+      when "home"
+        path = user.homedirectory
+      when nil
+        share = "home"
+        path = user.homedirectory
+      when "shares"
+        raise ArgumentError, "Not a valid share path!"
+      when "work"
+        path = user.workdirectory
+      else
+        raise ArgumentError, "You cannot browse directories outside of your home, work, or group share paths."
+      end
     end
 
     if Redmine::CwaBrowserHelper.type(path) !~ /application\/x\-directory/
@@ -26,8 +42,11 @@ class CwaBrowser
 
   # Return string of one directory up
   def up_dir
-    Rails.logger.debug "up_dir() => " + self.current_dir.gsub(/(.*)\/.*$/, '\1')
-    self.current_dir.gsub(/(.*)\/.*$/, '\1')
+    if self.current_dir !~ /[\/]+.*/
+      return ""
+    else
+      self.current_dir.gsub(/(.*)\/.*$/, '\1')
+    end
   end
 
   # return list of directories in the current path
