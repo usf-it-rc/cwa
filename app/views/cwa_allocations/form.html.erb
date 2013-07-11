@@ -1,23 +1,54 @@
+<!-- 
+  Some simple JS code to hide various elements based on selected 
+  radio button
+-->
+<script>
+
+</script>
 <h2>Allocations</h2>
 
 <div class="box">
 <h3>Request Allocation</h3>
 
-<%= form_for @allocation, :url => { :action => "submit", :project_id => @project.identifier }  do |a|%>
+<%= form_for @allocation, :url => { :action => "submit", :project_id => @project.identifier } do |a|%>
+  <div class="box">   
+    <div>
+      <%= a.radio_button :allocation_type, 1, :disabled => @one_time_startup_count > 0 %>
+      <%= a.label :allocation_type_1, "One-time Start-up Allocation" %>
+    </div>
+    <div>
+      <%= a.radio_button :allocation_type, "2" %>
+      <%= a.label :allocation_type_2, "Allocation to support awarded grant" %>
+    </div>
+    <div>
+      <%= a.radio_button :allocation_type, 3 %>
+      <%= a.label :allocation_type_3, "Allocation to support grant application" %>
+    </div>
+    <div>
+      <%= a.radio_button :allocation_type, 4 %>
+      <%= a.label :allocation_type_4, "Individual research allocation (non-grant, merit-based)" %>
+    </div>
+  </div>
+
   <table>
-   <tr>
+   <tr id="summary">
     <td style="text-align:right"><b><%= a.label :summary, "Summary: " %></b></td>
     <td style="text-align:left"><%= a.text_field :summary, :size => "64" %></td>
    </tr>
-   <tr>
+   <tr id="proposal">
     <td style="text-align:right"><b><%= a.label :proposal, "Proposal: " %></b></td>
     <td style="text-align:left"><%= a.text_area :proposal, :cols => "64", :rows => "18" %></td>
-  </tr>
-  <tr>
+   </tr>
+
+   <!--
+      TODO: Fields for grant-based applications
+   -->
+  
+   <tr id="hours">
     <td style="text-align:right"><b><%= a.label :time_in_hours, "Required CPU hours: " %></b></td>
     <td style="text-align:left"><%= a.text_field :time_in_hours, :size => "10", :value => "50000" %></td>
-  </tr>
- </table>
+   </tr>
+  </table>
   <p>
     <%= a.submit %>
   </p>

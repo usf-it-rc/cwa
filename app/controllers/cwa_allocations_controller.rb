@@ -29,6 +29,8 @@ class CwaAllocationsController < ApplicationController
 
     @user = CwaIpaUser.new
 
+    @one_time_startup_count = CwaAllocation.find_all_by_allocation_type(1).count
+
     (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
 
     @project = Project.find(params[:project_id])
@@ -125,25 +127,28 @@ class CwaAllocationsController < ApplicationController
       redirect_to :controller => 'cwa_default', :action => 'unavailable'
       return
     end
+
+    @project = Project.find(params[:project_id])
+
     if CwaAllocation.find(:all, :conditions => { :approved => true, :allocation_finished => nil }).count > 0
       flash[:error] = "You already have an active, unfinished allocation!"
       redirect_to :action => 'index'
       return
     end
 
-    allocation = CwaAllocation.new params[:cwa_allocation] do |a|
+    @allocation = CwaAllocation.new params[:cwa_allocation] do |a|
       a.time_submitted = Time.now
       a.user_id = User.current.id
       a.approved = false
       a.used_hours = 0
     end
 
-    if allocation.save
-      CwaMailer.allocation_submit_confirmation(User.current, allocation).deliver
+    if @allocation.save
+      CwaMailer.allocation_submit_confirmation(User.current, @allocation).deliver
       flash[:notice] = "Allocation request saved!"
       redirect_to :action => :index
     else
-      flash[:error] = "Couldn't save allocation request! " + allocation.errors.full_messages.to_sentence
+      flash[:error] = "Couldn't save allocation request! " + @allocation.errors.full_messages.to_sentence
       render :action => :form
     end
   end
