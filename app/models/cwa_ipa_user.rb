@@ -26,8 +26,6 @@ class CwaIpaUser
         make_user_fields
       end
 
-      Rails.logger.debug "MM() => #{fields.to_s}"
-
       if fields != nil && fields.has_key?(name)
         return fields[name.to_sym]
       end
@@ -36,8 +34,6 @@ class CwaIpaUser
       result = Rails.cache.fetch("cached_ipa_result_#{self.user.login}", :expires_in => 60.seconds) do
         ipa_query
       end
-
-      Rails.logger.debug "MM() => #{result.to_s}"
 
       if result != nil && result.has_key?(name.to_s)
         return result[name.to_s].first

@@ -104,10 +104,6 @@ class CwaApplicationsController < ApplicationController
     @browser = nil
     @groups = Array.new
 
-    
-
-    Rails.logger.debug "APPLICATIONS DISPLAY => #{params[:share]} #{params[:dir]}"
-
     if params[:dir] == nil and params[:selected_dir] != nil
       params.merge!({ :dir => params[:selected_dir] })
     end

@@ -35,7 +35,7 @@
     <div id="work#" onclick="chdir(this)" class="<%= @browser.current_share == "work" ? "browserButtonSelected" : "browserButton" %>">Work</div>
 
     <% @group_list.each do |group| %>
-      <div id="shares#<%= group[:cn] %>" onclick="chdir(this)" class="<%= @browser.current_path.split("/")[2] == "/shares/" + group[:cn] ? "browserButtonSelected" : "browserButton" %>"><%= group[:cn] %></div>
+      <div id="shares#<%= group[:cn] %>" onclick="chdir(this)" class="<%= @browser.current_dir =~ /^#{group[:cn]}\/*.*/ ? "browserButtonSelected" : "browserButton" %>"><%= group[:cn] %></div>
     <% end %>
   </div>
 

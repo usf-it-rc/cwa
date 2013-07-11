@@ -1,7 +1,10 @@
 class CwaBrowser
-  attr_accessor :current_dir, :current_share, :current_path, :user
+  attr_accessor :current_dir, :current_share, :current_path, :user, :home, :work
   def initialize(share, dir)
     @user = CwaIpaUser.new
+
+    @home = user.homedirectory
+    @work = user.workdirectory
 
     if share =~ /^(\/[^\0]+\/)+/
       (share,dir) = self.resolve_path_from_string(share)
@@ -10,25 +13,25 @@ class CwaBrowser
     if dir != nil
       case share
       when "home"
-        path = user.homedirectory + "/" + dir.to_s
+        path = home + "/" + dir.to_s
       when "shares"
         path = "/shares/" + dir
       when "work"
-        path = user.workdirectory + "/" + dir.to_s
+        path = work + "/" + dir.to_s
       else
         raise ArgumentError, "You cannot browse directories outside of your home, work, or group share paths."
       end
     else
       case share
       when "home"
-        path = user.homedirectory
+        path = home
       when nil
         share = "home"
-        path = user.homedirectory
+        path = home
       when "shares"
         raise ArgumentError, "Not a valid share path!"
       when "work"
-        path = user.workdirectory
+        path = work
       else
         raise ArgumentError, "You cannot browse directories outside of your home, work, or group share paths."
       end
@@ -83,18 +86,18 @@ class CwaBrowser
     if self.current_dir != nil
       case self.current_share
       when "home"
-        file = user.homedirectory + "/" + self.current_dir
+        file = home + "/" + self.current_dir
       when "work"
-        file = user.workdirectory + "/" + self.current_dir
+        file = work + "/" + self.current_dir
       when "shares"
         file = "/shares/" + self.current_dir
       end
     else
       case self.current_share
       when "home"
-        file = user.homedirectory
+        file = home
       when "work"
-        file = user.workdirectory
+        file = work
       when "shares"
         file = nil
       end
@@ -103,18 +106,16 @@ class CwaBrowser
   end
 
   def resolve_path_from_string(str)
-    share_paths = { home: user.homedirectory, work: user.workdirectory, shares: "/shares/" }
+    share_paths = { home: home, work: work, shares: "/shares/" }
     share = ""
     
     share_paths.keys.each do |path|
-      Rails.logger.debug "resolve_path_from_string => #{str} #{share_paths[path]}"
       share = path if str.match(share_paths[path])
     end
  
     dir = str.gsub(share_paths[share], "")
     dir.gsub!(/^\//,'')
 
-    Rails.logger.debug "resolve_path_from_string => #{str} => #{share.to_s} #{dir}"
     return [ share.to_s, dir ]
   end
 end
