@@ -1,7 +1,11 @@
 class CwaBrowser
-  attr_accessor :current_dir, :current_share, :current_path
+  attr_accessor :current_dir, :current_share, :current_path, :user
   def initialize(share, dir)
-    user = CwaIpaUser.new
+    @user = CwaIpaUser.new
+
+    if share =~ /^(\/[^\0]+\/)+/
+      (share,dir) = self.resolve_path_from_string(share)
+    end
 
     if dir != nil
       case share
@@ -59,8 +63,6 @@ class CwaBrowser
       dirs.push entry if entry != ""
     end
 
-    Rails.logger.debug "directories() => " + self.current_path
-    Rails.logger.debug "directories() => " + dirs.to_s
     return dirs
   end
 
@@ -74,8 +76,45 @@ class CwaBrowser
       fs.push entry if entry != ""
     end
 
-    Rails.logger.debug "files() => " + self.current_path
-    Rails.logger.debug "files() => " + fs.to_s
     return fs
+  end
+
+  def resolve_path
+    if self.current_dir != nil
+      case self.current_share
+      when "home"
+        file = user.homedirectory + "/" + self.current_dir
+      when "work"
+        file = user.workdirectory + "/" + self.current_dir
+      when "shares"
+        file = "/shares/" + self.current_dir
+      end
+    else
+      case self.current_share
+      when "home"
+        file = user.homedirectory
+      when "work"
+        file = user.workdirectory
+      when "shares"
+        file = nil
+      end
+    end
+    file
+  end
+
+  def resolve_path_from_string(str)
+    share_paths = { home: user.homedirectory, work: user.workdirectory, shares: "/shares/" }
+    share = ""
+    
+    share_paths.keys.each do |path|
+      Rails.logger.debug "resolve_path_from_string => #{str} #{share_paths[path]}"
+      share = path if str.match(share_paths[path])
+    end
+ 
+    dir = str.gsub(share_paths[share], "")
+    dir.gsub!(/^\//,'')
+
+    Rails.logger.debug "resolve_path_from_string => #{str} => #{share.to_s} #{dir}"
+    return [ share.to_s, dir ]
   end
 end

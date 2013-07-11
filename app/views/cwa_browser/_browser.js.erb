@@ -103,8 +103,7 @@ function chdir(elem){
 function chdirAppMgr(elem){
   var share = elem.id.split("#")[0];
   var path = elem.id.split("#")[1];
-  alert("Changing to " + share + "/" + path);
-  if (path != null){
+  if (path != ""){
     url_path = "share=" + share + "&dir=" + encodeURIComponent(path);
   } else {
     url_path = "share=" + share;
@@ -117,7 +116,7 @@ function back(){
 };
 
 function backAppMgr(){
-  window.location = "<%= request.path %>?dir=" + encodeURIComponent("<%= @browser.up_dir %>") + "&" + $('#app_form').serialize();
+  window.location = "<%= request.path %>?share=<%= @browser.current_share %>&dir=" + encodeURIComponent("<%= @browser.up_dir %>") + "&" + $('#app_form').serialize();
 };
 
 // Dustin Diaz's getElementsByClass to search for elements by class name regex
@@ -150,6 +149,29 @@ function clear_selected(){
   }
 }
 
+// these methods are for mini-browsers for job submission
+function set_selected_dir(elem, dir){
+  $("#selected_dir").val(dir);
+  var className = elem.className;
+  var re = new RegExp(".*Selected$");
+  if (!elem.className.match(re)){
+    clear_selected();
+    elem.className = className + "Selected";
+  }
+}
+
+function set_selected_file(elem, dir, file){
+  $("#selected_dir").val(dir);
+  $("#selected_file").val(dir + "/" + file);
+  var className = elem.className;
+  var re = new RegExp(".*Selected$");
+  if (!elem.className.match(re)){
+    clear_selected();
+    elem.className = className + "Selected";
+  }
+}
+
+// these methods are for the full file browser
 function select_directory(elem){
   var className = elem.className;
   var re = new RegExp(".*Selected$");

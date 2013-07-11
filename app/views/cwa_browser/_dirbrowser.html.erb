@@ -3,11 +3,11 @@
 </script>
 
 <div>
-  <div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory: </b> <%= @browser.current_dir %></div>
-  <div id="<%= @user.homedirectory %>" onclick="chdirAppMgr(this)" class="actionButton">Home</div>
-  <div id="<%= @user.workdirectory %>" onclick="chdirAppMgr(this)" class="actionButton">Work</div>
+  <div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory: </b> <%= @browser.current_share %>/<%= @browser.current_dir %></div>
+  <div id="home#" onclick="chdirAppMgr(this)" class="actionButton">Home</div>
+  <div id="work#" onclick="chdirAppMgr(this)" class="actionButton">Work</div>
 
-  <% if @browser.current_dir != nil %>
+  <% if @browser.current_dir != "" %>
     <div class="browserButtonBack" onclick="backAppMgr()">&lt; Back</div>
   <% else %>
     <div class="browserButtonBackInactive">&lt; Back</div>
@@ -18,11 +18,13 @@
       <center><p>Select a directory...</p></center>
       <%= hidden_field_tag :selected_dir, @browser.current_dir %>
       <% @browser.directories.each do |dir| %>
-        <% dir = @browser.current_dir != "" ? @browser.current_dir + "/" + dir : dir %>
-        <div class="browserDirEntry" onclick="select_directory(this)" ondblclick="chdirAppMgr(this);" id="<%= @browser.current_share + '#' + dir %>"><p class="browserEntry"><%= dir %></p></div>
+        <% dirent = @browser.current_dir != "" ? @browser.current_dir + "/" + dir : dir %>
+        <div class="browserDirEntry" onclick="set_select_dir(this,'<%= @browser.resolve_path %>')" ondblclick="chdirAppMgr(this);" id="<%= @browser.current_share + '#' + dirent %>"><p class="browserEntry"><%= dir %></p></div>
       <% end %>
       <% @browser.files.each do |file| %>
-        <div class="browserFileEntryDisabled" id="<%= @browser.current_share + "#" + @browser.current_dir + "/" + file %>"><p class="browserEntry"><%= file %></p></div>
+        <% fileent = @browser.current_dir != "" ? @browser.current_dir + "/" + file : file %>
+        <div class="browserDirEntry" onclick="set_selected_file(this,'<%= @browser.resolve_path %>', '<%= file %>')" ondblclick="chdirAppMgr(this);" id="<%= @browser.current_share + '#' + dirent %>"><p class="browserEntry"><%= dir %></p></div>
+        <div class="browserFileEntryDisabled" id="<%= @browser.current_share + "#" + fileent %>"><p class="browserEntry"><%= file %></p></div>
       <% end %>
     </div>
   </div>

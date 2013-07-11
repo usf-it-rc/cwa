@@ -2,30 +2,33 @@
   <%= render :partial => 'cwa_browser/browser.js.erb' %>
 </script>
 <div>
-  <div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory:</b> <%= @browser.current_dir %></div>
-    <div id="<%= @user.homedirectory %>" onclick="chdirAppMgr(this)" class="actionButton">Home</div>
-    <div id="<%= @user.workdirectory %>" onclick="chdirAppMgr(this)" class="actionButton">Work</div>
-    <% if @browser.current_dir != @user.homedirectory && @browser.current_dir != @user.workdirectory %>
-      <div class="browserButtonBack" onclick="backAppMgr()">&lt; Back</div>
-    <% else %>
-      <div class="browserButtonBackInactive">&lt; Back</div>
-    <% end %>
+  <div style="width:100%; float:left; position:relative; text-align:center;"><b>Current directory: </b> <%= @browser.current_share %>/<%= @browser.current_dir %></div>
+  <div id="home#" onclick="chdirAppMgr(this)" class="actionButton">Home</div>
+  <div id="work#" onclick="chdirAppMgr(this)" class="actionButton">Work</div>
 
-    <div class="browserSelector" style="width:100%">
-      <div class="browserContainer" style="width:40%">
-        <center><p>Select a directory...</p></center>
-        <%= hidden_field_tag :selected_dir, @browser.current_dir %>
-        <% @browser.directories.each do |dir| %>
-          <div class="browserDirEntry" onclick="select_directory(this)" ondblclick="chdirAppMgr(this)" id="<%= @browser.current_dir + '/' + dir %>"><p class="browserEntry"><%= dir %></p></div>
-        <% end %>
-      </div>
+  <% if @browser.current_dir != "" %>
+    <div class="browserButtonBack" onclick="backAppMgr()">&lt; Back</div>
+  <% else %>
+    <div class="browserButtonBackInactive">&lt; Back</div>
+  <% end %>
 
-      <div class="browserContainer" style="width:60%">
-        <center><p>Select a file...</p></center>
-        <%= hidden_field_tag :selected_file %>
-        <% @browser.files.each do |file| %>
-        <div class="browserFileEntry" onclick="$('#selected_dir').val('<%= @browser.current_dir %>'); select_file(this)" id="<%= @browser.current_dir + '/' + file %>"><p class="browserEntry"><%= file %></p></div>
+  <div class="browserSelector" style="width:100%">
+    <div class="browserContainer" style="width:40%">
+      <center><p>Select a directory...</p></center>
+      <%= hidden_field_tag :selected_dir, @browser.current_dir %>
+      <% @browser.directories.each do |dir| %>
+        <% dirent = @browser.current_dir != "" ? @browser.current_dir + "/" + dir : dir %>
+        <div class="browserDirEntry" onclick="set_selected_dir(this,'<%= @browser.resolve_path %>')" ondblclick="chdirAppMgr(this)" id="<%= @browser.current_share + '#' + dirent %>"><p class="browserEntry"><%= dir %></p></div>
       <% end %>
+    </div>
+
+    <div class="browserContainer" style="width:60%">
+      <center><p>Select a file...</p></center>
+      <%= hidden_field_tag :selected_file %>
+      <% @browser.files.each do |file| %>
+        <% fileent = @browser.current_dir != "" ? @browser.current_dir + "/" + file : file %>
+      <div class="browserFileEntry" onclick="set_selected_file(this,'<%= @browser.resolve_path %>','<%= file %>')" id="<%= @browser.current_share + '#' + fileent %>"><p class="browserEntry"><%= file %></p></div>
+    <% end %>
     </div>
   </div>
 </div>
