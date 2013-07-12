@@ -12,7 +12,12 @@
   <% @jobs.each do |job| %>
     <% jobs_hist = CwaJobHistory.find_by_jobid(job.jobid) %>
     <% workdir = jobs_hist.workdir if jobs_hist != nil %>
-    <% browser = CwaBrowser.new workdir, nil %>
+
+    <% begin %>
+      <% browser = CwaBrowser.new workdir, nil %>
+    <% rescue Exception => e %>
+      <% browser = nil %>
+    <% end %>
 
     <% if job.state == "r" %>
       <% host = RsgeHost.new(job.queue_name.to_s.split("@")[1]) %>
@@ -39,10 +44,14 @@
         <% end %>
       </td>
       <td>
-        <% if workdir != nil %>
-          <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => browser.current_share, :dir => browser.current_dir %>
+        <% if browser != nil %>
+          <% if browser.current_dir != nil %>
+            <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => browser.current_share, :dir => browser.current_dir %>
+          <% else %>
+            <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => browser.current_share %>
+          <% end %>
         <% else %>
-          n/a
+          N/A
         <% end %>
       </td>
     </tr>

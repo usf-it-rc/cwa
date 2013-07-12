@@ -1,6 +1,6 @@
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
 <script>
-  <%= render :partial => 'cwa_browser/browser.js.erb' %>
+  <%= render :formats => ['js'], :partial => 'cwa_browser/browser' %>
 </script>
 
 <div style="margin: 18px">
@@ -42,7 +42,6 @@
   <div class="browserSelectorFull">
 
 <% @browser.directories.each do |dir| %>
-<% Rails.logger.debug "index#render => Nil Dir => #{@browser.current_dir}" %>
   <% if @browser.current_dir != nil.to_s %>
     <% id = @browser.current_dir + "/" + dir %>
   <% else %>

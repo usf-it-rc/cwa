@@ -11,7 +11,11 @@
   </tr>
 <% hist_jobs.each do |h| %>
   <% if h.workdir != nil %>
-    <% browser = CwaBrowser.new h.workdir, nil %>
+    <% begin %>
+      <% browser = CwaBrowser.new h.workdir, nil %>
+    <% rescue Exception => e %>
+      <% browser = nil %>
+    <% end %>
   <% end %>
   <% if @jobs.where_id_is(h.jobid) == nil %>
     <tr>
@@ -30,10 +34,14 @@
         <td>N/A</td>
       <% end %>
       <td>
-        <% if browser.current_dir != "" %>
-          <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => browser.current_share, :dir => browser.current_dir %>
-        <% else %> 
-          <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => browser.current_share %>
+        <% if browser == nil %>
+          N/A
+        <% else %>
+          <% if browser.current_dir != "" %>
+            <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => browser.current_share, :dir => browser.current_dir %>
+          <% else %> 
+            <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => browser.current_share %>
+          <% end %>
         <% end %>
       </td>
     </tr>
