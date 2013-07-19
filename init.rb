@@ -48,7 +48,7 @@ Redmine::Plugin.register :cwa do
     permission :job_manager, :cwa_jobmanager => [:index, :alljobs, :current_jobs, :job_history, :delete, :submit, :queue_status]
     permission :allocations, { :cwa_allocations => [:index] }
     permission :web_apps, { :cwa_applications => [:index] }
-    permission :file_browser, { :cwa_browser => [:index] }
+    permission :file_browser, { :cwa_browser => [:index,:mkdir, :rename, :delete, :download, :get] }
     permission :user_stats, { :cwa_stats => [:index] }
   end
 end

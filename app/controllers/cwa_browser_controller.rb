@@ -4,6 +4,7 @@ class CwaBrowserController < ApplicationController
   include CwaIpaAuthorize
 
   before_filter :find_project, :authorize, :ipa_authorize
+  accept_api_auth :index, :mkdir, :rename, :delete, :download, :get
 
   def index
     @groups = CwaGroups.new
@@ -18,6 +19,19 @@ class CwaBrowserController < ApplicationController
 
     respond_to do |format|
       format.html
+      format.json { 
+        render :json => e.nil? ? { 
+          :response => "success",
+          :files => @browser.files, 
+          :error => nil,
+          :directories => @browser.directories
+        } : {
+          :response => "failure",
+          :files => nil,
+          :error => e.message,
+          :directories => nil
+        }
+      }
     end
   end
 
@@ -35,9 +49,8 @@ class CwaBrowserController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render :json => { :result => result }.to_json, :status => code }
+      format.json { render :json => { :response => result }, :status => code }
     end
-
   end
 
   # create a directory
@@ -57,7 +70,7 @@ class CwaBrowserController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render :json => { :result => result }.to_json, :status => code }
+      format.json { render :json => { :response => result }, :status => code }
     end
 
   end
@@ -97,7 +110,7 @@ class CwaBrowserController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render :json => { :result => result }.to_json, :status => code }
+      format.json { render :json => { :response => result }, :status => code }
     end
   end
 
@@ -157,10 +170,10 @@ class CwaBrowserController < ApplicationController
   def download
     file = resolve_path(params[:share], params[:path])
     
-    fid = Digest::SHA512.hexdigest("RandomSaltiness" + file)
+    fid = Digest::SHA512.hexdigest("RandomSaltiness" + (Time.now.to_i+Time.now.tv_usec+Time.now.tv_nsec).to_s + file)
 
     Rails.cache.fetch(fid, :expires_in => 60.seconds) do
-      file
+      { :user => @user.login, :path => file }
     end
 
     type = Redmine::CwaBrowserHelper.type(file)
@@ -174,13 +187,20 @@ class CwaBrowserController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render :json => { :result => result, :fid => fid, :type => type }.to_json, :status => code }
+      format.json { render :json => { :response => result, :fid => fid, :type => type }, :status => code }
     end
   end     
 
   # Download file from fid
   def get
-    file = Rails.cache.fetch(params[:fid])
+    file = nil
+    file_blob = Rails.cache.fetch(params[:fid])
+
+    if file_blob[:user] == @user.login
+      file = file_blob[:path]
+    else
+      return
+    end
 
     self.response.headers["Content-Type"] = "application/octet-stream"
     self.response.headers["Content-Disposition"] = "attachment; filename=#{file.split('/').last}"
@@ -193,7 +213,15 @@ class CwaBrowserController < ApplicationController
   
   # Download zip file archive of directory
   def get_zip
-    file = Rails.cache.fetch(params[:fid])
+
+    file = nil
+    file_blob = Rails.cache.fetch(params[:fid])
+
+    if file_blob[:user] == @user.login
+      file = file_blob[:path]
+    else
+      return
+    end
     
     self.response.headers["Content-Type"] = "application/octet-stream"
     self.response.headers["Content-Disposition"] = "attachment; filename=#{file.split('/').last}.zip"
@@ -209,18 +237,18 @@ class CwaBrowserController < ApplicationController
     if path != nil
       case share
       when "home"
-        file = @user.homedirectory + "/" + path
+        file = @ipa_user.homedirectory + "/" + path
       when "work"
-        file = @user.workdirectory + "/" + path
+        file = @ipa_user.workdirectory + "/" + path
       when "shares"
         file = "/shares/" + path
       end
     else
       case share
       when "home"
-        file = @user.homedirectory
+        file = @ipa_user.homedirectory
       when "work"
-        file = @user.workdirectory
+        file = @ipa_user.workdirectory
       when "shares"
         file = nil
       end
