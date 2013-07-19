@@ -1,57 +1,33 @@
-class CwaGroupmanagerController < ApplicationController
+class CwaGroupsController < ApplicationController
   unloadable
+
+  include CwaIpaAuthorize
+
+  before_filter :find_project, :authorize, :ipa_authorize
 
   # Load the default view
   def index
-    # Re-direct to unavailable page
-    if params[:project_id] != Redmine::Cwa.project_id 
-      redirect_to :controller => 'cwa_default', :action => 'unavailable'
-      return
-    end 
-
-    @project = Project.find(params[:project_id])
     @groups = CwaGroups.new
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     respond_to do |format|
       format.html
     end
   end
 
   def groups
-    # Re-direct to unavailable page
-    if params[:project_id] != Redmine::Cwa.project_id 
-      redirect_to :controller => 'cwa_default', :action => 'unavailable'
-      return
-    end 
-
-    @project = Project.find(params[:project_id])
     @gs = CwaGroups.new
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     respond_to do |format|
       format.html
     end
   end
 
   def show
-    # Re-direct to unavailable page
-    if params[:project_id] != Redmine::Cwa.project_id 
-      redirect_to :controller => 'cwa_default', :action => 'unavailable'
-      return
-    end 
-
-    @project = Project.find(params[:project_id])
     @gs = CwaGroups.new
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     respond_to do |format|
       format.html
     end
   end
 
   def create 
-    @project = Project.find(params[:project_id])
     respond_to do |format|
       format.html
     end
@@ -59,16 +35,7 @@ class CwaGroupmanagerController < ApplicationController
 
   # Create group
   def create_group
-    # Re-direct to unavailable page
-    if params[:project_id] != Redmine::Cwa.project_id 
-      redirect_to :controller => 'cwa_default', :action => 'unavailable'
-      return
-    end 
-
-    @project = Project.find(params[:project_id])
     @groups = CwaGroups.new
-
-    Rails.logger.debug "create_group() => " + @groups.that_i_manage.length.to_s
 
     if params[:group_name] !~ ::CwaConstants::GROUP_REGEX
       flash[:error] = "The group name you entered is invalid!"
@@ -77,7 +44,7 @@ class CwaGroupmanagerController < ApplicationController
     end
 
     if @groups.that_i_manage.length < ::CwaConstants::GROUP_MAX
-      if @groups.create({ :owner => User.current.login, :group_name => params[:group_name], :desc => params[:desc] })
+      if @groups.create({ :owner => @user.login, :group_name => params[:group_name], :desc => params[:desc] })
         flash[:notice] = "Your group \"#{params[:group_name]}\" has been created!"
       else
         flash[:error] = "Could not create group \"#{params[:group_name]}\".  Name is already taken!"
@@ -91,11 +58,6 @@ class CwaGroupmanagerController < ApplicationController
   end
 
   def delete_group
-    # Re-direct to unavailable page
-    if params[:project_id] != Redmine::Cwa.project_id 
-      redirect_to :controller => 'cwa_default', :action => 'unavailable'
-      return
-    end 
     @groups = CwaGroups.new
     if @groups.delete params[:group_name]
       flash[:notice] = "Group \"#{params[:group_name]}\" deleted!"
@@ -107,12 +69,6 @@ class CwaGroupmanagerController < ApplicationController
 
   # Add a user to a group
   def add
-    # Re-direct to unavailable page
-    if params[:project_id] != Redmine::Cwa.project_id 
-      redirect_to :controller => 'cwa_default', :action => 'unavailable'
-      return
-    end 
-
     @groups = CwaGroups.new
 
     user_name_regex = /^[a-zA-Z0-9-]{3,20}$/
@@ -134,12 +90,6 @@ class CwaGroupmanagerController < ApplicationController
 
   # Delete a user from a group
   def delete
-    # Re-direct to unavailable page
-    if params[:project_id] != Redmine::Cwa.project_id 
-      redirect_to :controller => 'cwa_default', :action => 'unavailable'
-      return
-    end 
-
     @groups = CwaGroups.new
 
     if params[:user_name]
@@ -160,12 +110,6 @@ class CwaGroupmanagerController < ApplicationController
   end
 
   def disband
-    # Re-direct to unavailable page
-    if params[:project_id] != Redmine::Cwa.project_id 
-      redirect_to :controller => 'cwa_default', :action => 'unavailable'
-      return
-    end 
-
     groups = CwaGroups.new
 
     if groups.delete(params[:group_name])
@@ -196,12 +140,6 @@ class CwaGroupmanagerController < ApplicationController
   end
 
   def allow_join
-    # Re-direct to unavailable page
-    if params[:project_id] != Redmine::Cwa.project_id 
-      redirect_to :controller => 'cwa_default', :action => 'unavailable'
-      return
-    end 
-
     groups = CwaGroups.new
     request = CwaGroupRequests.find_by_id(params[:request_id])
     group_name = groups.by_id(request.group_id)[:cn]
@@ -219,18 +157,13 @@ class CwaGroupmanagerController < ApplicationController
       
   # store request to join group
   def save_request
-    # Re-direct to unavailable page
-    if params[:project_id] != Redmine::Cwa.project_id 
-      redirect_to :controller => 'cwa_default', :action => 'unavailable'
-      return
-    end 
     @groups = CwaGroups.new
-    if CwaGroupRequests.find(:first, :conditions => ["group_id = ? and user_id = ?", params[:gidnumber], User.current.id])
+    if CwaGroupRequests.find(:first, :conditions => ["group_id = ? and user_id = ?", params[:gidnumber], @user.id])
       flash[:error] = "You've already requested to join this group!"
     else
       req = CwaGroupRequests.create do |r|
         r.group_id = params[:gidnumber]
-        r.user_id  = User.current.id
+        r.user_id  = @user.id
       end
 
       group_name = @groups.by_id(params[:gidnumber])[:cn]
@@ -244,5 +177,10 @@ class CwaGroupmanagerController < ApplicationController
       end
     end
     redirect_to :action => 'index', :project_id => params[:project_id]
+  end
+  
+  private
+  def find_project
+    @project = Project.find(params[:project_id])
   end
 end

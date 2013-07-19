@@ -1,15 +1,13 @@
 class CwaBrowserController < ApplicationController
   respond_to :json
   require 'digest/sha2'
+  include CwaIpaAuthorize
+
+  before_filter :find_project, :authorize, :ipa_authorize
 
   def index
-    @project = Project.find(params[:project_id])
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     @groups = CwaGroups.new
     @group_list = @groups.that_i_manage + @groups.member_of
-
-    Rails.logger.debug "CwaBrowserController::index() => #{params[:share]} #{params[:dir]}"
 
     begin 
       @browser = CwaBrowser.new params[:share], params[:dir]
@@ -25,12 +23,8 @@ class CwaBrowserController < ApplicationController
 
   # Change file name
   def rename
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-
     file = resolve_path(params[:share], params[:file])
     new_file = resolve_path(params[:share], params[:new_name])
-    Rails.logger.debug "Redmine::CwaBrowserHelper.rename() => #{file} #{new_file}"
 
     if Redmine::CwaBrowserHelper.rename(file, new_file)
       result = 'success'
@@ -48,9 +42,6 @@ class CwaBrowserController < ApplicationController
 
   # create a directory
   def mkdir 
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-
     if params[:path] == nil
       new_dir = resolve_path(params[:share], "/" + params[:new_dir])
     else 
@@ -73,9 +64,6 @@ class CwaBrowserController < ApplicationController
 
   # Create a text file
   def create
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-
     if params[:path] == nil
       new_file = resolve_path(params[:share], "/" + params[:new_file_name])
     else 
@@ -99,11 +87,6 @@ class CwaBrowserController < ApplicationController
 
   # Delete file/directory from :browse_path
   def delete
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-
-    Rails.logger.debug "Redmine::CwaBrowserController.delete() :: #{params[:share]} #{params[:path]}"
-
     item = resolve_path(params[:share], params[:path])
     if Redmine::CwaBrowserHelper.delete(item)
       result = 'success'
@@ -120,9 +103,6 @@ class CwaBrowserController < ApplicationController
 
   # Upload file and store
   def upload
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-
     upload = params["file"]
 
     if params[:path] != nil
@@ -149,8 +129,6 @@ class CwaBrowserController < ApplicationController
   end
 
   def tail
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
     text = ""
 
     file = resolve_path(params[:share], params[:file])
@@ -177,9 +155,6 @@ class CwaBrowserController < ApplicationController
   # lets set up a SHA512 file id, pass it back to the client, then use a GET, referencing the
   # fid, to trigger the download
   def download
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-
     file = resolve_path(params[:share], params[:path])
     
     fid = Digest::SHA512.hexdigest("RandomSaltiness" + file)
@@ -205,9 +180,6 @@ class CwaBrowserController < ApplicationController
 
   # Download file from fid
   def get
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-
     file = Rails.cache.fetch(params[:fid])
 
     self.response.headers["Content-Type"] = "application/octet-stream"
@@ -221,9 +193,6 @@ class CwaBrowserController < ApplicationController
   
   # Download zip file archive of directory
   def get_zip
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-
     file = Rails.cache.fetch(params[:fid])
     
     self.response.headers["Content-Type"] = "application/octet-stream"
@@ -259,6 +228,8 @@ class CwaBrowserController < ApplicationController
     file
   end
     
-    
+  def find_project    
+    @project = Project.find(params[:project_id])
+  end
 
 end

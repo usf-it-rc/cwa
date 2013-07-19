@@ -9,21 +9,22 @@ match 'cwa_accountsignup/:project_id/set_shell', :to => 'cwa_accountsignup#set_s
 match 'cwa_accountsignup/:project_id/delete', :to => 'cwa_accountsignup#delete', :via => :post
 
 # Group Manager
-get 'cwa_groupmanager/:project_id', :to => 'cwa_groupmanager#index'
-get 'cwa_groupmanager/:project_id/all', :to => 'cwa_groupmanager#groups'
-get 'cwa_groupmanager/:project_id/show/:group_name', :to => 'cwa_groupmanager#show', group_name: /[a-zA-Z0-9\-\._\ ]{2,20}/
-get 'cwa_groupmanager/:project_id/create', :to => 'cwa_groupmanager#create'
-match 'cwa_groupmanager/:project_id/add', :to => 'cwa_groupmanager#add', :via => :post
-match 'cwa_groupmanager/:project_id/delete', :to => 'cwa_groupmanager#delete', :via => :post
-match 'cwa_groupmanager/:project_id/disband', :to => 'cwa_groupmanager#disband', :via => :post
-match 'cwa_groupmanager/:project_id/save_request', :to => 'cwa_groupmanager#save_request', :via => :post
-match 'cwa_groupmanager/:project_id/delete_request', :to => 'cwa_groupmanager#delete_request', :via => :post
-match 'cwa_groupmanager/:project_id/allow_join', :to => 'cwa_groupmanager#allow_join', :via => :post
-match 'cwa_groupmanager/:project_id/create_group', :to => 'cwa_groupmanager#create_group', :via => :post
-match 'cwa_groupmanager/:project_id/delete_group', :to => 'cwa_groupmanager#delete_group', :via => :post
+get 'cwa_groups/:project_id', :to => 'cwa_groups#index'
+get 'cwa_groups/:project_id/all', :to => 'cwa_groups#groups'
+get 'cwa_groups/:project_id/show/:group_name', :to => 'cwa_groups#show', group_name: /[a-zA-Z0-9\-\._\ ]{2,20}/
+get 'cwa_groups/:project_id/create', :to => 'cwa_groups#create'
+match 'cwa_groups/:project_id/add', :to => 'cwa_groups#add', :via => :post
+match 'cwa_groups/:project_id/delete', :to => 'cwa_groups#delete', :via => :post
+match 'cwa_groups/:project_id/disband', :to => 'cwa_groups#disband', :via => :post
+match 'cwa_groups/:project_id/save_request', :to => 'cwa_groups#save_request', :via => :post
+match 'cwa_groups/:project_id/delete_request', :to => 'cwa_groups#delete_request', :via => :post
+match 'cwa_groups/:project_id/allow_join', :to => 'cwa_groups#allow_join', :via => :post
+match 'cwa_groups/:project_id/create_group', :to => 'cwa_groups#create_group', :via => :post
+match 'cwa_groups/:project_id/delete_group', :to => 'cwa_groups#delete_group', :via => :post
 
 # Job Manager
 get 'cwa_jobmanager/:project_id', :to => 'cwa_jobmanager#index'
+get 'cwa_jobmanager/:project_id/all', :to => 'cwa_jobmanager#alljobs'
 get 'cwa_jobmanager/:project_id/current_jobs', :to => 'cwa_jobmanager#current_jobs'
 get 'cwa_jobmanager/:project_id/queue_status', :to => 'cwa_jobmanager#queue_status'
 get 'cwa_jobmanager/:project_id/job_history', :to => 'cwa_jobmanager#job_history'

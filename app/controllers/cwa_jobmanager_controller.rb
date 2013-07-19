@@ -4,21 +4,29 @@ require 'rsgehost.rb'
 
 class CwaJobmanagerController < ApplicationController
   unloadable
+ 
+  include CwaIpaAuthorize 
+
+  before_filter :find_project, :authorize, :ipa_authorize
+  accept_api_auth :index, :alljobs, :current_jobs, :queue_status, :delete, :submit
 
   def index
-    @project = Project.find(params[:project_id])
-    @jobs = RsgeJobs.new User.current.login
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
+    @jobs = RsgeJobs.new @user.login
     respond_to do |format|
       format.html
     end
   end
 
+  def alljobs
+    @jobs = RsgeJobs.new nil
+    respond_to do |format|
+      format.json { render :json => @jobs.to_hash }
+    end
+  end
+
   def current_jobs
-    user = User.current.login
-    @jobs = Rails.cache.fetch("cached_job_list_#{user}", :expires_in => 5.seconds) do
-      RsgeJobs.new(user)
+    @jobs = Rails.cache.fetch("cached_job_list_#{@user.login}", :expires_in => 5.seconds) do
+      RsgeJobs.new @user.login
     end
     render :partial => 'cwa_jobmanager/current_jobs'
   end
@@ -28,15 +36,14 @@ class CwaJobmanagerController < ApplicationController
   end
 
   def job_history
-    user = User.current.login
-    @jobs = Rails.cache.fetch("cached_job_list_#{user}", :expires_in => 5.seconds) do
-      RsgeJobs.new(user)
+    @jobs = Rails.cache.fetch("cached_job_list_#{@user.login}", :expires_in => 5.seconds) do
+      RsgeJobs.new @user.login
     end
     render :partial => 'cwa_jobmanager/job_history'
   end
 
   def delete
-    jobs = RsgeJobs.new User.current.login
+    jobs = RsgeJobs.new @user.login
     job = jobs.where_id_is params[:jobid]
 
     if job.delete
@@ -89,7 +96,7 @@ class CwaJobmanagerController < ApplicationController
     end
 
     @job.script = script
-    @job.job_owner  = User.current.login
+    @job.job_owner = @user.login
 
     Rails.logger.debug "CwaJobmanager.submit() => " + @job.script
 
@@ -104,6 +111,12 @@ class CwaJobmanagerController < ApplicationController
     CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['selected_dir'], :app_id => @app.id, :submit_parameters => params.except("utf8","authenticity_token","commit","action").to_json.to_s
       
     redirect_to :action => 'index', :project_id => params[:project_id]
+  end
+
+  private
+
+  def find_project
+    @project = Project.find(params[:project_id])
   end
 
 end

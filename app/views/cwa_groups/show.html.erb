@@ -1,7 +1,7 @@
 <h2>Group Manager</h2>
 
 <p>
-<%= link_to "Group Manager", :action => :index %> > <%= link_to "All Groups", :action => :groups %> > <a href="/cwa_groupmanager/show?group_name=<%= params[:group_name] %>"><%= params[:group_name] %></a>
+<%= link_to "Group Manager", :action => :index %> > <%= link_to "All Groups", :action => :groups %> > <a href="/cwa_groups/show?group_name=<%= params[:group_name] %>"><%= params[:group_name] %></a>
 </p>
 
 <div class="box">
@@ -41,7 +41,7 @@
   </p>
   <p>
     <h4>Add User to Group</h4>
-    <%= form_tag(:controller => "cwa_groupmanager", :action => "add") do %>
+    <%= form_tag(:controller => "cwa_groups", :action => "add") do %>
       <%= hidden_field_tag :group_name, g[:cn] %>
       <%= label_tag :user_name, "Enter USF NetID" %>
       <%= text_field_tag :user_name %>

@@ -5,6 +5,7 @@ require 'ipagroup'
 require 'cwa_constants'
 require 'cwa_browser_helper'
 require 'cwa_stats_application_helper'
+require 'cwa_ipa_authorize'
 require_dependency 'cwa/hooks'
 require 'googlecharts'
 
@@ -42,16 +43,14 @@ Redmine::Plugin.register :cwa do
 
   # TODO: Get permissions nailed down
   project_module :cwa do
-    permission :cwa_accountsignup, { :cwa_accountsignup => [:index] }, :public => true
-    permission :cwa_groupmanager, { :cwa_groupmanager => [:index] }, :public => true
-    permission :cwa_jobmanager, { :cwa_jobmanager => [:index] }, :public => true
-    permission :cwa_tutorials, { :cwa_tutorials => [:index] }, :public => true
-    permission :cwa_allocations, { :cwa_allocations => [:index] }, :public => true
-    permission :cwa_applications, { :cwa_applications => [:index] }, :public => true
-    permission :cwa_browser, { :cwa_browser => [:index] }, :public => true
-    permission :cwa_stats, { :cwa_stats => [:index] }, :public => true
+    permission :account_signup, { :cwa_accountsignup => [:index] }, :public => true
+    permission :group_manager, :cwa_groups => [:index, :groups, :show, :create, :create_group, :delete_group, :add, :delete, :disband, :delete_request, :allow_join, :save_request]
+    permission :job_manager, :cwa_jobmanager => [:index, :alljobs, :current_jobs, :job_history, :delete, :submit, :queue_status]
+    permission :allocations, { :cwa_allocations => [:index] }
+    permission :web_apps, { :cwa_applications => [:index] }
+    permission :file_browser, { :cwa_browser => [:index] }
+    permission :user_stats, { :cwa_stats => [:index] }
   end
-
 end
 
 proj_proc = Proc.new { |p| p.identifier == Setting.plugin_cwa[:project_id] }
@@ -61,10 +60,10 @@ Redmine::MenuManager.map :project_menu do |menu|
        :caption => 'My Access', :after => :activity, :param => :project_id, :if => Proc.new { |p| p.identifier == Setting.plugin_cwa[:project_id] and Setting.plugin_cwa[:enable_acct_activation] == "on" }
   menu.push :cwa_allocations, { :controller => 'cwa_allocations', :action => 'index' }, 
        :caption => 'Allocations', :after => :cwa_accountsignup, :param => :project_id, :if => proj_proc
-  menu.push :cwa_groupmanager, { :controller => 'cwa_groupmanager', :action => 'index' }, 
+  menu.push :cwa_groups, { :controller => 'cwa_groups', :action => 'index' }, 
        :caption => 'Groups', :after => :cwa_allocations, :param => :project_id, :if => proj_proc
   menu.push :cwa_applications, { :controller => 'cwa_applications', :action => 'index' }, 
-       :caption => 'Web Apps', :after => :cwa_groupmanager, :param => :project_id
+       :caption => 'Web Apps', :after => :cwa_groups, :param => :project_id
   menu.push :cwa_jobmanager, { :controller => 'cwa_jobmanager', :action => 'index' }, 
        :caption => 'My Jobs', :after => :app_manager, :param => :project_id
   menu.push :wiki, { :controller => 'wiki', :action => 'show', :id => nil }, :param => :project_id,
