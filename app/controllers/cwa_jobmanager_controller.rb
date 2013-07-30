@@ -8,12 +8,13 @@ class CwaJobmanagerController < ApplicationController
   include CwaIpaAuthorize 
 
   before_filter :find_project, :authorize, :ipa_authorize
-  accept_api_auth :index, :alljobs, :current_jobs, :queue_status, :delete, :submit
+  accept_api_auth :index, :alljobs, :queue_status, :delete, :submit
 
   def index
     @jobs = RsgeJobs.new @user.login
     respond_to do |format|
       format.html
+      format.json { render :json => @jobs.to_hash }
     end
   end
 
@@ -56,10 +57,14 @@ class CwaJobmanagerController < ApplicationController
 
   def submit
     @job = RsgeJob.new
-    @app = CwaApplication.find(params[:app_id])
+
+    if params.has_key?(:app_id)
+      @app = CwaApplication.find(params[:app_id])
+    end
 
     Rails.logger.debug "CwaJobmanager.submit() => " + params.to_s
 
+    # Sanitize the job name
     if params.has_key?(:job_name)
       if params[:job_name] !~ ::CwaConstants::JOBNAME_REGEX
         flash[:error] = "Invalid job name specified!"
@@ -69,6 +74,7 @@ class CwaJobmanagerController < ApplicationController
       @job.job_name = params[:job_name]
     end
 
+    # sanitize the selected_file parameter
     if params[:selected_file] != nil
       if params[:selected_file] !~ ::CwaConstants::JOBPATH_REGEX
         flash[:error] = "Invalid job file specified! Make sure you're using forward-slash \"/\"!"
@@ -82,16 +88,21 @@ class CwaJobmanagerController < ApplicationController
       params[:selected_dir] = params[:current_dir]
     end
 
+    # And selected_dir
     if params[:selected_dir] !~ ::CwaConstants::JOBPATH_REGEX
       flash[:error] = "Invalid job directory specified! Make sure you're using forward-slash \"/\"!"
       redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id], :project_id => params[:project_id]
       return
     end
 
-    script = @app.exec.gsub(/\r\n/, "\n")
+    if !@app.nil?
+      script = @app.exec.gsub(/\r\n/, "\n")
+    else
+      script = Base64.decode64(params[:script])
+    end
 
     # Substitute out all %%KEY%% items in the job script, then assign
-    params.keys.each do |k|
+    params.except("utf8", "authenticity_token","commmit","action","script").keys.each do |k|
       script.gsub!(/%%#{k.upcase}%%/, params[k])
     end
 
@@ -108,9 +119,12 @@ class CwaJobmanagerController < ApplicationController
       flash[:notice] = "Submitted job"
     end
 
-    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['selected_dir'], :app_id => @app.id, :submit_parameters => params.except("utf8","authenticity_token","commit","action").to_json.to_s
+    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['selected_dir'], :app_id => @app.nil? ? nil : @app.id, :submit_parameters => params.except("utf8","authenticity_token","commit","action").to_json.to_s
       
-    redirect_to :action => 'index', :project_id => params[:project_id]
+    respond_to do |format|
+      format.html { redirect_to :action => 'index', :project_id => params[:project_id] }
+      format.json { render :json => { :id => @job.jobid, :status => status, :state => @job.state } }
+    end
   end
 
   private

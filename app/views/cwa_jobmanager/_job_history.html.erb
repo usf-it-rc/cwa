@@ -17,7 +17,7 @@
     <tr>
       <td><%= h.job_name %></td>
       <td><%= h.jobid %></td>
-      <% if h.submit_parameters != nil %> 
+      <% if h.submit_parameters != nil && h.app_id != nil%> 
         <% params = JSON.parse(h.submit_parameters).to_hash %>
         <% if params["description"] != nil %>
           <td><%= params["description"] %></td>
