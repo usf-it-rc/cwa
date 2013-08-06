@@ -8,6 +8,7 @@ require 'cwa_stats_application_helper'
 require 'cwa_ipa_authorize'
 require_dependency 'cwa/hooks'
 require 'googlecharts'
+require 'cwa_settings_helper'
 
 Redmine::MenuManager.map :project_menu do |menu|
   menu.delete :wiki if menu.exists? :wiki
@@ -16,10 +17,10 @@ Redmine::MenuManager.map :project_menu do |menu|
 end
 
 Redmine::Plugin.register :cwa do
-  name 'Cluster Web Access plugin'
+  name 'Redmine/CWA'
   author 'Brian Smith'
   description 'This plugin provides tools and features useful for HPC' 
-  version '0.0.1'
+  version '13.10'
   url 'https://redmine.rc.usf.edu/projects/jobman'
   author_url 'http://blah'
 

@@ -288,3 +288,40 @@ function hideTail(){
   document.getElementById("tail_box").reset;
   clearInterval(tail_handle);
 }
+
+function collapsibleExpand(elem){
+  var share = elem.id.split("#")[0];
+  var path = elem.id.split("#")[1];
+
+  $.getJSON('/cwa_browser/<%= @project.identifier %>/' + share + "/" + path, function(data){
+    $(elem).attr('onclick','').unbind('click');
+
+    var dirItems = [];
+    var fileItems = [];
+
+    dirItems.push('<ul class="collapsibleList">');
+
+    $.each(data, function(key,items){
+
+      if (key == 'directories'){
+        $.each(items, function(idx,val){
+          dirItems.push('<li class="dir" id="' + share + "#" + path + "/" + val + '" onclick="collapsibleExpand(this);">' + val + '</li>' );
+        });
+      }
+
+      if (key == 'files'){
+        $.each(items, function(idx,val){
+          fileItems.push('<div class="browserFileEntryIcon" oncontextmenu="showMenu(event, ' + 
+            "'menuFile'" + '); select_file(this);" onclick="select_file(this)" id="' + 
+            share + '#' + path + '/' + val + '"><p class="browserEntryIcon">' + 
+            val + '</p></div>');
+        });
+      }
+    });
+
+    dirItems.push('</ul>');
+
+    $(dirItems.join('\n')).appendTo(elem);
+    $("#fileContainer").html(fileItems.join('\n'));
+  });
+}

@@ -1,22 +1,19 @@
 div.browserButtonContainer {
   float:left;
 }
+
+div#stores {
+  display: block;
+  margin-top: 20px;
+}
+
 div.browserButton {
+  float:left;
   color:#444444;
   background:#BCC2C5;
-  float:left;
-  position:relative;
-  padding: 8px 0px;
+  padding: 8px 12px;
   text-align:center;
-  font-weight: bold;
-  width: 100%;
   border:1px solid #444444;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-  -moz-border-top-left-radius: 8px;
-  -moz-border-bottom-left-radius: 8px;
-  -webkit-border-top-left-radius: 8px;
-  -webkit-border-bottom-left-radius: 8px;
   z-index:2;
   -webkit-user-select: none; /* Chrome/Safari */        
   -moz-user-select: none; /* Firefox */
@@ -27,22 +24,13 @@ div.browserButton {
   user-select: none;
   cursor: default;
 }
+
 div.browserButtonSelected {
   float:left;
-  position:relative;
   background:#DEE4E7;
-  padding: 8px 0px;
+  padding: 8px 12px;
   text-align: center;
-  font-weight: bold;
-  width:100%;
   border:1px solid #444444;
-  border-right: 0px;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-  -moz-border-top-left-radius: 8px;
-  -moz-border-bottom-left-radius: 8px;
-  -webkit-border-top-left-radius: 8px;
-  -webkit-border-bottom-left-radius: 8px;
   z-index:2;
   -webkit-user-select: none; /* Chrome/Safari */        
   -moz-user-select: none; /* Firefox */
@@ -64,15 +52,11 @@ div.browserButtonBack {
   background:-moz-linear-gradient( center top, #fc8d83 5%, #e4685d 100% );
   filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fc8d83', endColorstr='#e4685d');
   background-color:#fc8d83;
-  -moz-border-radius:6px;
-  -webkit-border-radius:6px;
-  border-radius:6px;
   border:1px solid #d83526;
   display:inline-block;
   color:#ffffff;
   font-family:arial;
   font-size:15px;
-  font-weight:bold;
   padding:6px 24px;
   text-decoration:none;
   text-shadow:1px 1px 0px #b23e35;
@@ -96,15 +80,11 @@ div.browserButtonBackInactive {
   background:-moz-linear-gradient( center top, #fc8d83 5%, #e4685d 100% );
   filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fc8d83', endColorstr='#e4685d');
   background-color:#fc8d83;
-  -moz-border-radius:6px;
-  -webkit-border-radius:6px;
-  border-radius:6px;
   border:1px solid #d83526;
   display:inline-block;
   color:#bbbbbb;
   font-family:arial;
   font-size:15px;
-  font-weight:bold;
   padding:6px 24px;
   text-decoration:none;
 }
@@ -120,28 +100,19 @@ div.browserSelector {
 div.browserSelectorFull {
   float:left;
   position:relative;
-  width: 85%;
+  width: 100%;
   padding-top: 18px;
   padding-bottom: 18px;
   background: #DEE4E7;
   z-index: 5;
   /* border-top: 12px solid #DEE4E7; */
   min-height: 550px;
-  margin-top:12px;
   border:1px solid #444444;
-  /*border-left: 0px;*/
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-  -moz-border-top-right-radius: 8px;
-  -moz-border-bottom-right-radius: 8px;
-  -webkit-border-top-right-radius: 8px;
-  -webkit-border-bottom-right-radius: 8px;
 }
 
 div.actionButtons {
-  float: left; 
-  position: relative; 
   width: 100%;
+  margin: 0 auto;
 }
 
 div.browserDirEntry {
@@ -152,14 +123,14 @@ div.browserDirEntry {
 }
 
 div.browserDirEntrySelected {
-  background: #BCC2C5 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
+  background: #CDD3D6 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
   padding: 4px;
 }
 
 div.browserDirEntryIcon {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
+  background: url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
   background-size: 42px 42px;
   z-index:10;
   padding: 12px;
@@ -175,7 +146,7 @@ div.browserDirEntryIcon {
 }
 
 div.browserDirEntryIconSelected {
-  background: #BCC2C5 url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
+  background: #CDD3D6 url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
   background-size: 42px 42px;
   z-index:10;
   padding: 12px;
@@ -188,7 +159,6 @@ div.browserDirEntryIconSelected {
   white-space: -pre-wrap; /* Opera 4-6 */
   white-space: -o-pre-wrap; /* Opera 7 */
   word-wrap: break-word; /* Internet Explorer 5.5+ */
-}
 }
 
 div.browserContainer {
@@ -231,7 +201,7 @@ p.browserEntryIcon {
 }
 
 div.browserFileEntry {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat left;
+  background: url('/plugin_assets/cwa/images/file.png') no-repeat left;
   background-size: 24px 24px;
   z-index:10;
   padding: 4px;
@@ -254,7 +224,7 @@ div.browserFileEntrySelected {
 }
 
 div.browserFileEntryIcon {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat center top;
+  background: url('/plugin_assets/cwa/images/file.png') no-repeat center top;
   background-size: 42px 42px;
   z-index:10;
   padding: 12px;
@@ -329,7 +299,7 @@ div.menu {
   position: absolute;
   padding: 8px 8px 8px 8px;
   border:1px solid #DFDFDF;
-  background: #CDD3D6;
+  background: #DEE4E7;
   z-index: 15;
   display: none;
   -moz-box-shadow: 3px 3px 4px #333;
@@ -383,15 +353,11 @@ div.actionButton {
   background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
   filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
   background-color:#ededed;
-  -moz-border-radius:6px;
-  -webkit-border-radius:6px;
-  border-radius:6px;
   border:1px solid #dcdcdc;
   display:inline-block;
   color:#777777;
   font-family:arial;
   font-size:15px;
-  font-weight:bold;
   padding:6px 24px;
   cursor: default;
   text-decoration:none;
@@ -415,7 +381,7 @@ div.miniapp {
   border: 4px solid #000000;
   /*height: 400px;
   width: 800px;*/
-  margin: -175px 0 0 -100px;
+  margin: -275px 0 0 -200px;
   top: 50%;
   left: 50%;
   display: none;
@@ -441,4 +407,48 @@ table.sortableList th .asc {
 
 table.sortableList th .desc { 
   background-image: url(/plugin_assets/cwa/images/arrow-dn.png);
+}
+
+div.dirSelector {
+  padding: 12px;
+  width: 20%;
+  overflow: auto;
+  min-height: 256px;
+  float: left;
+  margin-top: 28px;
+}
+
+div.fileSelector {
+  margin-top: 24px;
+  padding: 8px;
+  width: 75%;
+  min-height: 512px;
+  float: left;
+  margin-left: 12px;
+}
+
+ul.collapsibleList {
+  padding: 0px;
+}
+
+.collapsibleList li {
+  list-style-type: none;
+  background-image: url('/plugin_assets/cwa/images/folder_mini.png');
+  background-repeat: no-repeat;
+  background-position: 0 .4em;
+  padding-left: 2em;
+  padding-bottom: .5em;
+  padding-top: .5em;
+  cursor: pointer;
+}
+
+li.collapsibleListOpen {
+  list-style-type: none;
+  background-image: url('/plugin_assets/cwa/images/folder_mini.png');
+  background-repeat: no-repeat;
+  background-position: 0 .4em;
+  padding-left: 2em;
+  padding-bottom: .5em;
+  padding-top: .5em;
+  cursor: pointer;
 }

@@ -1,6 +1,7 @@
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
+<%= javascript_include_tag "/plugin_assets/cwa/javascript/CollapsibleLists.js" %>
 <script>
-  <%= render :partial => 'cwa_browser/browser.js.erb' %>
+  <%= render :formats => [:js], :partial => 'cwa_browser/browser' %>
 </script>
 
 <div style="margin: 18px">
@@ -24,33 +25,36 @@
     <% end %>
 
     <!-- Current directory window -->
-    <div style="float:left; position:relative; vertical-align:center; text-align:center;">
-      <b>Path:</b> <%= text_field_tag :current_dir, @browser.current_path, :size => @browser.current_path.length < 72 ? @browser.current_path.length : 72, :disabled => true %>
+    <div>
+      <b>Current Path:</b> <%= text_field_tag :current_dir, @browser.current_path, :size => @browser.current_path.length < 72 ? @browser.current_path.length : 72, :disabled => true %>
     </div>
   </div>
 
-  <!-- File store tabs -->
-  <div id="stores" style="float: left; position:relative; width:10%; margin-top:12px; margin-right:0px; z-index:10;">
-    <div id="home#" onclick="chdir(this)" class="<%= @browser.current_share == "home" ? "browserButtonSelected" : "browserButton" %>">Home</div>
-    <div id="work#" onclick="chdir(this)" class="<%= @browser.current_share == "work" ? "browserButtonSelected" : "browserButton" %>">Work</div>
+<div>
+  <div class="box dirSelector" id="dirContainer">
+    <p><b>Data Stores</b></p>
+    <ul class="collapsibleList">
+    <% ([["home",nil],["work",nil]] + @group_list.map {|g| [ "shares", g[:cn]]}).each do |store| %>
 
-    <% @group_list.each do |group| %>
-      <div id="shares#<%= group[:cn] %>" onclick="chdir(this)" class="<%= @browser.current_dir =~ /^#{group[:cn]}\/*.*/ ? "browserButtonSelected" : "browserButton" %>"><%= group[:cn] %></div>
+      <li><%= store[1].nil? ? store[0] : store[1] %>
+      
+      <% b = CwaBrowser.new store[0], store[1] %>
+      <% b.directories.each do |dir| %>
+        <ul>
+          <% if b.current_dir != nil.to_s %>
+            <% id = b.current_dir + "/" + dir %>
+          <% else %>
+            <% id = dir %>
+          <% end %>
+          <li id="<%= b.current_share + "#" + id %>" onclick="collapsibleExpand(this)"><%= dir %></li>
+        </ul>
+      <% end %>
+      </li>
     <% end %>
+    </ul>
   </div>
 
-  <div class="browserSelectorFull">
-
-<% @browser.directories.each do |dir| %>
-<% Rails.logger.debug "index#render => Nil Dir => #{@browser.current_dir}" %>
-  <% if @browser.current_dir != nil.to_s %>
-    <% id = @browser.current_dir + "/" + dir %>
-  <% else %>
-    <% id = dir %>
-  <% end %>
-<div class="browserDirEntryIcon" oncontextmenu="showMenu(event, 'menuDir'); select_directory(this);" onclick="select_directory(this)" ondblclick="chdir(this)" id="<%= @browser.current_share + "#" + id %>"><p class="browserEntryIcon"><%= dir %></p></div>
-<% end %>
-
+  <div class="box fileSelector" id="fileContainer">
 <% @browser.files.each do |file| %>
   <% if @browser.current_dir != nil.to_s %>
     <% id = @browser.current_dir + "/" + file %>
@@ -62,6 +66,7 @@
 
 </div>
 <% end %>
+</div>
 </div>
 
 <div id="upload">
@@ -108,6 +113,7 @@
   <div class="menuItem" onclick="cwaAction('download', null, false)">Download as Zip</div>
   <div class="menuItem" onclick="cwaAction('rename','Enter new name for directory:', false)">Rename...</div>
   <div class="menuItem" onclick="cwaAction('delete',null, true)">Delete...</div>
+  <div class="menuItem" onclick="showMove()">Move...</div>
 </div>
 
 <div id="menuFile" class="menu">
@@ -115,4 +121,9 @@
   <div class="menuItem" onclick="showTail()">Tail...</div>
   <div class="menuItem" onclick="cwaAction('rename', 'Enter new name for file:', false)">Rename...</div>
   <div class="menuItem" onclick="cwaAction('delete',null, true)">Delete...</div>
+  <div class="menuItem" onclick="showMove()">Move...</div>
 </div>
+
+<script>
+  CollapsibleLists.apply();
+</script>

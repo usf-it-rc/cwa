@@ -6,6 +6,11 @@ module Redmine::CwaBrowserHelper
     #def chmod(file, mode)
     #  userexec("chmod #{mode} #{file}")[2] == 0 ? true : false
     #end
+     
+    def cwa_browser_tab
+      tabs = [{:name => 'home', :controller => 'cwa_browser', :action => 'index', :share => 'home' },
+              {:name => 'work', :controller => 'cwa_browser', :action => 'index', :share => 'work' }]
+    end
 
     def type(file)
       return userexec("type #{file}")[0].chomp
