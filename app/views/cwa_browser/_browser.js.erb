@@ -95,14 +95,14 @@ function cwaAction(action, promptString, confirmBool){
 };
 
 function chdir(elem){
-  var share = elem.id.split("#")[0];
-  var path = elem.id.split("#")[1];
+  components = path_components(elem);
+  share = components.share;
+  path = components.path;
   window.location = "/cwa_browser/<%= @project.identifier %>/" + share + "/" + path;
 };
 
 function chdirAppMgr(elem){
-  var share = elem.id.split("#")[0];
-  var path = elem.id.split("#")[1];
+  [share,path] = path_components(elem);
   if (path != ""){
     url_path = "share=" + share + "&dir=" + encodeURIComponent(path);
   } else {
@@ -179,8 +179,10 @@ function select_directory(elem){
     clear_selected();
     elem.className = className + "Selected";
   }
-  var share = elem.id.split("#")[0];
-  var path = elem.id.split("#")[1];
+
+  components = path_components(elem);
+  share = components.share;
+  path = components.path;
 
   $("#selected_dir").val(share + "/" + path);
   $("#selected_item").val(share + "/" + path);
@@ -194,8 +196,9 @@ function select_file(elem) {
     elem.className = className + "Selected";
   }
 
-  var share = elem.id.split("#")[0];
-  var path = elem.id.split("#")[1];
+  components = path_components(elem);
+  share = components.share;
+  path = components.path;
 
   $("#selected_file").val(share + "/" + path);
   $("#selected_item").val(share + "/" + path);
@@ -289,39 +292,77 @@ function hideTail(){
   clearInterval(tail_handle);
 }
 
+// Handle the file tree view
 function collapsibleExpand(elem){
-  var share = elem.id.split("#")[0];
-  var path = elem.id.split("#")[1];
+  if (elem.id != event.target.id){
+    return;
+  }
+
+  components = path_components(elem);
+  share = components.share;
+  path = components.path;
 
   $.getJSON('/cwa_browser/<%= @project.identifier %>/' + share + "/" + path, function(data){
-    $(elem).attr('onclick','').unbind('click');
 
     var dirItems = [];
     var fileItems = [];
 
-    dirItems.push('<ul class="collapsibleList">');
+    if (elem.className == 'dirExpanded'){
+      $(elem).find('ul').remove();
+    }
+
+    dirItems.push('<ul>');
 
     $.each(data, function(key,items){
-
-      if (key == 'directories'){
+      if (key == 'directories' && elem.className != 'dirExpanded'){
         $.each(items, function(idx,val){
-          dirItems.push('<li class="dir" id="' + share + "#" + path + "/" + val + '" onclick="collapsibleExpand(this);">' + val + '</li>' );
+          if (!path.length){
+            dirItems.push('<li class="dir" id="' + share + "." + val + '" onclick="collapsibleExpand(this);">' + val + '</li>' );
+          } else {
+            dirItems.push('<li class="dir" id="' + share + "." + path + "/" + val + '" onclick="collapsibleExpand(this);">' + val + '</li>' );
+          }
+ 
         });
       }
 
       if (key == 'files'){
         $.each(items, function(idx,val){
-          fileItems.push('<div class="browserFileEntryIcon" oncontextmenu="showMenu(event, ' + 
-            "'menuFile'" + '); select_file(this);" onclick="select_file(this)" id="' + 
-            share + '#' + path + '/' + val + '"><p class="browserEntryIcon">' + 
-            val + '</p></div>');
+          if (path == ''){
+            fileItems.push('<div class="browserFileEntryIcon" oncontextmenu="showMenu(event, ' + 
+              "'menuFile'" + '); select_file(this);" onclick="select_file(this)" id="' + 
+              share + '.' + val + '"><p class="browserEntryIcon">' + 
+              val + '</p></div>');
+          } else {
+            fileItems.push('<div class="browserFileEntryIcon" oncontextmenu="showMenu(event, ' + 
+              "'menuFile'" + '); select_file(this);" onclick="select_file(this)" id="' + 
+              share + '.' + path + '/' + val + '"><p class="browserEntryIcon">' + 
+              val + '</p></div>');
+          }
         });
       }
     });
+
+    if (elem.className != 'dirExpanded'){
+      elem.className = 'dirExpanded';
+    } else {
+      elem.className = 'dir';
+    }
 
     dirItems.push('</ul>');
 
     $(dirItems.join('\n')).appendTo(elem);
     $("#fileContainer").html(fileItems.join('\n'));
   });
+}
+
+function path_components(elem){
+  var parts = elem.id.split(".");
+  var share = parts[0];
+  parts.shift();
+  var path = parts.join('.');
+  
+  return {
+    share: share,
+    path: path
+  };
 }

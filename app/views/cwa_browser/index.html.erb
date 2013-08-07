@@ -1,5 +1,4 @@
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
-<%= javascript_include_tag "/plugin_assets/cwa/javascript/CollapsibleLists.js" %>
 <script>
   <%= render :formats => [:js], :partial => 'cwa_browser/browser' %>
 </script>
@@ -33,23 +32,11 @@
 <div>
   <div class="box dirSelector" id="dirContainer">
     <p><b>Data Stores</b></p>
-    <ul class="collapsibleList">
+    <hr/>
+    <ul class="dir">
     <% ([["home",nil],["work",nil]] + @group_list.map {|g| [ "shares", g[:cn]]}).each do |store| %>
-
-      <li><%= store[1].nil? ? store[0] : store[1] %>
-      
-      <% b = CwaBrowser.new store[0], store[1] %>
-      <% b.directories.each do |dir| %>
-        <ul>
-          <% if b.current_dir != nil.to_s %>
-            <% id = b.current_dir + "/" + dir %>
-          <% else %>
-            <% id = dir %>
-          <% end %>
-          <li id="<%= b.current_share + "#" + id %>" onclick="collapsibleExpand(this)"><%= dir %></li>
-        </ul>
-      <% end %>
-      </li>
+      <% id = store[1].nil? ? store[0] + "." : store[0] + "#" + store[1] %>
+      <li id="<%= id %>" onclick="collapsibleExpand(this)"><%= store[1].nil? ? store[0] : store[1] %></li>
     <% end %>
     </ul>
   </div>
@@ -61,7 +48,7 @@
   <% else %>
     <% id = file %>
   <% end %>
-<div class="browserFileEntryIcon" oncontextmenu="showMenu(event, 'menuFile'); select_file(this);" onclick="select_file(this)" id="<%= @browser.current_share + "#" + id %>"><p class="browserEntryIcon"><%= file %></p></div>
+<div class="browserFileEntryIcon" oncontextmenu="showMenu(event, 'menuFile'); select_file(this);" onclick="select_file(this)" id="<%= @browser.current_share + "." + id %>"><p class="browserEntryIcon"><%= file %></p></div>
 <% end %>
 
 </div>
@@ -125,5 +112,5 @@
 </div>
 
 <script>
-  CollapsibleLists.apply();
+//  CollapsibleLists.apply();
 </script>

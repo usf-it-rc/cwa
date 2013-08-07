@@ -427,11 +427,11 @@ div.fileSelector {
   margin-left: 12px;
 }
 
-ul.collapsibleList {
+.dir, .dirExpanded li, ul {
   padding: 0px;
 }
 
-.collapsibleList li {
+.dir li {
   list-style-type: none;
   background-image: url('/plugin_assets/cwa/images/folder_mini.png');
   background-repeat: no-repeat;
@@ -442,11 +442,12 @@ ul.collapsibleList {
   cursor: pointer;
 }
 
-li.collapsibleListOpen {
+li.dirExpanded {
   list-style-type: none;
   background-image: url('/plugin_assets/cwa/images/folder_mini.png');
   background-repeat: no-repeat;
   background-position: 0 .4em;
+  text-decoration: bold;
   padding-left: 2em;
   padding-bottom: .5em;
   padding-top: .5em;
