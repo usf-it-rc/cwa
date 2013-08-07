@@ -188,8 +188,7 @@ p.browserEntry {
 }
 
 p.browserEntryIcon {
-  text-align: center;
-  margin-top: 38px;
+  padding-left: 32px;
   cursor: default;
   -webkit-user-select: none; /* Chrome/Safari */        
   -moz-user-select: none; /* Firefox */
@@ -200,27 +199,24 @@ p.browserEntryIcon {
   user-select: none;
 }
 
-div.browserFileEntry {
-  background: url('/plugin_assets/cwa/images/file.png') no-repeat left;
-  background-size: 24px 24px;
-  z-index:10;
+.browserFileEntry {
+  z-index: 10;
   padding: 4px;
+  height: 32px;
 }
 
 div.browserFileEntryDisabled {
-  background: #DEE4E7 url('/plugin_assets/cwa/images/file.png') no-repeat left;
-  background-size: 24px 24px;
   color: #AAAAAA;
   z-index:10;
   padding: 4px;
 }
 
-div.browserFileEntrySelected {
-  background: #BCC2C5 url('/plugin_assets/cwa/images/file.png') no-repeat left;
-  background-size: 24px 24px;
+.browserFileEntrySelected {
+  background: #BCC2C5;
   color: #000000;
   z-index:10;
   padding: 4px;
+  height: 32px;
 }
 
 div.browserFileEntryIcon {
@@ -252,7 +248,6 @@ div.browserDirEntry:hover {
   z-index:10;
   padding: 4px;
 }
-}
 
 div.browserDirEntryIcon:hover {
   background: #BCC2C5 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
@@ -262,8 +257,6 @@ div.browserDirEntryIcon:hover {
 }
 
 div.browserFileEntry:hover {
-  background: #BCC2C5 url('/plugin_assets/cwa/images/file.png') no-repeat left;
-  background-size: 24px 24px;
   z-index:10;
   padding: 4px;
 }
@@ -452,4 +445,46 @@ li.dirExpanded {
   padding-bottom: .5em;
   padding-top: .5em;
   cursor: pointer;
+}
+
+table.fileItem {
+  width: 100%;
+  border: 0px;
+  /*padding-left: 20px;*/
+  font-family: mono, courier;
+  font-size: 12px;
+} 
+
+table.fileItem td, th {
+  padding: 4px;
+}
+
+table.fileItem tr td:first-child {
+  width: 60%;
+  text-align: left;
+  background: url('/plugin_assets/cwa/images/file.png') no-repeat left;
+  background-size: 24px 24px;
+}
+
+table.fileItem tr:first-child th:first-child {
+  width: 60%;
+  text-align: left;
+}
+
+table.fileItem th {
+  border: 1px solid;
+  font-family: ariel, sans;
+  font-size: 12px;
+}
+
+.toolButton {
+  margin: 2px;
+  width: 32px; 
+  height: 32px; 
+  background-color: #dddddd;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px;
+  border: 1px solid;
+  float: right;
 }

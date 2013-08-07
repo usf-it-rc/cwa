@@ -58,26 +58,45 @@ class CwaBrowser
 
   # return list of directories in the current path
   def directories
-    dirs = Array.new
+    dirs = Hash.new
     lines = Redmine::CwaBrowserHelper.userexec("list #{self.current_path} -- d")[0]
 
     lines.each_line do |line| 
-      entry = line.chomp.gsub("\"","")
-      dirs.push entry if entry != ""
+      dirent = line.chomp.gsub("\"","").split('::')
+
+      dirs[dirent[0]] = { 
+        :size => dirent[1],
+        :user => dirent[2],
+        :group => dirent[3],
+        :permissions => dirent[4],
+        :date => dirent[5]
+        
+      } if dirent != nil 
     end
 
+    Rails.logger.debug "DIRECTORIES => #{dirs.to_s}"
+  
     return dirs
   end
 
   # return list of files in the current path
   def files
-    fs = Array.new
+    fs = Hash.new
     lines = Redmine::CwaBrowserHelper.userexec("list #{self.current_path} -- f")[0]
 
     lines.each_line do |line| 
-      entry = line.chomp.gsub("\"","")
-      fs.push entry if entry != ""
+      fileent = line.chomp.gsub("\"","").split('::')
+      
+      fs[fileent[0]] = { 
+        :size => fileent[1],
+        :user => fileent[2],
+        :group => fileent[3],
+        :permissions => fileent[4],
+        :date => fileent[5]
+      } if fileent != nil
     end
+
+    Rails.logger.debug "FILES => #{fs.to_s}"
 
     return fs
   end

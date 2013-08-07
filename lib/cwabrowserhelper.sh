@@ -45,6 +45,7 @@ case "$cmd" in
   mkdir)  mkdir "${argv[0]}" ;;
   lines)  wc -l "${argv[0]}" | awk '{ print $1 }' ;;
   type)   file -bi "${argv[0]}" ;;
-  list)   find "${argv[0]}" ! -path "${argv[0]}" ! -type l ! -iname '.*' -maxdepth 1 -type ${argv[1]} -printf \"%f\\n\" | sort -f ;;
+  list)   find "${argv[0]}" ! -path "${argv[0]}" ! -type l ! -iname '.*' -maxdepth 1 -type ${argv[1]} \
+            -printf "%f::%s::%u::%g::%m::%CD %Cr %CZ\n" | sort -f ;;
   *) echo "No way, Jose!"; exit 1 ;;
 esac

@@ -13,19 +13,15 @@
 
   <div class="actionButtons">
     <!-- Action buttons -->
-    <div class="actionButton" onclick="cwaAction('mkdir','Specify directory name to be created:',false)">New Folder...</div>
-    <div class="actionButton" onclick="showTextEditor()">Create File...</div>
-    <div class="actionButton" onclick="showUploadFile()">Upload File...</div>
-
-    <% if @browser.current_dir != nil  %>
-      <div class="browserButtonBack" onclick="back()">&lt; Back</div>
-    <% else %>
-      <div class="browserButtonBackInactive">&lt; Back</div>
-    <% end %>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/mkdir.svg');" onclick="cwaAction('mkdir','Specify directory name to be created:',false)" title="New Folder..."></div>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/newfile.svg');" onclick="showTextEditor()"title="Create File..."></div>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/delete.svg');" onclick="cwaAction('delete',null, true)" title="Delete File..."></div>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/upload.svg');" onclick="showUploadFile()" title="Upload File..."></div>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/download.svg');" onclick="cwaAction('download', null, false)" title="Download File..."></div>
 
     <!-- Current directory window -->
     <div>
-      <b>Current Path:</b> <%= text_field_tag :current_dir, @browser.current_path, :size => @browser.current_path.length < 72 ? @browser.current_path.length : 72, :disabled => true %>
+      <b>Current Path:</b> <%= text_field_tag :current_dir, "", :size => 72, :disabled => true %>
     </div>
   </div>
 
@@ -34,24 +30,28 @@
     <p><b>Data Stores</b></p>
     <hr/>
     <ul class="dir">
-    <% ([["home",nil],["work",nil]] + @group_list.map {|g| [ "shares", g[:cn]]}).each do |store| %>
+    <% ([["home",nil,"home.svg"],["work",nil,"netshare.svg"]] + @group_list.map {|g| [ "shares", g[:cn], "netshare.svg"]}).each do |store| %>
       <% id = store[1].nil? ? store[0] + "." : store[0] + "#" + store[1] %>
-      <li id="<%= id %>" onclick="collapsibleExpand(this)"><%= store[1].nil? ? store[0] : store[1] %></li>
+      <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this)"><%= store[1].nil? ? store[0] : store[1] %></li>
     <% end %>
     </ul>
   </div>
 
-  <div class="box fileSelector" id="fileContainer">
-<% @browser.files.each do |file| %>
-  <% if @browser.current_dir != nil.to_s %>
-    <% id = @browser.current_dir + "/" + file %>
-  <% else %>
-    <% id = file %>
-  <% end %>
-<div class="browserFileEntryIcon" oncontextmenu="showMenu(event, 'menuFile'); select_file(this);" onclick="select_file(this)" id="<%= @browser.current_share + "." + id %>"><p class="browserEntryIcon"><%= file %></p></div>
-<% end %>
-
-</div>
+  <div class="box fileSelector">
+  <table class="fileItem">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Owner</th>
+      <th>Group</th>
+      <th>Mode</th>
+      <th>Change Time</th>
+    </tr>
+    </thead>
+    <tbody id="fileContainer">
+    </tbody>
+  </table> 
+  </div>
 <% end %>
 </div>
 </div>
@@ -112,5 +112,5 @@
 </div>
 
 <script>
-//  CollapsibleLists.apply();
+  document.getElementById('home.').click();
 </script>

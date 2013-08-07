@@ -313,32 +313,34 @@ function collapsibleExpand(elem){
 
     dirItems.push('<ul>');
 
-    $.each(data, function(key,items){
+    $.each(data, function(key,obj){
+      console.log(data);
       if (key == 'directories' && elem.className != 'dirExpanded'){
-        $.each(items, function(idx,val){
+        for (var dir in obj){
           if (!path.length){
-            dirItems.push('<li class="dir" id="' + share + "." + val + '" onclick="collapsibleExpand(this);">' + val + '</li>' );
+            dirItems.push('<li class="dir" id="' + share + "." + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_file(this);" onclick="collapsibleExpand(this);">' + dir + '</li>' );
           } else {
-            dirItems.push('<li class="dir" id="' + share + "." + path + "/" + val + '" onclick="collapsibleExpand(this);">' + val + '</li>' );
+            dirItems.push('<li class="dir" id="' + share + "." + path + "/" + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_file(this);" onclick="collapsibleExpand(this);">' + dir + '</li>' );
           }
- 
-        });
+        }
       }
 
       if (key == 'files'){
-        $.each(items, function(idx,val){
+        for (var file in obj){
           if (path == ''){
-            fileItems.push('<div class="browserFileEntryIcon" oncontextmenu="showMenu(event, ' + 
+            fileItems.push('<tr class="browserFileEntry" oncontextmenu="showMenu(event, ' + 
               "'menuFile'" + '); select_file(this);" onclick="select_file(this)" id="' + 
-              share + '.' + val + '"><p class="browserEntryIcon">' + 
-              val + '</p></div>');
+              share + '.' + file + '"><td><p class="browserEntryIcon">' + 
+              file + "</p></td><td>" + obj[file]['user'] + "</td><td>" + obj[file]['group'] + "</td><td>" + 
+              obj[file]['permissions'] + "</td><td>" + obj[file]['date'] + '</td></tr>');
           } else {
-            fileItems.push('<div class="browserFileEntryIcon" oncontextmenu="showMenu(event, ' + 
+            fileItems.push('<tr class="browserFileEntry" oncontextmenu="showMenu(event, ' + 
               "'menuFile'" + '); select_file(this);" onclick="select_file(this)" id="' + 
-              share + '.' + path + '/' + val + '"><p class="browserEntryIcon">' + 
-              val + '</p></div>');
+              share + '.' + path + '/' + file + '"><td><p class="browserEntryIcon">' + 
+              file + "</p></td><td>" + obj[file]['user'] + "</td><td>" + obj[file]['group'] + "</td><td>" + 
+              obj[file]['permissions'] + "</td><td>" + obj[file]['date'] + '</td></tr>');
           }
-        });
+        }
       }
     });
 
@@ -352,6 +354,7 @@ function collapsibleExpand(elem){
 
     $(dirItems.join('\n')).appendTo(elem);
     $("#fileContainer").html(fileItems.join('\n'));
+    $("#current_dir").val(share + " => " + path);
   });
 }
 
