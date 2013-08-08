@@ -260,24 +260,27 @@ function clearMenu() { //used to make the menu disappear
 }
 
 function showUploadFile(){
-  var menu = document.getElementById('upload');
-  menu.style.display = "block"; //don't show menu
+  $('#upload_form').attr('action', '/cwa_browser/<%= @project.identifier %>/' + $('#selected_share').val() + 
+    "/" + $('#selected_dir').val() + "/upload");
+  $('#upload').css("display", "block");
 }
 
 function hideUploadFile(){
-  var menu = document.getElementById('upload');
-  menu.style.display = "none"; //don't show menu
+  $('#upload').css("display", "none");
 }
 
+/*function uploadFile(){
+  $.ajax( */
+
 function showTextEditor(){
-  var menu = document.getElementById('textEditor');
-  menu.style.display = "block"; //don't show menu
+  $('#upload_form').attr('action', '/cwa_browser/<%= @project.identifier %>/' + $('#selected_share').val() + 
+    "/" + $('#selected_dir').val() + "/create");
+  $('#textEditor').css("display", "block");
 }
 
 function hideTextEditor(){
-  var menu = document.getElementById('textEditor');
-  menu.style.display = "none"; //don't show menu
-  document.getElementById("new_file_form").reset();
+  $('#textEditor').css("display","none");
+  document.getElementById('new_file_form').reset();
 }
 
 function showTail(){
@@ -288,7 +291,7 @@ function showTail(){
 
 function hideTail(){
   $('#tail').css('display', "none"); //don't show tail box
-  document.getElementById("tail_box").reset;
+  document.getElementById('tail_box').reset();
   clearInterval(tail_handle);
 }
 
@@ -298,9 +301,12 @@ function collapsibleExpand(elem){
     return;
   }
 
-  components = path_components(elem);
-  share = components.share;
-  path = components.path;
+  var components = path_components(elem);
+  var share = components.share;
+  var path = components.path;
+
+  $('#selected_share').val(share);
+  $('#selected_dir').val(path);
 
   $.getJSON('/cwa_browser/<%= @project.identifier %>/' + share + "/" + path, function(data){
 

@@ -137,8 +137,6 @@ class CwaBrowserController < ApplicationController
     else
       flash[:error] = "File \"#{upload.original_filename}\" failed to upload!"
     end
-
-    redirect_to :action => 'index', :share => params[:share], :dir => params[:path]
   end
 
   def tail

@@ -58,13 +58,11 @@
 
 <div id="upload">
   <center>
-  <% form_url = "/cwa_browser/#{@project.identifier}/#{@browser.current_share}" %>
-  <% form_url += "/#{@browser.current_dir}" if @browser.current_dir != nil %>
-  <% form_url += "/upload" %>
+  <% form_url = "STUB" %>
   <%= form_tag form_url, :id => 'upload_form', :multipart => true do %>
     <b><p>Select file to upload</p></b>
-    <p><%= file_field_tag :file %></p>
-    <%= submit_tag "Upload" %><%= button_to_function "Cancel", "hideUploadFile()"%>
+    <p><%= file_field_tag :upload_file %></p>
+    <%= button_to_function "Upload", "uploadFile()" %><%= button_to_function "Cancel", "hideUploadFile()"%>
   <% end %>
   </center>
 </div>
@@ -81,10 +79,7 @@
 
 <div id="textEditor" class="miniapp">
   <center>
-  <% form_url = "/cwa_browser/#{@project.identifier}" %>
-  <% form_url += "/#{@browser.current_share}" %>
-  <% form_url += "/#{@browser.current_dir}" if @browser.current_dir != nil %>
-  <%= form_tag "#{form_url}/create", :id => 'new_file_form', :multipart => true do %>
+  <%= form_tag "STUB", :id => 'new_file_form', :multipart => true do %>
     <%= label_tag :new_file_name, "New Text File Name" %>
     <%= hidden_field_tag :dir, @browser.current_dir %>
     <%= text_field_tag :new_file_name, nil, :length => 128 %>
