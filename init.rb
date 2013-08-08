@@ -9,6 +9,7 @@ require 'cwa_ipa_authorize'
 require_dependency 'cwa/hooks'
 require 'googlecharts'
 require 'cwa_settings_helper'
+require 'jquery-fileupload-rails'
 
 Redmine::MenuManager.map :project_menu do |menu|
   menu.delete :wiki if menu.exists? :wiki
@@ -49,7 +50,7 @@ Redmine::Plugin.register :cwa do
     permission :job_manager, :cwa_jobmanager => [:index, :alljobs, :current_jobs, :job_history, :delete, :submit, :queue_status]
     permission :allocations, { :cwa_allocations => [:index] }
     permission :web_apps, { :cwa_applications => [:index] }
-    permission :file_browser, { :cwa_browser => [:index,:mkdir, :rename, :delete, :download, :get, :tail] }
+    permission :file_browser, { :cwa_browser => [:index, :mkdir, :rename, :delete, :download, :get, :tail, :upload] }
     permission :user_stats, { :cwa_stats => [:index] }
   end
 end

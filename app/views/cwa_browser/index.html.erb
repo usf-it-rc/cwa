@@ -1,4 +1,5 @@
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
+<%= javascript_include_tag "/plugin_assets/cwa/javascript/jquery.cookie.js" %>
 <script>
   <%= render :formats => [:js], :partial => 'cwa_browser/browser' %>
 </script>
@@ -58,11 +59,10 @@
 
 <div id="upload">
   <center>
-  <% form_url = "STUB" %>
-  <%= form_tag form_url, :id => 'upload_form', :multipart => true do %>
+  <%= form_tag "STUB", :id => 'upload_form', :multipart => true do %>
     <b><p>Select file to upload</p></b>
     <p><%= file_field_tag :upload_file %></p>
-    <%= button_to_function "Upload", "uploadFile()" %><%= button_to_function "Cancel", "hideUploadFile()"%>
+    <%= submit_tag "Upload", :onclick => "uploadFile()" %><%= button_to_function "Cancel", "hideUploadFile()"%>
   <% end %>
   </center>
 </div>

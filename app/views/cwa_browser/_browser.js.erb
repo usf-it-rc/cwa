@@ -1,3 +1,4 @@
+// Catch click events
 if (document.addEventListener) {
   document.addEventListener('contextmenu', function(event) {
     event.preventDefault();
@@ -269,8 +270,15 @@ function hideUploadFile(){
   $('#upload').css("display", "none");
 }
 
-/*function uploadFile(){
-  $.ajax( */
+function uploadFile(){
+  if ($('#selected_dir').val() == ''){
+    var url = '/cwa_browser/<%= @project.identifier %>/' + $('#selected_share').val() + '/upload';
+  } else {
+    var url = '/cwa_browser/<%= @project.identifier %>/' + $('#selected_share').val() + '/' + $('#selected_dir').val() + '/upload';
+  }
+
+  $('#upload_form').attr('action', url);
+}
 
 function showTextEditor(){
   $('#upload_form').attr('action', '/cwa_browser/<%= @project.identifier %>/' + $('#selected_share').val() + 
@@ -295,6 +303,13 @@ function hideTail(){
   clearInterval(tail_handle);
 }
 
+// Expand tree based on current path
+/*function goToPath(share, path){
+  path_elements = path.split('/');
+  
+  $.getJSON('/cwa_browser/<%= @project.identifier %>/' + share, function(data){
+}*/
+     
 // Handle the file tree view
 function collapsibleExpand(elem){
   if (elem.id != event.target.id){

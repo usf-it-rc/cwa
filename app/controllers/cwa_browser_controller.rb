@@ -4,7 +4,7 @@ class CwaBrowserController < ApplicationController
   include CwaIpaAuthorize
 
   before_filter :find_project, :authorize, :ipa_authorize
-  accept_api_auth :index, :mkdir, :rename, :delete, :download, :get
+  accept_api_auth :index, :mkdir, :rename, :delete, :download, :get, :upload
 
   def index
     @groups = CwaGroups.new
@@ -84,7 +84,6 @@ class CwaBrowserController < ApplicationController
     end
 
     if params[:new_file_content] != nil and new_file != nil
-      upload = params["file"]
       file = Redmine::CwaBrowserHelper::Put.new(new_file)
       if file
         file.write(params[:new_file_content])
@@ -116,7 +115,7 @@ class CwaBrowserController < ApplicationController
 
   # Upload file and store
   def upload
-    upload = params["file"]
+    upload = params["upload_file"]
 
     if params[:path] != nil
       dir = resolve_path(params[:share], "/" + params[:path])
@@ -136,6 +135,10 @@ class CwaBrowserController < ApplicationController
       flash[:notice] = "File \"#{upload.original_filename}\" successfully upload!"
     else
       flash[:error] = "File \"#{upload.original_filename}\" failed to upload!"
+    end
+    respond_to do |format|
+      format.html { redirect_to :action => 'index', :params => params }
+      format.json { render :json => {} }
     end
   end
 
