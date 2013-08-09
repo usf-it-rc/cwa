@@ -1,5 +1,4 @@
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
-<%= javascript_include_tag "/plugin_assets/cwa/javascript/jquery.cookie.js" %>
 <script>
   <%= render :formats => [:js], :partial => 'cwa_browser/browser' %>
 </script>
@@ -107,5 +106,5 @@
 </div>
 
 <script>
-  document.getElementById('home.').click();
+  goToPath("<%= params[:share] %>", "<%= params[:dir] %>");
 </script>

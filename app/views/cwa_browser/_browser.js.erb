@@ -303,13 +303,115 @@ function hideTail(){
   clearInterval(tail_handle);
 }
 
-// Expand tree based on current path
-/*function goToPath(share, path){
-  path_elements = path.split('/');
+// Parse out file items and return nicely-formatted HTML string
+function getJSONfileItems(obj,share,path){
+  var fileItems = [];
+  for (var file in obj){
+    if (!path){
+      fileItems.push('<tr class="browserFileEntry" oncontextmenu="showMenu(event, ' + 
+        "'menuFile'" + '); select_file(this);" onclick="select_file(this)" id="' + 
+        share + '.' + file + '"><td><p class="browserEntryIcon">' + 
+        file + "</p></td><td>" + obj[file]['user'] + "</td><td>" + obj[file]['group'] + "</td><td>" + 
+        obj[file]['permissions'] + "</td><td>" + obj[file]['date'] + '</td></tr>');
+    } else {
+      fileItems.push('<tr class="browserFileEntry" oncontextmenu="showMenu(event, ' + 
+        "'menuFile'" + '); select_file(this);" onclick="select_file(this)" id="' + 
+        share + '.' + path + '/' + file + '"><td><p class="browserEntryIcon">' + 
+        file + "</p></td><td>" + obj[file]['user'] + "</td><td>" + obj[file]['group'] + "</td><td>" + 
+        obj[file]['permissions'] + "</td><td>" + obj[file]['date'] + '</td></tr>');
+    }
+  }
+  return fileItems.join('\n');
+}
+
+// Parse out directory items and return nicely-formatted HTML string
+function getJSONdirItems(obj,share,path){
+  var dirItems = [];
+  dirItems.push('<ul>');
+
+  for (var dir in obj){
+    if (!path){
+      dirItems.push('<li class="dir" id="' + share + "." + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_file(this);" onclick="collapsibleExpand(this);">' + dir + '</li>' );
+    } else {
+      dirItems.push('<li class="dir" id="' + share + "." + path + "/" + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_file(this);" onclick="collapsibleExpand(this);">' + dir + '</li>' );
+    }
+  }
+  dirItems.push('</ul>');
+
+  return dirItems.join('\n');
+}
+
+function setEntrySelected(elem){
   
-  $.getJSON('/cwa_browser/<%= @project.identifier %>/' + share, function(data){
-}*/
-     
+  $('#dirContainer').find('ul').css("font-weight", "normal");
+  $('#dirContainer').find('li').css("font-weight", "normal");
+
+  $(elem).css("font-weight", "bold");
+}
+
+// Expand tree based on current path
+function goToPath(share, path){
+  var dirItems = "";
+  var fileItems = "";
+  var path_elements = [];
+  var dir = "";
+  var dir_path = "";
+  var eid = "";
+
+  if (share == ""){
+    share = "home";
+  }
+
+  path_elements = [share];
+
+  if (path != null && path != ""){
+    if (path.indexOf('/') === -1){
+      path_elements.push(path);
+    } else {
+      path_elements = path_elements.concat(path.split('/'));
+    }
+  }
+
+  $.each(path_elements, function(key,comp){
+    switch (key){
+      case 0:
+        dir = comp;
+        eid = comp + '.';
+        break;
+      case 1:
+        dir_path = comp;
+        dir = dir + '/' + comp;
+        eid = eid + comp;
+        break;
+      default:
+        dir_path = dir_path + '/' + comp;
+        dir = dir + '/' + comp;
+        eid = eid + '/' + comp;
+    }
+
+    $.ajaxSetup( { "async": false } ); 
+
+    $.getJSON('/cwa_browser/<%= @project.identifier %>/' + dir, function(data){
+      $.each(data,function(key,obj){
+        if (key == 'directories'){
+          dirItems = getJSONdirItems(obj,share,dir_path);
+        }
+        if (key == 'files'){
+          fileItems = getJSONfileItems(obj,share,dir_path);
+        }
+      });
+
+      var elem = document.getElementById(eid);
+
+      setEntrySelected(elem);
+      $(elem).attr('class','dirExpanded');
+      $(dirItems).appendTo(elem);
+      $("#fileContainer").html(fileItems);
+    });
+  });
+  $("#current_dir").val(share + " => " + path);
+}
+
 // Handle the file tree view
 function collapsibleExpand(elem){
   if (elem.id != event.target.id){
@@ -319,49 +421,24 @@ function collapsibleExpand(elem){
   var components = path_components(elem);
   var share = components.share;
   var path = components.path;
+  var dirItems = "";
+  var fileItems = "";
 
   $('#selected_share').val(share);
   $('#selected_dir').val(path);
 
   $.getJSON('/cwa_browser/<%= @project.identifier %>/' + share + "/" + path, function(data){
 
-    var dirItems = [];
-    var fileItems = [];
-
     if (elem.className == 'dirExpanded'){
       $(elem).find('ul').remove();
     }
 
-    dirItems.push('<ul>');
-
     $.each(data, function(key,obj){
-      console.log(data);
       if (key == 'directories' && elem.className != 'dirExpanded'){
-        for (var dir in obj){
-          if (!path.length){
-            dirItems.push('<li class="dir" id="' + share + "." + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_file(this);" onclick="collapsibleExpand(this);">' + dir + '</li>' );
-          } else {
-            dirItems.push('<li class="dir" id="' + share + "." + path + "/" + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_file(this);" onclick="collapsibleExpand(this);">' + dir + '</li>' );
-          }
-        }
+        dirItems = getJSONdirItems(obj,share,path);
       }
-
       if (key == 'files'){
-        for (var file in obj){
-          if (path == ''){
-            fileItems.push('<tr class="browserFileEntry" oncontextmenu="showMenu(event, ' + 
-              "'menuFile'" + '); select_file(this);" onclick="select_file(this)" id="' + 
-              share + '.' + file + '"><td><p class="browserEntryIcon">' + 
-              file + "</p></td><td>" + obj[file]['user'] + "</td><td>" + obj[file]['group'] + "</td><td>" + 
-              obj[file]['permissions'] + "</td><td>" + obj[file]['date'] + '</td></tr>');
-          } else {
-            fileItems.push('<tr class="browserFileEntry" oncontextmenu="showMenu(event, ' + 
-              "'menuFile'" + '); select_file(this);" onclick="select_file(this)" id="' + 
-              share + '.' + path + '/' + file + '"><td><p class="browserEntryIcon">' + 
-              file + "</p></td><td>" + obj[file]['user'] + "</td><td>" + obj[file]['group'] + "</td><td>" + 
-              obj[file]['permissions'] + "</td><td>" + obj[file]['date'] + '</td></tr>');
-          }
-        }
+        fileItems = getJSONfileItems(obj,share,path);
       }
     });
 
@@ -371,10 +448,9 @@ function collapsibleExpand(elem){
       elem.className = 'dir';
     }
 
-    dirItems.push('</ul>');
-
-    $(dirItems.join('\n')).appendTo(elem);
-    $("#fileContainer").html(fileItems.join('\n'));
+    setEntrySelected(elem);
+    $(dirItems).appendTo(elem);
+    $("#fileContainer").html(fileItems);
     $("#current_dir").val(share + " => " + path);
   });
 }

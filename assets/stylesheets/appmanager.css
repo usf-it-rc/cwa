@@ -429,6 +429,7 @@ div.fileSelector {
   background-image: url('/plugin_assets/cwa/images/folder_mini.png');
   background-repeat: no-repeat;
   background-position: 0 .4em;
+  font-weight: normal;
   padding-left: 2em;
   padding-bottom: .5em;
   padding-top: .5em;
@@ -440,7 +441,6 @@ li.dirExpanded {
   background-image: url('/plugin_assets/cwa/images/folder_mini.png');
   background-repeat: no-repeat;
   background-position: 0 .4em;
-  text-decoration: bold;
   padding-left: 2em;
   padding-bottom: .5em;
   padding-top: .5em;

@@ -9,7 +9,6 @@ require 'cwa_ipa_authorize'
 require_dependency 'cwa/hooks'
 require 'googlecharts'
 require 'cwa_settings_helper'
-require 'jquery-fileupload-rails'
 
 Redmine::MenuManager.map :project_menu do |menu|
   menu.delete :wiki if menu.exists? :wiki

@@ -117,8 +117,8 @@ class CwaBrowserController < ApplicationController
   def upload
     upload = params["upload_file"]
 
-    if params[:path] != nil
-      dir = resolve_path(params[:share], "/" + params[:path])
+    if params[:dir] != nil
+      dir = resolve_path(params[:share], "/" + params[:dir])
     else 
       dir = resolve_path(params[:share], nil)
     end
@@ -137,7 +137,7 @@ class CwaBrowserController < ApplicationController
       flash[:error] = "File \"#{upload.original_filename}\" failed to upload!"
     end
     respond_to do |format|
-      format.html { redirect_to :action => 'index', :params => params }
+      format.html { redirect_to :action => 'index', :share => params[:share], :dir => params[:dir] }
       format.json { render :json => {} }
     end
   end

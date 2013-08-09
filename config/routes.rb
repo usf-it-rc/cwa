@@ -93,7 +93,7 @@ post 'cwa_browser/:project_id/*share/upload',
   :to => 'cwa_browser#upload',
   :share => /(home|shares|work)/
 
-post 'cwa_browser/:project_id/*share/*path/upload',
+post 'cwa_browser/:project_id/*share/*dir/upload',
   :to => 'cwa_browser#upload',
   #:path => /[^\0]+/,
   :share => /(home|shares|work)/
