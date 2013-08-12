@@ -12,48 +12,50 @@
 <%= hidden_field_tag :selected_share, @browser.current_share %>
 
   <div class="actionButtons">
+    <!-- Current directory window -->
+    <div style="float:left; margin-top: 6px;">
+      <b>Current Path:</b> <%= text_field_tag :current_dir, "", :size => 72, :disabled => true %>
+    </div>
     <!-- Action buttons -->
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/mkdir.svg');" onclick="cwaAction('mkdir','Specify directory name to be created:',false)" title="New Folder..."></div>
     <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/newfile.svg');" onclick="showTextEditor()"title="Create File..."></div>
     <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/delete.svg');" onclick="cwaAction('delete',null, true)" title="Delete File..."></div>
     <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/upload.svg');" onclick="showUploadFile()" title="Upload File..."></div>
     <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/download.svg');" onclick="cwaAction('download', null, false)" title="Download File..."></div>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/tail.svg');" onclick="showTail()" title="Watch File..."></div>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/rename.png');" onclick="cwaAction('rename','Enter new name for directory:', false)" title="Rename File..."></div>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/move.svg');" onclick="showMove()" title="Move File..."></div>
+  </div>
 
-    <!-- Current directory window -->
-    <div>
-      <b>Current Path:</b> <%= text_field_tag :current_dir, "", :size => 72, :disabled => true %>
+  <div>
+    <div class="box dirSelector" id="dirContainer">
+      <div id="dirBoxTitle" style="float:left; padding-top: 6px; margin: 8px;"><b>Data Stores</b></div>
+      <div class="toolButton" style="float: right; margin: 8px; background-image: url('/plugin_assets/cwa/images/mkdir.svg');" onclick="cwaAction('mkdir','Specify directory name to be created:',false)" title="New Folder..."></div>
+      <hr/>
+      <ul class="dir">
+      <% ([["home",nil,"home.svg"],["work",nil,"netshare.svg"]] + @group_list.map {|g| [ "shares", g[:cn], "netshare.svg"]}).each do |store| %>
+        <% id = store[1].nil? ? store[0] + "." : store[0] + "#" + store[1] %>
+        <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this,true)"><%= store[1].nil? ? store[0] : store[1] %></li>
+      <% end %>
+      </ul>
     </div>
+  
+    <div class="box fileSelector">
+    <table class="fileItem">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Owner</th>
+        <th>Group</th>
+        <th>Mode</th>
+        <th>Change Time</th>
+      </tr>
+      </thead>
+      <tbody id="fileContainer">
+      </tbody>
+    </table> 
+    </div>
+  <% end %>
   </div>
-
-<div>
-  <div class="box dirSelector" id="dirContainer">
-    <p><b>Data Stores</b></p>
-    <hr/>
-    <ul class="dir">
-    <% ([["home",nil,"home.svg"],["work",nil,"netshare.svg"]] + @group_list.map {|g| [ "shares", g[:cn], "netshare.svg"]}).each do |store| %>
-      <% id = store[1].nil? ? store[0] + "." : store[0] + "#" + store[1] %>
-      <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this)"><%= store[1].nil? ? store[0] : store[1] %></li>
-    <% end %>
-    </ul>
-  </div>
-
-  <div class="box fileSelector">
-  <table class="fileItem">
-    <thead>
-    <tr>
-      <th>Name</th>
-      <th>Owner</th>
-      <th>Group</th>
-      <th>Mode</th>
-      <th>Change Time</th>
-    </tr>
-    </thead>
-    <tbody id="fileContainer">
-    </tbody>
-  </table> 
-  </div>
-<% end %>
-</div>
 </div>
 
 <div id="upload">
@@ -69,9 +71,9 @@
 <div id="tail" class="miniapp">
   <center>
   <%= form_tag "/cwa_browser/#{@project.identifier}/tail", :id => 'tail_box' do %>
-    <%= text_area_tag :tail_content, nil, { :rows => "28", :cols => "96", :readonly => true } %>
+    <%= text_area_tag :tail_content, nil, { :readonly => true } %>
     <br/>
-    <%= button_to_function "Close", "hideTail()"%>
+    <%= button_to_function "Close", "hideTail()", { :style => "position:absolute;top:96%;" } %>
   <% end %>
   </center>
 </div>
@@ -105,6 +107,20 @@
   <div class="menuItem" onclick="showMove()">Move...</div>
 </div>
 
+<div id="move" class="miniapp" style="width: 25%; height: 75%;">
+  <div class="box dirSelector" id="dirContainer" style="width:95%; height:90%; max-height: 90%; padding-right: 0px;">
+    <div id="dirBoxTitle"><b>Select Destination...</b></div>
+    <hr/>
+    <ul class="dir">
+      <% ([["home",nil,"home.svg"],["work",nil,"netshare.svg"]] + @group_list.map {|g| [ "shares", g[:cn], "netshare.svg"]}).each do |store| %>
+        <% id = store[1].nil? ? store[0] + "." : store[0] + "#" + store[1] %>
+        <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this,false)"><%= store[1].nil? ? store[0] : store[1] %></li>
+      <% end %>
+    </ul>
+  </div>
+  <%= button_to_function "Select", "startMove()" %>  
+</div>
+  
 <script>
   goToPath("<%= params[:share] %>", "<%= params[:dir] %>");
 </script>

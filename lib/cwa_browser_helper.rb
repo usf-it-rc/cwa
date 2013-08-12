@@ -23,6 +23,31 @@ module Redmine::CwaBrowserHelper
       return result[2] == 0 ? true : false
     end
 
+    def remoteMove(source, target, move_id)
+      Rails.logger.debug "mv #{source} -- #{target}"
+      stdin, stdout, stderr, wait_thr = Open3.popen3(
+        "sudo -u #{User.current.login} /usr/bin/cwabrowserhelper.sh mv #{source} -- #{target}"
+        )
+
+      while !@stdout.eof?
+        progress = @stdout.read
+        Rails.cache.fetch("moveop_" + move_id) do
+          { :progress => progress.to_i }
+        end
+      end
+
+      status = Rails.cache.fetch("moveop_" + move_id) do
+        { :progress => 100 }
+      end
+
+      stdout.close
+      stdin.close
+      stderr.close
+      exit_status = wait_thr.value
+      return exit_status
+    end
+      
+
     def delete(file)
       Rails.logger.debug "userexec rm #{file}"
       # TODO: Make this safer!

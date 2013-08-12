@@ -33,8 +33,8 @@ function cwaAction(action, promptString, confirmBool){
   item = item.split("/");
   item = item[item.length-1];
 
-  var path = "<%= @browser.current_dir %>";
-  var share = "<%= @browser.current_share %>";
+  var path = $("#selected_dir").val();
+  var share = $("#selected_share").val();
   var proj = "<%= @project.identifier %>";
   var argument;
   var continuation = false;
@@ -87,7 +87,7 @@ function cwaAction(action, promptString, confirmBool){
           }
           window.location.assign("/cwa_browser/<%= @project.identifier %>/" + method + "/" + data.fid);
         } else {
-          location.reload(); 
+          window.location.assign("/cwa_browser/<%= @project.identifier %>/" + share + "/" + path);
         }
       },
       error: function(data){ alert(errorString); }
@@ -303,6 +303,15 @@ function hideTail(){
   clearInterval(tail_handle);
 }
 
+function showMove(){
+  $('#move').css('display', "block");
+  // do stuff for move
+}
+
+function startMove(){
+  $('#move').css('display', "none");
+}
+
 // Parse out file items and return nicely-formatted HTML string
 function getJSONfileItems(obj,share,path){
   var fileItems = [];
@@ -325,15 +334,15 @@ function getJSONfileItems(obj,share,path){
 }
 
 // Parse out directory items and return nicely-formatted HTML string
-function getJSONdirItems(obj,share,path){
+function getJSONdirItems(obj,share,path,filePop){
   var dirItems = [];
   dirItems.push('<ul>');
 
   for (var dir in obj){
     if (!path){
-      dirItems.push('<li class="dir" id="' + share + "." + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_file(this);" onclick="collapsibleExpand(this);">' + dir + '</li>' );
+      dirItems.push('<li class="dir" id="' + share + "." + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_file(this);" onclick="collapsibleExpand(this,' + filePop + ');">' + dir + '</li>' );
     } else {
-      dirItems.push('<li class="dir" id="' + share + "." + path + "/" + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_file(this);" onclick="collapsibleExpand(this);">' + dir + '</li>' );
+      dirItems.push('<li class="dir" id="' + share + "." + path + "/" + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_file(this);" onclick="collapsibleExpand(this,' + filePop +');">' + dir + '</li>' );
     }
   }
   dirItems.push('</ul>');
@@ -394,7 +403,7 @@ function goToPath(share, path){
     $.getJSON('/cwa_browser/<%= @project.identifier %>/' + dir, function(data){
       $.each(data,function(key,obj){
         if (key == 'directories'){
-          dirItems = getJSONdirItems(obj,share,dir_path);
+          dirItems = getJSONdirItems(obj,share,dir_path,true);
         }
         if (key == 'files'){
           fileItems = getJSONfileItems(obj,share,dir_path);
@@ -413,7 +422,7 @@ function goToPath(share, path){
 }
 
 // Handle the file tree view
-function collapsibleExpand(elem){
+function collapsibleExpand(elem,popFiles){
   if (elem.id != event.target.id){
     return;
   }
@@ -435,9 +444,9 @@ function collapsibleExpand(elem){
 
     $.each(data, function(key,obj){
       if (key == 'directories' && elem.className != 'dirExpanded'){
-        dirItems = getJSONdirItems(obj,share,path);
+        dirItems = getJSONdirItems(obj,share,path,popFiles);
       }
-      if (key == 'files'){
+      if (key == 'files' && popFiles){
         fileItems = getJSONfileItems(obj,share,path);
       }
     });
@@ -450,8 +459,10 @@ function collapsibleExpand(elem){
 
     setEntrySelected(elem);
     $(dirItems).appendTo(elem);
-    $("#fileContainer").html(fileItems);
-    $("#current_dir").val(share + " => " + path);
+    if (popFiles){
+      $("#fileContainer").html(fileItems);
+      $("#current_dir").val(share + " => " + path);
+    }
   });
 }
 

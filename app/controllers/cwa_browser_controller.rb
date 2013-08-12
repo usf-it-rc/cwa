@@ -4,7 +4,7 @@ class CwaBrowserController < ApplicationController
   include CwaIpaAuthorize
 
   before_filter :find_project, :authorize, :ipa_authorize
-  accept_api_auth :index, :mkdir, :rename, :delete, :download, :get, :upload
+  accept_api_auth :index, :mkdir, :rename, :delete, :download, :get, :upload, :move
 
   def index
     @groups = CwaGroups.new
@@ -231,6 +231,62 @@ class CwaBrowserController < ApplicationController
 
     self.response_body = Redmine::CwaBrowserHelper::RetrieveZip.new(file)
   end
+
+  def move
+    path = resolve_path(params[:share], params[:path])
+    target_path = resolve_path(params[:target_share], params[:target_path])
+    response = {}
+ 
+    # Check to see if shares match.  If so, simple mv will do
+    if params[:share] == params[:target_share]
+      # use rename, its just the mv command
+      if Redmine::CwaBrowserHelper.rename(path, target_path)
+        response[:status] = "success"
+        response[:code] = 200
+      else
+        response[:status] = "failure"
+        response[:code] = 500
+      end
+    else
+      # Now we have to kick off an asynchronous task that feeds data to a cache
+      # based on the hash of the transfer components
+
+      move_id = Digest::SHA512.hexdigest("MySaltySurprise" + (Time.now.to_i+Time.now.tv_usec+Time.now.tv_nsec).to_s +
+        path + target_path)
+      Thread.new do
+        Redmine::CwaBrowserHelper.RemoteMove(path, target_path, move_id)
+      end
+      #
+      # Then we have to send back a JSON response to signal the beginning of the transfer
+      response[:status] = "started"
+      response[:code] = 200
+      response[:move_id] = move_id
+    end
+  
+    respond_to do |format|
+      format.json { render :json => response }
+    end
+  end
+
+  # That's pretty easy.  Just check the status of the thread from the cache
+  def move_status
+    move_id = params[:move_id]
+
+    status = Rails.cache.fetch("moveop_" + move_id)
+    if status[:progress] != 100
+      status[:status] = "in-progress"
+    else
+      status[:status] = "complete"
+    end
+
+    status[:code] = 200
+    status[:move_id] = move_id
+    
+    respond_to do |format|
+      format.json { render :json => status }
+    end
+  end
+    
 
   private
   def resolve_path(share,path)
