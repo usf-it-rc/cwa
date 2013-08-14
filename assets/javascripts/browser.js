@@ -175,7 +175,7 @@ function set_selected_file(elem, dir, file){
 }
 
 // these methods are for the full file browser
-function select_directory(elem, targetDir){
+function select_directory(elem, divPopup){
   var className = elem.className;
   var re = new RegExp(".*Selected$");
   if (!elem.className.match(re)){
@@ -187,9 +187,9 @@ function select_directory(elem, targetDir){
   share = components.share;
   path = components.path;
 
-  if (targetDir){
-    $("#target_dir").val(share + "/" + path);
-    $("#target_item").val(share + "/" + path);
+  if (divPopup){
+    $("#target_share").val(share);
+    $("#target_path").val(path);
   } else {
     $("#selected_dir").val(share + "/" + path);
     $("#selected_item").val(share + "/" + path);
@@ -313,22 +313,32 @@ function showMove(){
   $('#move').css('display', "block");
 }
 
-// polling function to get progress of move
-var move_id = '';
+// polling function to get display progress of file operations
+var op_id = '';
 var move_interval;
 var move_status = function(){
-  $.getJSON('/cwa_browser/' + redmine_project + '/move_status/' + move_id, function(data){
+  $.getJSON('/cwa_browser/' + redmine_project + '/op_status/', function(data){
     $.each(data, function(key,value){
-      if (key == 'status'){
-        #('#move_progress_bar_status').val(value);
-        if (value == 'finished'){
-          sleep(5);
-          $('#move_progress').css('display', 'none'); 
+      if (key == 'operations'){
+        if (!value.length){
+          clearInterval(move_interval);
+          $('#queue_progress').html('');
+          $('#queue_progress').css('display', 'none');
+          return false;
         }
+        var op_status = [];
+        $.each(value, function(key,op){
+          // this will add divs and progress bars to a parent div defined
+          // in the main view
+          if (op.progress == 100){
+            op_status.push('<div id="' + op.id + '" class="browserProgressElement"><p>' + op.operation + ' complete</p><p>' + op.file_name + '</p></div>');
+          } else {
+            op_status.push('<div id="' + op.id + '" class="browserProgressElement"><p>' + op.operation + ' ' + op.progress + '%</p><p>' + op.file_name + '</p></div>');
+          }
+        });
+        console.log(op_status.join('\n'));
+        $('#queue_progress').html(op_status.join('\n'));
       }
-      if (key == 'progress'){
-        #('#move_progress_bar').val(value);
-      } 
     });
   }); 
 };
@@ -342,63 +352,48 @@ function startMove(){
   var url_action = moveUrlAction();
 
   if (url_action){
-    $.postJSON('/cwa_browser/' + redmine_project + '/' + url_action, function(data){
+    $.post('/cwa_browser/' + redmine_project + '/' + url_action, null, function(data){
       $.each(data, function(key,value){
         if (key == 'move_id'){
           move_id = value;
         }
         if (key == 'status'){
-          if (value != 'success'){
-            $('#move_progress').css('display', 'block');
-            $('#move_progress_bar_status').val('Failed!');
-            sleep(5);
-            $('#move_progress').css('display', 'none'); 
-          } else { 
-            $('#move_progress').css('display', 'block');
-            move_interval = setInterval(move_status, 5000);
-          }
+          $('#queue_progress').css('display', 'block');
+          move_status();
+          goToPath($('#target_share').val(),$('#target_path').val()); 
+          move_interval = setInterval(move_status, 5000);
         }
       });
-    });
+    }, 'json');
   }
 }
 
 // Create a URL suffix based on the current selected_file, selected_dir, target_file, target_dir
 function moveUrlAction(){
-  // possible actions:
-  //
-  // selected_share/selected_file/move/target_share
-  // selected_share/selected_file/move/target_share/target_path
-  // selected_share/selected_path/selected_file/move/target_share
-  // selected_share/selected_path/selected_file/move/target_share/target_path
-  // selected_share/selected_path/move/target_share
-  // selected_share/selected_path/move/target_share/target_path
-  
-  var selected_share = $('#selected_share').val();
-  var selected_path = $('#selected_dir').val();
+  var selected_dir = $('#selected_dir').val();
   var selected_file = $('#selected_file').val();
   var target_share = $('#target_share').val();
   var target_path = $('#target_path').val();
   var url = false;
 
-  if (!selected_share || !target_share){
-    alert("Source and/or Target shares not properly set!");
-  } else if (selected_share && !selected_path){
-    alert("You cannot move " + selected_share + " to another location!");
-  } else if (selected_share && selected_path && !selected_file && target_share && !target_path){
-    url = selected_share + '/' + selected_path + '/move/' + target_share;
-  } else if (selected_share && selected_path && selected_file && target_share && !target_path){
-    url = selected_share + '/' + selected_path + '/' + selected_file + '/move/' + target_share;
-  } else if (selected_share && selected_path && !selected_file && target_share && target_path){
-    url = selected_share + '/' + selected_path + '/move/' + target_share + '/' + target_path;
-  } else if (selected_share && selected_path && selected_file && target_share && target_path){
-    url = selected_share + '/' + selected_path + '/' + selected_file + '/move/' + target_share + '/' + target_path;
-  } else if (selected_share && !selected_path && selected_file && target_share && !target_path){
-    url = selected_share + '/' + selected_file + '/move/' + target_share;
-  } else if (selected_share && !selected_path && selected_file && target_share && target_path){
-    url = selected_share + '/' + selected_file + '/move/' + target_share + '/' + target_path;
+  console.log("sd:" + selected_dir + " sf:" + selected_file +
+        " ts:" + target_share + " tp:" + target_path);
+
+  if ((!selected_file && !selected_dir) || !target_share){
+    alert("Source and/or Target not properly set!");
+  } else if (selected_file && target_share && !target_path){
+    url = selected_file + '/move/' + target_share;
+  } else if (selected_file && target_share && target_path){
+    url = selected_file + '/move/' + target_share + '/' + target_path;
+  } else if (!selected_file && selected_dir && target_share && target_path){
+    url = selected_dir + '/move/' + target_share + '/' + target_path;
+  } else if (!selected_file && selected_dir && target_share && !target_path){
+    url = selected_dir + '/move/' + target_share;
+  } else {
+    alert("Invalid move request");
   }
 
+  console.log(url);
   return url; 
 }
 
@@ -424,15 +419,15 @@ function getJSONfileItems(obj,share,path){
 }
 
 // Parse out directory items and return nicely-formatted HTML string
-function getJSONdirItems(obj,share,path,filePop){
+function getJSONdirItems(obj,share,path,divPopup){
   var dirItems = [];
   dirItems.push('<ul>');
 
   for (var dir in obj){
     if (!path){
-      dirItems.push('<li class="dir" id="' + share + "." + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_directory(this,' + filePop + ');" onclick="collapsibleExpand(this,' + filePop + ');">' + dir + '</li>' );
+      dirItems.push('<li class="dir" id="' + share + "." + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_directory(this,' + divPopup + ');" onclick="collapsibleExpand(this,' + divPopup + ');">' + dir + '</li>' );
     } else {
-      dirItems.push('<li class="dir" id="' + share + "." + path + "/" + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_directory(this,' + filePop + ');" onclick="collapsibleExpand(this,' + filePop +');">' + dir + '</li>' );
+      dirItems.push('<li class="dir" id="' + share + "." + path + "/" + dir + '" oncontextmenu="showMenu(event, ' + "'menuDir'" + '); select_directory(this,' + divPopup + ');" onclick="collapsibleExpand(this,' + divPopup +');">' + dir + '</li>' );
     }
   }
   dirItems.push('</ul>');
@@ -444,6 +439,8 @@ function getJSONdirItems(obj,share,path,filePop){
 function setEntrySelected(elem){
   $('#dirContainer').find('ul').css("font-weight", "normal");
   $('#dirContainer').find('li').css("font-weight", "normal");
+  $('#dirContainerSelector').find('ul').css("font-weight", "normal");
+  $('#dirContainerSelector').find('li').css("font-weight", "normal");
   $(elem).css("font-weight", "bold");
 }
 
@@ -492,7 +489,7 @@ function goToPath(share, path){
     $.getJSON('/cwa_browser/' + redmine_project + '/' + dir, function(data){
       $.each(data,function(key,obj){
         if (key == 'directories'){
-          dirItems = getJSONdirItems(obj,share,dir_path,true);
+          dirItems = getJSONdirItems(obj,share,dir_path,false);
         }
         if (key == 'files'){
           fileItems = getJSONfileItems(obj,share,dir_path);
@@ -511,7 +508,7 @@ function goToPath(share, path){
 }
 
 // Handle the file tree view
-function collapsibleExpand(elem,popFiles){
+function collapsibleExpand(elem,divPopup){
   if (elem.id != event.target.id){
     return;
   }
@@ -522,8 +519,13 @@ function collapsibleExpand(elem,popFiles){
   var dirItems = "";
   var fileItems = "";
 
-  $('#selected_share').val(share);
-  $('#selected_dir').val(path);
+  if (divPopup){
+    $('#target_share').val(share);
+    $('#target_path').val(path);
+  } else {
+    $('#selected_share').val(share);
+    $('#selected_dir').val(share + '/' + path);
+  }
 
   $.getJSON('/cwa_browser/' + redmine_project + '/' + share + "/" + path, function(data){
 
@@ -533,9 +535,9 @@ function collapsibleExpand(elem,popFiles){
 
     $.each(data, function(key,obj){
       if (key == 'directories' && elem.className != 'dirExpanded'){
-        dirItems = getJSONdirItems(obj,share,path,popFiles);
+        dirItems = getJSONdirItems(obj,share,path,divPopup);
       }
-      if (key == 'files' && popFiles){
+      if (key == 'files' && !divPopup){
         fileItems = getJSONfileItems(obj,share,path);
       }
     });
@@ -548,7 +550,7 @@ function collapsibleExpand(elem,popFiles){
 
     setEntrySelected(elem);
     $(dirItems).appendTo(elem);
-    if (popFiles){
+    if (!divPopup){
       $("#fileContainer").html(fileItems);
       $("#current_dir").val(share + " => " + path);
     }

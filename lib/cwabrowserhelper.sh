@@ -41,8 +41,8 @@ case "$cmd" in
   zip)    cd ${argv[0]}; zip -q -r - "${argv[1]}" ;;
   rm)     rm -r "${argv[0]}" ;;
   rename) mv "${argv[0]}" "${argv[1]}" ;;
-  mv)     count=$(find ${argv[0]} | wc -l)
-          rsync --partial --progress --append -r -h --remove-source-files "${argv[0]}" "${argv[1]}" | pv -nls $count
+  mv)     count=$(find "${argv[0]}" | wc -l)
+          rsync -ai --remove-source-files "${argv[0]}" "${argv[1]}" 2>&1 | pv -nls $(((count*2)+4)) > /dev/null
     ;;
   stat)   stat -c "%s" "${argv[0]}" ;;
   mkdir)  mkdir "${argv[0]}" ;;

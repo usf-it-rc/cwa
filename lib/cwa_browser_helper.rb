@@ -17,28 +17,70 @@ module Redmine::CwaBrowserHelper
     end
 
     def rename(file, new_name)
-      Rails.logger.debug "userexec rename #{file} -- #{new_name}"
+
+      id = Digest::SHA512.hexdigest("MySaltySurprise" + 
+        (Time.now.to_i+Time.now.tv_usec+Time.now.tv_nsec).to_s +
+        file + new_name)
+
+      op_name = "fileop_rename_#{User.current.login}_#{id}"
+
+      myops = Rails.cache.read("file_operations_#{User.current.login}")
+
+      if myops.nil?
+        myops = [op_name]
+      else
+        myops << op_name
+      end
+
+      Rails.cache.write("file_operations_#{User.current.login}", myops)
+
       result = userexec "rename #{file} -- #{new_name}"
-      Rails.logger.debug "Redmine::CwaBrowserHelper.rename() #{result.to_s}"
+
+      status = Rails.cache.write(op_name, {
+          :file_name => file,
+          :id => id,
+          :progress => 100,
+          :status => result[2] == 0 ? 'complete' : 'failed',
+          :operation => 'move' 
+        }, expires_in: 30.seconds)
       return result[2] == 0 ? true : false
     end
 
     def remoteMove(source, target, move_id)
+      op_name = "fileop_move_#{User.current.login}_#{move_id}"
       Rails.logger.debug "mv #{source} -- #{target}"
       stdin, stdout, stderr, wait_thr = Open3.popen3(
         "sudo -u #{User.current.login} /usr/bin/cwabrowserhelper.sh mv #{source} -- #{target}"
         )
 
-      while !@stdout.eof?
-        progress = @stdout.read
-        Rails.cache.fetch("moveop_" + move_id) do
-          { :progress => progress.to_i }
-        end
+      myops = Rails.cache.read("file_operations_#{User.current.login}")
+
+      if myops.nil?
+        myops = [op_name]
+      else
+        myops << op_name
       end
 
-      status = Rails.cache.fetch("moveop_" + move_id) do
-        { :progress => 100 }
+      Rails.cache.write("file_operations_#{User.current.login}", myops)
+
+      while !@stdout.eof?
+        progress = @stdout.read
+        Rails.cache.write(op_name, { 
+            :file_name => source,
+            :id => move_id,
+            :progress => progress.to_i.nil? ? 0 : progress.to_i,
+            :status => 'in_progress',
+            :operation => 'move' 
+          })
       end
+
+      status = Rails.cache.write(op_name, {
+          :file_name => source,
+          :id => move_id,
+          :progress => 100,
+          :status => 'complete',
+          :operation => 'move' 
+        }, expires_in: 30.seconds)
 
       stdout.close
       stdin.close

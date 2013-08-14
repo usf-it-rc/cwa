@@ -254,7 +254,12 @@ class CwaBrowserController < ApplicationController
       move_id = Digest::SHA512.hexdigest("MySaltySurprise" + (Time.now.to_i+Time.now.tv_usec+Time.now.tv_nsec).to_s +
         path + target_path)
       Thread.new do
-        Redmine::CwaBrowserHelper.RemoteMove(path, target_path, move_id)
+        Rails.logger.debug("IM IN A THREAD BIATCH!")
+        begin
+          Redmine::CwaBrowserHelper.remoteMove(path, target_path, move_id)
+        ensure
+          Rails.logger.flush
+        end
       end
       #
       # Then we have to send back a JSON response to signal the beginning of the transfer
@@ -269,28 +274,28 @@ class CwaBrowserController < ApplicationController
   end
 
   # That's pretty easy.  Just check the status of the thread from the cache
-  def move_status
+  def op_status
     move_id = params[:move_id]
+    op_hash = { :operations => [] }
 
-    status = Rails.cache.fetch("browser_op_#{User.current.login}_move_" + move_id)
-    if status[:progress] != 100
-      status[:status] = "in-progress"
-    else
-      status[:status] = "complete"
+    ops = Rails.cache.fetch("file_operations_#{User.current.login}")
+    
+    ops.each do |op|
+      item = Rails.cache.fetch(op)
+      if item.nil?
+        ops.delete(item) 
+      else
+        op_hash[:operations] << item
+      end
     end
 
-    status[:code] = 200
-    status[:move_id] = move_id
-    
+    Rails.cache.write("file_operations_#{User.current.login}", ops)
+
     respond_to do |format|
-      format.json { render :json => status }
+      format.json { render :json => op_hash }
     end
   end
     
-  def browser_queue
-    # Need to get all keys and match ("browser_op_" + User.current.login .*)
-  end
-
   private
   def resolve_path(share,path)
 
