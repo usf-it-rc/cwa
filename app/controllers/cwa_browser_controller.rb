@@ -272,7 +272,7 @@ class CwaBrowserController < ApplicationController
   def move_status
     move_id = params[:move_id]
 
-    status = Rails.cache.fetch("moveop_" + move_id)
+    status = Rails.cache.fetch("browser_op_#{User.current.login}_move_" + move_id)
     if status[:progress] != 100
       status[:status] = "in-progress"
     else
@@ -287,6 +287,9 @@ class CwaBrowserController < ApplicationController
     end
   end
     
+  def browser_queue
+    # Need to get all keys and match ("browser_op_" + User.current.login .*)
+  end
 
   private
   def resolve_path(share,path)

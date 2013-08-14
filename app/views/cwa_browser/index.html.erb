@@ -123,12 +123,8 @@
   <%= button_to_function "Select", "startMove()" %>  
 </div>
 
-$('#move_progress_bar_status').val('starting');
-  $('#move_progress_bar').val(0);
-
-
-<div id="move_progress" class="progress">
-  
+<div id="queue_progress" class="browserProgress">
+</div>
   
 <script>
   goToPath("<%= params[:share] %>", "<%= params[:dir] %>");
