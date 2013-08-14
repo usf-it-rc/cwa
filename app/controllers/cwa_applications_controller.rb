@@ -122,7 +122,7 @@ class CwaApplicationsController < ApplicationController
 
     # Render haml from the database, include nice header
     haml = <<EOF
-= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css"
+= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/cwa.css"
 %h2 Run #{@app.name} v#{@app.version}
 #{@app.haml_form}
 EOF

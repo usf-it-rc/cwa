@@ -1,6 +1,8 @@
-<%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/appmanager.css" %>
-<script>
-  <%= render :formats => [:js], :partial => 'cwa_browser/browser' %>
+<%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/cwa.css" %>
+<%= javascript_include_tag "/plugin_assets/cwa/javascripts/browser.js" %>
+
+<script type="text/javascript">
+  redmine_project = "<%= @project.identifier %>";
 </script>
 
 <div style="margin: 18px">
@@ -120,6 +122,13 @@
   </div>
   <%= button_to_function "Select", "startMove()" %>  
 </div>
+
+$('#move_progress_bar_status').val('starting');
+  $('#move_progress_bar').val(0);
+
+
+<div id="move_progress" class="progress">
+  
   
 <script>
   goToPath("<%= params[:share] %>", "<%= params[:dir] %>");
