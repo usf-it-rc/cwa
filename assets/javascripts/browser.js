@@ -36,31 +36,33 @@ function cwaAction(action, promptString, confirmBool){
   item = item.split("/");
   item = item[item.length-1];
 
+  var file = $("#selected_file").val();
   var path = $("#selected_dir").val();
   var share = $("#selected_share").val();
+  var dir = $("#selected_dir").val();
+  dir = dir.split("/");
+  dir.shift();
+  dir = dir.join('/');
+  
   var argument;
   var continuation = false;
 
   if (promptString){
     argument = prompt(promptString);
-
     url = "/cwa_browser/" + redmine_project + "/";
-    url += share + "/";
-    if (path)
-      url += path + "/"; 
-    url += item + "/";
-    url += action + "/";
-    url += argument;
-
+    if (file){
+      url += file + '/' + action + '/' + argument;
+    } else {
+      url += path + '/' + action + '/' + argument;
+    }
     errorString = "Failed to " + action + " \"" + argument + "\"!";
   } else {
     url = "/cwa_browser/" + redmine_project + "/";
-    url += share + "/";
-    if (path)
-      url += path + "/";
-    url += item + "/";
-    url += action;
-
+    if (file){
+      url += file + '/' + action;
+    } else {
+      url += path + '/' + action;
+    }
     errorString = "Failed to " + action + " \"" + item + "\"!";
   }
 
@@ -71,7 +73,6 @@ function cwaAction(action, promptString, confirmBool){
   } else {
     continuation = true;
   }
-      
 
   if ((promptString && argument && continuation == true) || 
       (!promptString && !argument && continuation == true)){
@@ -89,7 +90,7 @@ function cwaAction(action, promptString, confirmBool){
           }
           window.location.assign("/cwa_browser/" + redmine_project + "/" + method + "/" + data.fid);
         } else {
-          window.location.assign("/cwa_browser/" + redmine_project + "/" + share + "/" + path);
+          goToPath(share, dir, false);
         }
       },
       error: function(data){ alert(errorString); }
@@ -309,47 +310,54 @@ function hideTail(){
 }
 
 // Show the move div
-function showMove(){
-  $('#move').css('display', "block");
+function showCopyMove(action){
+  $('#copymove').css('display', "block");
+  if (action == "move"){
+    $('#copymove_button').attr('value', 'Move');
+    $('#copymove_button').attr('onclick', "startCopyMove('move')");
+  } else {
+    $('#copymove_button').attr('value', 'Copy');
+    $('#copymove_button').attr('onclick', "startCopyMove('copy')");
+  }
 }
+
+function hideCopyMove(){
+  $('#copymove').css('display', 'none');
+}
+
 
 // polling function to get display progress of file operations
 var op_id = '';
-var move_interval;
-var move_status = function(){
+var op_interval;
+var op_status = function(){
   $.getJSON('/cwa_browser/' + redmine_project + '/op_status/', function(data){
     $.each(data, function(key,value){
       if (key == 'operations'){
+        var progress;
         if (!value.length){
-          clearInterval(move_interval);
+          clearInterval(op_interval);
           $('#queue_progress').html('');
           $('#queue_progress').css('display', 'none');
           return false;
         }
-        var op_status = [];
+        var op_items = [];
         $.each(value, function(key,op){
           // this will add divs and progress bars to a parent div defined
           // in the main view
-          if (op.progress == 100){
-            op_status.push('<div id="' + op.id + '" class="browserProgressElement"><p>' + op.operation + ' complete</p><p>' + op.file_name + '</p></div>');
-          } else {
-            op_status.push('<div id="' + op.id + '" class="browserProgressElement"><p>' + op.operation + ' ' + op.progress + '%</p><p>' + op.file_name + '</p></div>');
-          }
+
+          op_items.push('<div id="' + op.id + '" class="browserProgressElement"><div id="shade_' + op.id + '" class="browserProgressElementShader" style="width:' + op.progress + '%"></div>' + op.operation + ' ' + op.file_name + '<br/>Status: ' + op.status + '</div>');
         });
-        console.log(op_status.join('\n'));
-        $('#queue_progress').html(op_status.join('\n'));
+        $('#queue_progress').html(op_items.join('\n'));
       }
     });
   }); 
 };
 
 // Post a move to the server, initialize polling function to update progress indicator
-function startMove(){
-  $('#move').css('display', 'none');
-  $('#move_progress_bar_status').val('starting');
-  $('#move_progress_bar').val(0);
+function startCopyMove(action){
+  $('#copymove').css('display', 'none');
 
-  var url_action = moveUrlAction();
+  var url_action = copyMoveUrlAction(action);
 
   if (url_action){
     $.post('/cwa_browser/' + redmine_project + '/' + url_action, null, function(data){
@@ -359,9 +367,9 @@ function startMove(){
         }
         if (key == 'status'){
           $('#queue_progress').css('display', 'block');
-          move_status();
-          goToPath($('#target_share').val(),$('#target_path').val()); 
-          move_interval = setInterval(move_status, 5000);
+          op_status();
+          op_interval = setInterval(op_status, 5000);
+          goToPath($('#target_share').val(),$('#target_path').val(),false); 
         }
       });
     }, 'json');
@@ -369,7 +377,7 @@ function startMove(){
 }
 
 // Create a URL suffix based on the current selected_file, selected_dir, target_file, target_dir
-function moveUrlAction(){
+function copyMoveUrlAction(action){
   var selected_dir = $('#selected_dir').val();
   var selected_file = $('#selected_file').val();
   var target_share = $('#target_share').val();
@@ -382,15 +390,15 @@ function moveUrlAction(){
   if ((!selected_file && !selected_dir) || !target_share){
     alert("Source and/or Target not properly set!");
   } else if (selected_file && target_share && !target_path){
-    url = selected_file + '/move/' + target_share;
+    url = selected_file + '/' + action + '/' + target_share;
   } else if (selected_file && target_share && target_path){
-    url = selected_file + '/move/' + target_share + '/' + target_path;
+    url = selected_file + '/' + action + '/' + target_share + '/' + target_path;
   } else if (!selected_file && selected_dir && target_share && target_path){
-    url = selected_dir + '/move/' + target_share + '/' + target_path;
+    url = selected_dir + '/' + action + '/' + target_share + '/' + target_path;
   } else if (!selected_file && selected_dir && target_share && !target_path){
-    url = selected_dir + '/move/' + target_share;
+    url = selected_dir + '/' + action + '/' + target_share;
   } else {
-    alert("Invalid move request");
+    alert("Invalid " + action + " request");
   }
 
   console.log(url);
@@ -444,8 +452,8 @@ function setEntrySelected(elem){
   $(elem).css("font-weight", "bold");
 }
 
-// Expand tree based on current path
-function goToPath(share, path){
+// Expand tree based on a provided path
+function goToPath(share, path, divPopup){
   var dirItems = "";
   var fileItems = "";
   var path_elements = [];
@@ -456,6 +464,14 @@ function goToPath(share, path){
   if (share == ""){
     share = "home";
   }
+
+  if (!divPopup){
+    $('#selected_dir').val('');
+    $('#selected_file').val('');
+  }
+
+  $('#target_share').val('');
+  $('#target_path').val('');
 
   path_elements = [share];
 
@@ -491,7 +507,7 @@ function goToPath(share, path){
         if (key == 'directories'){
           dirItems = getJSONdirItems(obj,share,dir_path,false);
         }
-        if (key == 'files'){
+        if (key == 'files' && !divPopup){
           fileItems = getJSONfileItems(obj,share,dir_path);
         }
       });
@@ -500,14 +516,17 @@ function goToPath(share, path){
 
       setEntrySelected(elem);
       $(elem).attr('class','dirExpanded');
+      $(elem).find('ul li').remove();
       $(dirItems).appendTo(elem);
-      $("#fileContainer").html(fileItems);
+      if (!divPopup){
+        $("#fileContainer").html(fileItems);
+      }
     });
   });
   $("#current_dir").val(share + " => " + path);
 }
 
-// Handle the file tree view
+// Expand tree and navigate based on current selected element
 function collapsibleExpand(elem,divPopup){
   if (elem.id != event.target.id){
     return;

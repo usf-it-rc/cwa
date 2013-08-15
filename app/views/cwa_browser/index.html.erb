@@ -100,7 +100,8 @@
   <div class="menuItem" onclick="cwaAction('download', null, false)">Download as Zip</div>
   <div class="menuItem" onclick="cwaAction('rename','Enter new name for directory:', false)">Rename...</div>
   <div class="menuItem" onclick="cwaAction('delete',null, true)">Delete...</div>
-  <div class="menuItem" onclick="showMove()">Move...</div>
+  <div class="menuItem" onclick="showCopyMove('move')">Move...</div>
+  <div class="menuItem" onclick="showCopyMove('copy')">Copy...</div>
 </div>
 
 <div id="menuFile" class="menu">
@@ -108,10 +109,11 @@
   <div class="menuItem" onclick="showTail()">Tail...</div>
   <div class="menuItem" onclick="cwaAction('rename', 'Enter new name for file:', false)">Rename...</div>
   <div class="menuItem" onclick="cwaAction('delete',null, true)">Delete...</div>
-  <div class="menuItem" onclick="showMove()">Move...</div>
+  <div class="menuItem" onclick="showCopyMove('move')">Move...</div>
+  <div class="menuItem" onclick="showCopyMove('copy')">Copy...</div>
 </div>
 
-<div id="move" class="miniapp" style="width: 25%; height: 75%;">
+<div id="copymove" class="miniapp" style="width: 25%; height: 75%;">
   <div class="box dirSelector" id="dirContainerSelector" style="width:95%; height:90%; max-height: 90%; padding-right: 0px;">
     <div id="dirBoxTitle"><b>Select Destination...</b></div>
     <hr/>
@@ -122,12 +124,14 @@
       <% end %>
     </ul>
   </div>
-  <%= button_to_function "Select", "startMove()" %>  
+  <%= button_to_function "STUB", "startCopyMove()", :id => 'copymove_button' %>  
+  <%= button_to_function "Cancel", "hideCopyMove()" %>  
 </div>
 
+<!-- We pop up divs in here for the progress of various file operations -->
 <div id="queue_progress" class="browserProgress">
 </div>
   
 <script>
-  goToPath("<%= params[:share] %>", "<%= params[:dir] %>");
+  goToPath("<%= params[:share] %>", "<%= params[:dir] %>", false);
 </script>

@@ -541,19 +541,15 @@ table.fileItem th {
 
 div.browserProgress {
   display: none;
-  position: bottom;
   position: absolute;
   bottom: 0px;
-  padding: 0px;
-  margin-left: -16px;
-  margin-right: 0px;
-  width: 100%;
+  width: 99%;
   height: 36px;
+  margin-top: -8px;
 }
 
 div.browserProgressElement {
   padding: 2px;
-  display: block;
   position: relative;
   float: right;
   font-size: 0.7em;
@@ -565,6 +561,13 @@ div.browserProgressElement {
   margin-left: 4px;
 }
 
-.browserProgressElement p {
-  padding: 2px;
+.browserProgressElementShader {
+  position:absolute;
+  left:0px;
+  top:0px;
+  background-color: #6699FF;
+  float:left;
+  height: 100%;
+  opacity: 0.5;
+  filter:alpha(opacity=40);
 }

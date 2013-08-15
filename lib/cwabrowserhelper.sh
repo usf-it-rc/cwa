@@ -30,7 +30,7 @@ for ((i=0;i<=len;i++)); do
   val1=$?
 
   if (((val1 + val2) > 1 )); then
-    echo "There's something fishing going on here."
+    echo "There's something fishy going on here."
     exit 1
   fi
 done
@@ -41,14 +41,17 @@ case "$cmd" in
   zip)    cd ${argv[0]}; zip -q -r - "${argv[1]}" ;;
   rm)     rm -r "${argv[0]}" ;;
   rename) mv "${argv[0]}" "${argv[1]}" ;;
+  cp)     count=$(find "${argv[0]}" | wc -l)
+          rsync -ai "${argv[0]}" "${argv[1]}" 2>&1 | pv -nls $(((count)+4)) > /dev/null
+    ;;
+  mkdir)  mkdir "${argv[0]}" ;;
   mv)     count=$(find "${argv[0]}" | wc -l)
-          rsync -ai --remove-source-files "${argv[0]}" "${argv[1]}" 2>&1 | pv -nls $(((count*2)+4)) > /dev/null
+          rsync -ai --remove-source-files "${argv[0]}" "${argv[1]}" 2>&1 | pv -nls $(((count)+4)) > /dev/null && ([ -d "${argv[0]}"] && rmdir -r "${argv[0]}")
     ;;
   stat)   stat -c "%s" "${argv[0]}" ;;
   mkdir)  mkdir "${argv[0]}" ;;
   lines)  wc -l "${argv[0]}" | awk '{ print $1 }' ;;
   type)   file -bi "${argv[0]}" ;;
-  list)   find "${argv[0]}" ! -path "${argv[0]}" ! -type l ! -iname '.*' -maxdepth 1 -type ${argv[1]} \
-            -printf "%f::%s::%u::%g::%m::%CD %Cr %CZ\n" | sort -f ;;
+  list)   find "${argv[0]}" ! -path "${argv[0]}" ! -type l ! -iname '.*' -maxdepth 1 -type ${argv[1]} -printf "%f::%s::%u::%g::%m::%CD %Cr %CZ\n" | sort -f ;;
   *) echo "No way, Jose!"; exit 1 ;;
 esac

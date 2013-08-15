@@ -4,7 +4,7 @@ class CwaBrowserController < ApplicationController
   include CwaIpaAuthorize
 
   before_filter :find_project, :authorize, :ipa_authorize
-  accept_api_auth :index, :mkdir, :rename, :delete, :download, :get, :upload, :move
+  accept_api_auth :index, :mkdir, :rename, :delete, :download, :get, :upload, :move, :copy, :op_status
 
   def index
     @groups = CwaGroups.new
@@ -233,10 +233,11 @@ class CwaBrowserController < ApplicationController
   end
 
   def move
+    user = User.current.login
     path = resolve_path(params[:share], params[:path])
     target_path = resolve_path(params[:target_share], params[:target_path])
     response = {}
- 
+
     # Check to see if shares match.  If so, simple mv will do
     if params[:share] == params[:target_share]
       # use rename, its just the mv command
@@ -250,23 +251,52 @@ class CwaBrowserController < ApplicationController
     else
       # Now we have to kick off an asynchronous task that feeds data to a cache
       # based on the hash of the transfer components
-
       move_id = Digest::SHA512.hexdigest("MySaltySurprise" + (Time.now.to_i+Time.now.tv_usec+Time.now.tv_nsec).to_s +
         path + target_path)
       Thread.new do
         Rails.logger.debug("IM IN A THREAD BIATCH!")
         begin
-          Redmine::CwaBrowserHelper.remoteMove(path, target_path, move_id)
+          Redmine::CwaBrowserHelper.remoteMove(path, target_path, move_id, user)
         ensure
           Rails.logger.flush
         end
       end
-      #
+      
       # Then we have to send back a JSON response to signal the beginning of the transfer
       response[:status] = "started"
       response[:code] = 200
       response[:move_id] = move_id
     end
+  
+    respond_to do |format|
+      format.json { render :json => response }
+    end
+  end
+
+  def copy
+    path = resolve_path(params[:share], params[:path])
+    target_path = resolve_path(params[:target_share], params[:target_path])
+    user = User.current.login
+    response = {}
+
+    # Now we have to kick off an asynchronous task that feeds data to a cache
+    # based on the hash of the transfer components
+
+    copy_id = Digest::SHA512.hexdigest("MySaltySurprise" + (Time.now.to_i+Time.now.tv_usec+Time.now.tv_nsec).to_s +
+              path + target_path)
+    Thread.new do
+      Rails.logger.debug("IM IN A THREAD BIATCH!")
+      begin
+        Redmine::CwaBrowserHelper.copy(path, target_path, copy_id, user)
+      ensure
+        Rails.logger.flush
+      end
+    end
+      
+    # Then we have to send back a JSON response to signal the beginning of the transfer
+    response[:status] = "started"
+    response[:code] = 200
+    response[:copy_id] = copy_id
   
     respond_to do |format|
       format.json { render :json => response }

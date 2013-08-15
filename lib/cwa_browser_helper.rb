@@ -46,14 +46,14 @@ module Redmine::CwaBrowserHelper
       return result[2] == 0 ? true : false
     end
 
-    def remoteMove(source, target, move_id)
-      op_name = "fileop_move_#{User.current.login}_#{move_id}"
-      Rails.logger.debug "mv #{source} -- #{target}"
+    def remoteMove(source, target, move_id, user)
+      op_name = "fileop_move_#{user}_#{move_id}"
+      Rails.logger.debug "#{user} => mv #{source} -- #{target}"
       stdin, stdout, stderr, wait_thr = Open3.popen3(
-        "sudo -u #{User.current.login} /usr/bin/cwabrowserhelper.sh mv #{source} -- #{target}"
+        "sudo -u #{user} /usr/bin/cwabrowserhelper.sh mv #{source} -- #{target}"
         )
 
-      myops = Rails.cache.read("file_operations_#{User.current.login}")
+      myops = Rails.cache.read("file_operations_#{user}")
 
       if myops.nil?
         myops = [op_name]
@@ -61,16 +61,24 @@ module Redmine::CwaBrowserHelper
         myops << op_name
       end
 
-      Rails.cache.write("file_operations_#{User.current.login}", myops)
+      Rails.cache.write("file_operations_#{user}", myops)
+      Rails.cache.write(op_name, { 
+        :file_name => source,
+        :id => move_id,
+        :progress => 0,
+        :status => 'Starting',
+        :operation => 'Move' 
+      })
 
-      while !@stdout.eof?
-        progress = @stdout.read
+      while !stderr.eof?
+        progress = stderr.readline
+        Rails.logger.debug "remoteMove: #{progress}"
         Rails.cache.write(op_name, { 
             :file_name => source,
             :id => move_id,
             :progress => progress.to_i.nil? ? 0 : progress.to_i,
-            :status => 'in_progress',
-            :operation => 'move' 
+            :status => 'In Progress',
+            :operation => 'Move' 
           })
       end
 
@@ -78,8 +86,8 @@ module Redmine::CwaBrowserHelper
           :file_name => source,
           :id => move_id,
           :progress => 100,
-          :status => 'complete',
-          :operation => 'move' 
+          :status => 'Complete',
+          :operation => 'Move' 
         }, expires_in: 30.seconds)
 
       stdout.close
@@ -89,6 +97,57 @@ module Redmine::CwaBrowserHelper
       return exit_status
     end
       
+    def copy(source, target, copy_id, user)
+      op_name = "fileop_copy_#{user}_#{copy_id}"
+      Rails.logger.debug "#{user} => cp #{source} -- #{target}"
+      stdin, stdout, stderr, wait_thr = Open3.popen3(
+        "sudo -u #{user} /usr/bin/cwabrowserhelper.sh cp #{source} -- #{target}"
+        )
+
+      myops = Rails.cache.read("file_operations_#{user}")
+
+      if myops.nil?
+        myops = [op_name]
+      else
+        myops << op_name
+      end
+
+      # Get our first op data into the cache
+      Rails.cache.write("file_operations_#{user}", myops)
+      Rails.cache.write(op_name, { 
+        :file_name => source,
+        :id => copy_id,
+        :progress => 0,
+        :status => 'starting',
+        :operation => 'Copy' 
+      })
+
+      while !stderr.eof?
+        progress = stderr.readline
+        Rails.logger.debug "COPY: #{progress}"
+        Rails.cache.write(op_name, { 
+          :file_name => source,
+          :id => copy_id,
+          :progress => progress.to_i.nil? ? 0 : progress.to_i,
+          :status => 'in_progress',
+          :operation => 'Copy' 
+        })
+      end
+
+      status = Rails.cache.write(op_name, {
+        :file_name => source,
+        :id => copy_id,
+        :progress => 100,
+        :status => 'complete',
+        :operation => 'Copy' 
+      }, expires_in: 30.seconds)
+
+      stdout.close
+      stdin.close
+      stderr.close
+      exit_status = wait_thr.value
+      return exit_status
+    end
 
     def delete(file)
       Rails.logger.debug "userexec rm #{file}"

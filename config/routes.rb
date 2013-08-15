@@ -93,6 +93,21 @@ post 'cwa_browser/:project_id/*share/*path/move/*target_share/*target_path',
   #:path => /[^\0]+/,
   :target_path => /[^\0]+/
 
+# file copy goodness
+post 'cwa_browser/:project_id/*share/*path/copy/*target_share',
+  :to => 'cwa_browser#copy',
+  :share => /(home|shares|work)/,
+  :target_share => /(home|shares|work)/
+  #:path => /[^\0]+/
+
+# Case where we're moving from the share/path to a share/path
+post 'cwa_browser/:project_id/*share/*path/copy/*target_share/*target_path',
+  :to => 'cwa_browser#copy',
+  :share => /(home|shares|work)/,
+  :target_share => /(home|shares|work)/,
+  #:path => /[^\0]+/,
+  :target_path => /[^\0]+/
+
 get 'cwa_browser/:project_id/op_status',
   :to => 'cwa_browser#op_status'
 
