@@ -2,18 +2,16 @@ require 'rsgejob'
 
 class CwaApplicationsController < ApplicationController
   unloadable
+  include CwaIpaAuthorize
+
+  before_filter :find_project, :authorize, :ipa_authorize
 
   def new
     @app = CwaApplication.new
-    @project = Project.find(params[:project_id])
-
     render :action => 'show', :project_id => params[:project_id]
   end
 
   def show
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-    @project = Project.find(params[:project_id])
     @app = CwaApplication.find(params[:id])
     Rails.logger.debug "Apps::Show => #{@app.to_s}"
     respond_to do |format|
@@ -22,7 +20,6 @@ class CwaApplicationsController < ApplicationController
   end
 
   def update
-    @project = Project.find(params[:project_id])
     # Look for CamelCase declarations and squash them
     haml_form = params[:cwa_application][:haml_form]
     if haml_form =~ /\=\W*[A-Z]([A-Z0-9]*[a-z][a-z0-9]*[A-Z]|[a-z0-9]*[A-Z][A-Z0-9]*[a-z])[A-Za-z0-9]\.*/
@@ -41,8 +38,6 @@ class CwaApplicationsController < ApplicationController
   end
 
   def new
-    @project = Project.find(params[:project_id])
-
     if params[:cwa_application].nil?
       @app = CwaApplication.new
       render :action => 'show', :project_id => params[:project_id]
@@ -83,9 +78,6 @@ class CwaApplicationsController < ApplicationController
   end
 
   def index
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-    @project = Project.find(params[:project_id])
     @apps = CwaApplication.find_all_by_project_id(@project.id).sort_by &:name
 
     respond_to do |format|
@@ -94,9 +86,6 @@ class CwaApplicationsController < ApplicationController
   end
 
   def display
-    @user = CwaIpaUser.new
-    (redirect_to :controller => 'cwa_default', :action => 'not_activated' and return) if !@user.provisioned?
-    @project = Project.find(params[:project_id])
     @app = CwaApplication.find(params[:id])
     grp = CwaGroups.new
     @job = RsgeJob.new
@@ -120,13 +109,17 @@ class CwaApplicationsController < ApplicationController
 
     (grp.that_i_manage + grp.member_of).each {|g| @groups << g[:cn]}
 
-    # Render haml from the database, include nice header
-    haml = <<EOF
-= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/cwa.css"
-%h2 Run #{@app.name} v#{@app.version}
-#{@app.haml_form}
-EOF
-    render :inline => haml, :type => 'haml', :layout => true
+    # View will render haml from the model
+    @haml = @app.haml_form
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  private
+  def find_project
+    @project = Project.find(params[:project_id])
   end
 
 end

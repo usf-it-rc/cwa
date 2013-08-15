@@ -1,0 +1,57 @@
+<%= javascript_include_tag "/plugin_assets/cwa/javascripts/browser.js" %>
+<%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/cwa.css" %>
+
+<script type="text/javascript">
+  redmine_project = "<%= @project.identifier %>";
+</script>
+
+<div class="box">
+  <h3>Submit <%= @app.name %> <%= @app.version %> job...</h3>
+  <%= form_tag "/cwa_jobmanager/#{@project.identifier}/submit", :id => 'app_form', :multipart => true do %>
+
+    <%= hidden_field_tag :selected_item, nil %>
+    <%= hidden_field_tag :selected_dir, nil %>
+    <%= hidden_field_tag :selected_file, nil %>
+    <%= hidden_field_tag :selected_share, @browser.current_share %>
+    <%= hidden_field_tag :app_id, @app.id %>
+
+    <%= render :inline => @haml, :type => 'haml' %>
+    <%= submit_tag "Submit" %>
+  <% end %>
+</div>
+
+<!-- hidden div for file and directory selection -->
+<div id="copymove" class="floating_browser">
+  <div class="box dirSelector" style="height:100%" id="dirContainer">
+    <div id="dirBoxTitle" style="float:left; padding-top: 6px; margin: 8px;">
+      <b>Data Stores</b>
+    </div>
+    <hr/>
+    <ul class="dir">
+    <% ([["home",nil,"home.svg"],["work",nil,"netshare.svg"]]).each do |store| %>
+      <% id = store[1].nil? ? store[0] + "." : store[0] + "#" + store[1] %>
+      <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this,false)"><%= store[1].nil? ? store[0] : store[1] %></li>
+    <% end %>
+    </ul>
+  </div>
+
+  <div class="box fileSelector" style="height:100%">
+    <table class="fileItem">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Owner</th>
+        <th>Group</th>
+        <th>Mode</th>
+        <th>Change Time</th>
+      </tr>
+      </thead>
+      <tbody id="fileContainer">
+      </tbody>
+    </table>
+  </div>
+  <div style="height: 48px; width: 100%;">
+    <%= button_to_function "Select file...", "startCopyMove('select',null)", :id => 'copymove_button' %>
+    <%= button_to_function "Cancel", "hideCopyMove()" %>
+  </div>
+</div>

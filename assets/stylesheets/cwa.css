@@ -379,6 +379,27 @@ div.miniapp {
   filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#333333');
 }
 
+div.floating_browser {
+  position: absolute;
+  padding: 12px;
+  background: #CDD3D6;
+  border: 4px solid #000000;
+  height: 80%;
+  width: 80%;
+  margin: auto;
+  top: 0; left: 0; bottom: 0; right: 0;
+  display: none;
+  z-index: 100;
+
+  -moz-box-shadow: 8px 8px 10px #333;
+  -webkit-box-shadow: 8px 8px 10px #333;
+  box-shadow: 8px 8px 10px #333;
+  /* For IE 8 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#333333')";
+  /* For IE 5.5 - 7 */
+  filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#333333');
+}
+
 textarea#tail_content {
   height: 90%;
   width:  95%;
@@ -401,25 +422,26 @@ table.sortableList th .desc {
   background-image: url(/plugin_assets/cwa/images/arrow-dn.png);
 }
 
+div.browserBox {
+  width: 100%;
+}
+
 div.dirSelector {
-  padding: 12px;
   padding-top: 0px;
-  padding-bottom: 4px;
   width: 20%;
   overflow: auto;
   min-height: 256px;
-  max-height: 700px;
+  max-height: 92%;
   float: left;
 }
 
 div.fileSelector {
   padding: 8px;
-  width: 75%;
+  min-width: 50%;
+  max-width: 80%;
   min-height: 256px;
-  max-height: 700px;
+  max-height: 92%;
   overflow: auto;
-  float: left;
-  margin-left: 12px;
 }
 
 .dir, .dirExpanded li, ul {

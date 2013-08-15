@@ -51,17 +51,17 @@ function cwaAction(action, promptString, confirmBool){
     argument = prompt(promptString);
     url = "/cwa_browser/" + redmine_project + "/";
     if (file){
-      url += file + '/' + action + '/' + argument;
+      url += share + '/' + file + '/' + action + '/' + argument;
     } else {
-      url += path + '/' + action + '/' + argument;
+      url += share + '/' + path + '/' + action + '/' + argument;
     }
     errorString = "Failed to " + action + " \"" + argument + "\"!";
   } else {
     url = "/cwa_browser/" + redmine_project + "/";
     if (file){
-      url += file + '/' + action;
+      url += share + '/' + file + '/' + action;
     } else {
-      url += path + '/' + action;
+      url += share + '/' + path + '/' + action;
     }
     errorString = "Failed to " + action + " \"" + item + "\"!";
   }
@@ -98,31 +98,6 @@ function cwaAction(action, promptString, confirmBool){
   }
 };
 
-function chdir(elem){
-  components = path_components(elem);
-  share = components.share;
-  path = components.path;
-  window.location = "/cwa_browser/" + redmine_project + "/" + share + "/" + path;
-};
-
-function chdirAppMgr(elem){
-  [share,path] = path_components(elem);
-  if (path != ""){
-    url_path = "share=" + share + "&dir=" + encodeURIComponent(path);
-  } else {
-    url_path = "share=" + share;
-  }
-  window.location = "<%= request.path %>?" + url_path + "&" + $('#app_form').serialize();
-};
-
-function back(){
-  window.location = "/cwa_browser/" + redmine_project + "/<%= @browser.current_share %>/<%= @browser.up_dir %>";
-};
-
-function backAppMgr(){
-  window.location = "<%= request.path %>?share=<%= @browser.current_share %>&dir=" + encodeURIComponent("<%= @browser.up_dir %>") + "&" + $('#app_form').serialize();
-};
-
 // Dustin Diaz's getElementsByClass to search for elements by class name regex
 function getElementsByClass(searchClass,node,tag) {
   var classElements = new Array();
@@ -153,28 +128,6 @@ function clear_selected(){
   }
 }
 
-// these methods are for mini-browsers for job submission
-function set_selected_dir(elem, dir){
-  $("#selected_dir").val(dir);
-  var className = elem.className;
-  var re = new RegExp(".*Selected$");
-  if (!elem.className.match(re)){
-    clear_selected();
-    elem.className = className + "Selected";
-  }
-}
-
-function set_selected_file(elem, dir, file){
-  $("#selected_dir").val(dir);
-  $("#selected_file").val(dir + "/" + file);
-  var className = elem.className;
-  var re = new RegExp(".*Selected$");
-  if (!elem.className.match(re)){
-    clear_selected();
-    elem.className = className + "Selected";
-  }
-}
-
 // these methods are for the full file browser
 function select_directory(elem, divPopup){
   var className = elem.className;
@@ -192,7 +145,7 @@ function select_directory(elem, divPopup){
     $("#target_share").val(share);
     $("#target_path").val(path);
   } else {
-    $("#selected_dir").val(share + "/" + path);
+    $("#selected_dir").val(path);
     $("#selected_item").val(share + "/" + path);
   }
 }
@@ -209,7 +162,7 @@ function select_file(elem) {
   share = components.share;
   path = components.path;
 
-  $("#selected_file").val(share + "/" + path);
+  $("#selected_file").val(path);
   $("#selected_item").val(share + "/" + path);
 }
 
@@ -272,6 +225,7 @@ function hideUploadFile(){
 }
 
 function uploadFile(){
+  console.log("Uploading to " + $('#selected_share').val() + '/' + $('#selected_dir').val());
   if ($('#selected_dir').val() == ''){
     var url = '/cwa_browser/' + redmine_project + '/' + $('#selected_share').val() + '/upload';
   } else {
@@ -310,14 +264,18 @@ function hideTail(){
 }
 
 // Show the move div
-function showCopyMove(action){
+function showCopyMove(action,elem_id){
   $('#copymove').css('display', "block");
   if (action == "move"){
     $('#copymove_button').attr('value', 'Move');
-    $('#copymove_button').attr('onclick', "startCopyMove('move')");
-  } else {
+    $('#copymove_button').attr('onclick', "startCopyMove('move',null)");
+  } else if (action == "copy") {
     $('#copymove_button').attr('value', 'Copy');
-    $('#copymove_button').attr('onclick', "startCopyMove('copy')");
+    $('#copymove_button').attr('onclick', "startCopyMove('copy',null)");
+  } else if (action == "select"){
+    $('#copymove_button').attr('value', 'Select file...');
+    $('#copymove_button').attr('onclick', "startCopyMove('select','" + elem_id + "')");
+    goToPath("home",'',false);
   }
 }
 
@@ -354,8 +312,17 @@ var op_status = function(){
 };
 
 // Post a move to the server, initialize polling function to update progress indicator
-function startCopyMove(action){
+function startCopyMove(action, elem_id){
   $('#copymove').css('display', 'none');
+  if (action == "select"){
+    console.log("SELECTED_FILE: " + $('#selected_file').val());
+    var file_elem = document.getElementById(elem_id);
+    var file_label_elem = document.getElementById(elem_id + "_selected");
+    $(file_elem).html($('#selected_file').val());
+    $(file_label_elem).html('[ ' +$('#selected_share').val() + ' ] / ' + $('#selected_file').val());
+    
+    return;
+  }
 
   var url_action = copyMoveUrlAction(action);
 
@@ -378,6 +345,7 @@ function startCopyMove(action){
 
 // Create a URL suffix based on the current selected_file, selected_dir, target_file, target_dir
 function copyMoveUrlAction(action){
+  var selected_share = $('#selected_share').val();
   var selected_dir = $('#selected_dir').val();
   var selected_file = $('#selected_file').val();
   var target_share = $('#target_share').val();
@@ -387,16 +355,16 @@ function copyMoveUrlAction(action){
   console.log("sd:" + selected_dir + " sf:" + selected_file +
         " ts:" + target_share + " tp:" + target_path);
 
-  if ((!selected_file && !selected_dir) || !target_share){
+  if (!selected_share || (!selected_file && !selected_dir) || !target_share){
     alert("Source and/or Target not properly set!");
   } else if (selected_file && target_share && !target_path){
-    url = selected_file + '/' + action + '/' + target_share;
+    url = selected_share + '/' + selected_file + '/' + action + '/' + target_share;
   } else if (selected_file && target_share && target_path){
-    url = selected_file + '/' + action + '/' + target_share + '/' + target_path;
+    url = selected_share + '/' + selected_file + '/' + action + '/' + target_share + '/' + target_path;
   } else if (!selected_file && selected_dir && target_share && target_path){
-    url = selected_dir + '/' + action + '/' + target_share + '/' + target_path;
+    url = selected_share + '/' + selected_dir + '/' + action + '/' + target_share + '/' + target_path;
   } else if (!selected_file && selected_dir && target_share && !target_path){
-    url = selected_dir + '/' + action + '/' + target_share;
+    url = selected_share + '/' + selected_dir + '/' + action + '/' + target_share;
   } else {
     alert("Invalid " + action + " request");
   }
@@ -543,7 +511,7 @@ function collapsibleExpand(elem,divPopup){
     $('#target_path').val(path);
   } else {
     $('#selected_share').val(share);
-    $('#selected_dir').val(share + '/' + path);
+    $('#selected_dir').val(path);
   }
 
   $.getJSON('/cwa_browser/' + redmine_project + '/' + share + "/" + path, function(data){
@@ -583,6 +551,8 @@ function path_components(elem){
   var share = parts[0];
   parts.shift();
   var path = parts.join('.');
+
+  console.log("Share: " + share + " Path: " + path);
   
   return {
     share: share,

@@ -12,6 +12,7 @@
   <% @jobs.each do |job| %>
     <% jobs_hist = CwaJobHistory.find_by_jobid(job.jobid) %>
     <% workdir = jobs_hist.workdir if jobs_hist != nil %>
+    <% Rails.logger.debug "ALSDFJALSDF => #{workdir}" %>
     <% browser = CwaBrowser.new workdir, nil %>
 
     <% if job.state == "r" %>

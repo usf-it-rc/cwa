@@ -30,10 +30,13 @@
     <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/move.svg');" onclick="showMove()" title="Move File..."></div>
   </div>
 
-  <div>
+  <div class="browserBox">
     <div class="box dirSelector" id="dirContainer">
-      <div id="dirBoxTitle" style="float:left; padding-top: 6px; margin: 8px;"><b>Data Stores</b></div>
-      <div class="toolButton" style="float: right; margin: 8px; background-image: url('/plugin_assets/cwa/images/mkdir.svg');" onclick="cwaAction('mkdir','Specify directory name to be created:',false)" title="New Folder..."></div>
+      <div id="dirBoxTitle" style="float:left; padding-top: 6px; margin: 8px;">
+        <b>Data Stores</b>
+      </div>
+      <div class="toolButton" style="float: right; margin: 8px; background-image: url('/plugin_assets/cwa/images/mkdir.svg');" onclick="cwaAction('mkdir','Specify directory name to be created:',false)" title="New Folder...">
+      </div>
       <hr/>
       <ul class="dir">
       <% ([["home",nil,"home.svg"],["work",nil,"netshare.svg"]] + @group_list.map {|g| [ "shares", g[:cn], "netshare.svg"]}).each do |store| %>
@@ -100,8 +103,8 @@
   <div class="menuItem" onclick="cwaAction('download', null, false)">Download as Zip</div>
   <div class="menuItem" onclick="cwaAction('rename','Enter new name for directory:', false)">Rename...</div>
   <div class="menuItem" onclick="cwaAction('delete',null, true)">Delete...</div>
-  <div class="menuItem" onclick="showCopyMove('move')">Move...</div>
-  <div class="menuItem" onclick="showCopyMove('copy')">Copy...</div>
+  <div class="menuItem" onclick="showCopyMove('move',null)">Move...</div>
+  <div class="menuItem" onclick="showCopyMove('copy',null)">Copy...</div>
 </div>
 
 <div id="menuFile" class="menu">
@@ -109,8 +112,8 @@
   <div class="menuItem" onclick="showTail()">Tail...</div>
   <div class="menuItem" onclick="cwaAction('rename', 'Enter new name for file:', false)">Rename...</div>
   <div class="menuItem" onclick="cwaAction('delete',null, true)">Delete...</div>
-  <div class="menuItem" onclick="showCopyMove('move')">Move...</div>
-  <div class="menuItem" onclick="showCopyMove('copy')">Copy...</div>
+  <div class="menuItem" onclick="showCopyMove('move',null)">Move...</div>
+  <div class="menuItem" onclick="showCopyMove('copy',null)">Copy...</div>
 </div>
 
 <div id="copymove" class="miniapp" style="width: 25%; height: 75%;">

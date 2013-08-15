@@ -74,6 +74,8 @@ class CwaJobmanagerController < ApplicationController
       @job.job_name = params[:job_name]
     end
 
+    
+
     # sanitize the selected_file parameter
     if params[:selected_file] != nil
       if params[:selected_file] !~ ::CwaConstants::JOBPATH_REGEX
@@ -81,12 +83,12 @@ class CwaJobmanagerController < ApplicationController
         redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id], :project_id => params[:project_id]
         return
       end
-      params[:selected_dir] = params[:selected_file].gsub(/(.*)\/.*$/, '\1')
+      #params[:selected_dir] = params[:selected_file].gsub(/(.*)\/.*$/, '\1')
     end
 
-    if params[:selected_dir] == nil && params[:current_dir] != nil
-      params[:selected_dir] = params[:current_dir]
-    end
+    #if params[:selected_dir] == nil && params[:current_dir] != nil
+    #  params[:selected_dir] = params[:current_dir]
+    #end
 
     # And selected_dir
     if params[:selected_dir] !~ ::CwaConstants::JOBPATH_REGEX
@@ -131,6 +133,29 @@ class CwaJobmanagerController < ApplicationController
 
   def find_project
     @project = Project.find(params[:project_id])
+  end
+
+  def resolve_path(share,path)
+    if path != nil
+      case share
+      when "home"
+        file = @ipa_user.homedirectory + "/" + path
+      when "work"
+        file = @ipa_user.workdirectory + "/" + path
+      when "shares"
+        file = "/shares/" + path
+      end
+    else
+      case share
+      when "home"
+        file = @ipa_user.homedirectory
+      when "work"
+        file = @ipa_user.workdirectory
+      when "shares"
+        file = nil
+      end
+    end
+    file
   end
 
 end
