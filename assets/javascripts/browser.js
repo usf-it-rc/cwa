@@ -145,6 +145,7 @@ function select_directory(elem, divPopup){
     $("#target_share").val(share);
     $("#target_path").val(path);
   } else {
+    $("#selected_share").val(share);
     $("#selected_dir").val(path);
     $("#selected_item").val(share + "/" + path);
   }
@@ -164,6 +165,7 @@ function select_file(elem) {
 
   $("#selected_file").val(path);
   $("#selected_item").val(share + "/" + path);
+  $("#selected_share").val(share);
 }
 
 function showMenu(event, elementId) {
@@ -267,14 +269,14 @@ function hideTail(){
 function getSelectedDir(elem_id){
   $('#minibrowser').css('display', 'block');
   $('#minibrowser_button').attr('value', 'Select directory...');
-  $('#minibrowser_button').attr('onclick', "miniBrowserSelectItem('dir', '" + elem_id + "')");
+  $('#minibrowser_button').attr('onclick', "miniBrowserSelectItem('dir', '" + elem_id + "',null)");
   goToPath("home",'',false);
 }
 
-function getSelectedFile(elem_id){
+function getSelectedFile(elem_id,inferWorkDir){
   $('#minibrowser').css('display', 'block');
   $('#minibrowser_button').attr('value', 'Select file...');
-  $('#minibrowser_button').attr('onclick', "miniBrowserSelectItem('file', '" + elem_id + "')");
+  $('#minibrowser_button').attr('onclick', "miniBrowserSelectItem('file', '" + elem_id + "','" + inferWorkDir + "')");
   goToPath("home",'',false);
 }
 
@@ -282,17 +284,25 @@ function hideMiniBrowser(){
   $('#minibrowser').css('display', 'none');
 }
 
-function miniBrowserSelectItem(type, elem_id){
+function miniBrowserSelectItem(type, elem_id, inferWorkdir){
   if (type == 'file'){
+    // We'll be infering the work directory from this.  We'll set the hidden
+    // field work_dir
     var file = resolve_path($('#selected_share').val(), $('#selected_file').val());
-    console.log("SELECTED_FILE: " + file);
+    console.log("miniBrowserSelectItem => " + file);
+    if (inferWorkdir != '' && inferWorkdir != null){
+       var fileArray = file.split('/');
+       fileArray.pop();
+       work_dir = fileArray.join('/'); 
+       var wdelem = document.getElementById(inferWorkdir);
+       $(wdelem).val(work_dir);
+    }
     var file_elem = document.getElementById(elem_id);
     var file_label_elem = document.getElementById(elem_id + "_label");
     $(file_elem).val(file);
     $(file_label_elem).html(file);
   } else if (type == 'dir'){
     var dir  = resolve_path($('#selected_share').val(), $('#selected_dir').val());
-    console.log("SELECTED_DIR: " + dir);
     var dir_elem = document.getElementById(elem_id);
     var dir_label_elem = document.getElementById(elem_id + "_label");
     $(dir_elem).val(dir);

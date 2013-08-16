@@ -9,10 +9,10 @@
   <h3>Submit <%= @app.name %> <%= @app.version %> job...</h3>
   <%= form_tag "/cwa_jobmanager/#{@project.identifier}/submit", :id => 'app_form', :multipart => true do %>
 
-    <%= hidden_field_tag :selected_item, nil %>
-    <%= hidden_field_tag :selected_dir, nil %>
-    <%= hidden_field_tag :selected_file, nil %>
-    <%= hidden_field_tag :selected_share, @browser.current_share %>
+    <%= hidden_field_tag :selected_item, params[:selected_item] %>
+    <%= hidden_field_tag :selected_dir, params[:selected_dir] %>
+    <%= hidden_field_tag :selected_file, params[:selected_file] %>
+    <%= hidden_field_tag :selected_share, params[:selected_share] %>
     <%= hidden_field_tag :user_home_dir, @ipa_user.homedirectory %>
     <%= hidden_field_tag :user_work_dir, @ipa_user.workdirectory %>
     <%= hidden_field_tag :app_id, @app.id %>

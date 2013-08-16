@@ -5,6 +5,7 @@ class CwaApplicationsController < ApplicationController
   include CwaIpaAuthorize
 
   before_filter :find_project, :authorize, :ipa_authorize
+  helper_method :file_browser, :dir_browser
 
   def new
     @app = CwaApplication.new
@@ -98,7 +99,7 @@ class CwaApplicationsController < ApplicationController
     end
 
     begin 
-      @browser = CwaBrowser.new params[:share], params[:dir]
+      @browser = CwaBrowser.new params[:selected_share], params[:selected_dir]
     rescue Exception => e
       flash[:error] = e.message
       redirect_to :action => 'display', :project_id => params[:project_id]
@@ -121,5 +122,16 @@ class CwaApplicationsController < ApplicationController
   def find_project
     @project = Project.find(params[:project_id])
   end
+
+  # Provide HAML code to generate necessary bits for a file selector
+  def file_browser(param_name, infer_work_dir)
+    render_to_string :partial => 'cwa_applications/file_browser', :locals => { :param_name => param_name, :infer_work_dir => infer_work_dir }, :layout => false
+  end
+
+  # Provide HAML code to generate necessary bits for a directory selector
+  def dir_browser(param_name)
+    render_to_string :partial => 'cwa_applications/dir_browser', :locals => { :param_name => param_name }, :layout => false
+  end
+
 
 end

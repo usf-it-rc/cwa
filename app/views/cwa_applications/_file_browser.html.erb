@@ -1,0 +1,7 @@
+<%= hidden_field_tag param_name.to_sym, params[param_name.to_sym] %>
+<% if !infer_work_dir.nil? %>
+  <%= hidden_field_tag infer_work_dir.to_sym, params[infer_work_dir.to_sym] %>
+<% end %>
+
+<%= button_to_function "Select file...", "getSelectedFile('#{param_name}','#{infer_work_dir}')" %>
+<%= label_tag "#{param_name}_label".to_sym, params[param_name.to_sym].nil? ? "No file selected" : params[param_name.to_sym], :id => "#{param_name}_label" %>
