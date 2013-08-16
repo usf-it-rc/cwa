@@ -175,6 +175,19 @@ module Redmine::CwaBrowserHelper
       size = size.chomp.to_i
       size
     end
+ 
+    #Redmine::CwaBrowserHelper.paramfile_parser(params[:param_file])    
+    def paramfile_parser(file)
+      (size,err,code) = userexec "lines #{file}"
+      size = size.chomp.to_i
+
+      # get first line, so we can parse our variable names
+      file = Redmine::CwaBrowserHelper::Retrieve.new(file)
+      vars = file.readline.chomp
+      file.done
+
+      { :count => size-1, :vars => vars.split(",") }
+    end
     
     # Wicked cool privileged file writer 
     class Redmine::CwaBrowserHelper::Put
@@ -213,6 +226,14 @@ module Redmine::CwaBrowserHelper
         pid = @wait_thr[:pid]
       end
 
+      def readline
+        if !@stdout.eof?
+          @stdout.readline
+        else
+          nil
+        end
+      end
+        
       def each
         while !@stdout.eof? 
           data = @stdout.read(1024*128)

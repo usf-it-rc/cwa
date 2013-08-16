@@ -57,6 +57,7 @@ class CwaJobmanagerController < ApplicationController
 
   def submit
     @job = RsgeJob.new
+    script = ""
 
     if params.has_key?(:app_id)
       @app = CwaApplication.find(params[:app_id])
@@ -74,10 +75,28 @@ class CwaJobmanagerController < ApplicationController
       @job.job_name = params[:job_name]
     end
 
+    if params.has_key?(:param_file)
+      # read the parameterization file, get column and row lengths
+      param_data = []
+      job_params = Redmine::CwaBrowserHelper.paramfile_parser(params[:param_file])
+      script += "\#\$ -t 1-#{job_params[:count]}\n"
+      
+      # retrieve entry line from param_file
+      params[:param_code] = "params=\$(sed \"\$((SGE_TASK_ID+1))q;d\" #{params[:param_file]})\n"
+     
+      i = 1
+      job_params[:vars].each do |var|
+        params[:param_code] += "#{var}=$(echo \$params | cut -d',' -f#{i})\n"
+        i += 1
+      end
+      params[:param_code] += "var_names=( \"" + job_params[:vars].join('" "') + "\" )\n" 
+ 
+    end
+
     if !@app.nil?
-      script = @app.exec.gsub(/\r\n/, "\n")
+      script += @app.exec.gsub(/\r\n/, "\n")
     else
-      script = Base64.decode64(params[:script])
+      script += Base64.decode64(params[:script])
     end
 
     # Substitute out all %%KEY%% items in the job script, then assign

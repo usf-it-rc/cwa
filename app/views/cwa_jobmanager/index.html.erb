@@ -1,4 +1,8 @@
 <script>
+$.ajaxSetup ({
+    // Disable caching of AJAX responses
+    cache: false
+});
 $(document).ready(
   function(){
     setInterval(function(){
