@@ -13,6 +13,8 @@
     <%= hidden_field_tag :selected_dir, nil %>
     <%= hidden_field_tag :selected_file, nil %>
     <%= hidden_field_tag :selected_share, @browser.current_share %>
+    <%= hidden_field_tag :user_home_dir, @ipa_user.homedirectory %>
+    <%= hidden_field_tag :user_work_dir, @ipa_user.workdirectory %>
     <%= hidden_field_tag :app_id, @app.id %>
 
     <%= render :inline => @haml, :type => 'haml' %>
@@ -21,7 +23,7 @@
 </div>
 
 <!-- hidden div for file and directory selection -->
-<div id="copymove" class="floating_browser">
+<div id="minibrowser" class="floating_browser">
   <div class="box dirSelector" style="height:100%" id="dirContainer">
     <div id="dirBoxTitle" style="float:left; padding-top: 6px; margin: 8px;">
       <b>Data Stores</b>
@@ -51,7 +53,7 @@
     </table>
   </div>
   <div style="height: 48px; width: 100%;">
-    <%= button_to_function "Select file...", "startCopyMove('select',null)", :id => 'copymove_button' %>
-    <%= button_to_function "Cancel", "hideCopyMove()" %>
+    <%= button_to_function "Select file...", "somefunc()", :id => 'minibrowser_button' %>
+    <%= button_to_function "Cancel", "hideMiniBrowser()" %>
   </div>
 </div>

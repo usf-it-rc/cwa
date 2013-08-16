@@ -14,6 +14,8 @@
 <%= hidden_field_tag :target_share, nil %>
 <%= hidden_field_tag :target_path, nil %>
 <%= hidden_field_tag :selected_share, @browser.current_share %>
+<%= hidden_field_tag :user_home_dir, @ipa_user.homedirectory %>
+<%= hidden_field_tag :user_work_dir, @ipa_user.workdirectory %>
 
   <div class="actionButtons">
     <!-- Current directory window -->

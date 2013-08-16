@@ -51,7 +51,7 @@ Redmine::Plugin.register :cwa do
     permission :web_apps, { :cwa_applications => [:index] }
     permission :file_browser, { :cwa_browser => [:index, :mkdir, :rename, :delete, :download, :get, :tail, :upload, :move, :op_status, :copy] }
     permission :user_stats, { :cwa_stats => [:index] }
-    permission :applications, { :cwa_applications => [:index, :show, :display, :update, :delete] }
+    permission :applications, { :cwa_applications => [:index, :show, :display, :update, :delete, :new] }
   end
 end
 

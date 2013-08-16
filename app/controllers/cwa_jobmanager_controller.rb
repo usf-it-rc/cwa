@@ -74,29 +74,6 @@ class CwaJobmanagerController < ApplicationController
       @job.job_name = params[:job_name]
     end
 
-    
-
-    # sanitize the selected_file parameter
-    if params[:selected_file] != nil
-      if params[:selected_file] !~ ::CwaConstants::JOBPATH_REGEX
-        flash[:error] = "Invalid job file specified! Make sure you're using forward-slash \"/\"!"
-        redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id], :project_id => params[:project_id]
-        return
-      end
-      #params[:selected_dir] = params[:selected_file].gsub(/(.*)\/.*$/, '\1')
-    end
-
-    #if params[:selected_dir] == nil && params[:current_dir] != nil
-    #  params[:selected_dir] = params[:current_dir]
-    #end
-
-    # And selected_dir
-    if params[:selected_dir] !~ ::CwaConstants::JOBPATH_REGEX
-      flash[:error] = "Invalid job directory specified! Make sure you're using forward-slash \"/\"!"
-      redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id], :project_id => params[:project_id]
-      return
-    end
-
     if !@app.nil?
       script = @app.exec.gsub(/\r\n/, "\n")
     else
@@ -121,7 +98,7 @@ class CwaJobmanagerController < ApplicationController
       flash[:notice] = "Submitted job"
     end
 
-    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['selected_dir'], :app_id => @app.nil? ? nil : @app.id, :submit_parameters => params.except("utf8","authenticity_token","commit","action").to_json.to_s
+    CwaJobHistory.create :owner => @job.job_owner, :jobid => @job.jobid, :job_name => @job.job_name, :workdir => params['work_dir'], :app_id => @app.nil? ? nil : @app.id, :submit_parameters => params.except("utf8","authenticity_token","commit","action").to_json.to_s
       
     respond_to do |format|
       format.html { redirect_to :action => 'index', :project_id => params[:project_id] }

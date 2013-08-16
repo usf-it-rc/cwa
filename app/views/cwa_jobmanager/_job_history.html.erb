@@ -10,6 +10,7 @@
     <td><b>Job Directory</b></td>
   </tr>
 <% hist_jobs.each do |h| %>
+  <% Rails.logger.debug "ALSDFJALSDF => #{h.workdir}" %>
   <% if h.workdir != nil %>
     <% browser = CwaBrowser.new h.workdir, nil %>
   <% end %>

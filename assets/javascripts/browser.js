@@ -21,7 +21,7 @@ var redmine_project;
 var tail_handle;
 var my_tail_func = function(){
   var data = "";
-  $.post("/cwa_browser/" + redmine_project + "/" + $('#selected_file').val() + "/tail",
+  $.post("/cwa_browser/" + redmine_project + "/" + $('#selected_share').val() + '/' + $('#selected_file').val() + "/tail",
     function(data){ 
       $('#tail_content').val('');
       $('#tail_content').val(data);
@@ -263,8 +263,46 @@ function hideTail(){
   clearInterval(tail_handle);
 }
 
+// functions for application minibrowser for file and directory selection
+function getSelectedDir(elem_id){
+  $('#minibrowser').css('display', 'block');
+  $('#minibrowser_button').attr('value', 'Select directory...');
+  $('#minibrowser_button').attr('onclick', "miniBrowserSelectItem('dir', '" + elem_id + "')");
+  goToPath("home",'',false);
+}
+
+function getSelectedFile(elem_id){
+  $('#minibrowser').css('display', 'block');
+  $('#minibrowser_button').attr('value', 'Select file...');
+  $('#minibrowser_button').attr('onclick', "miniBrowserSelectItem('file', '" + elem_id + "')");
+  goToPath("home",'',false);
+}
+
+function hideMiniBrowser(){
+  $('#minibrowser').css('display', 'none');
+}
+
+function miniBrowserSelectItem(type, elem_id){
+  if (type == 'file'){
+    var file = resolve_path($('#selected_share').val(), $('#selected_file').val());
+    console.log("SELECTED_FILE: " + file);
+    var file_elem = document.getElementById(elem_id);
+    var file_label_elem = document.getElementById(elem_id + "_label");
+    $(file_elem).val(file);
+    $(file_label_elem).html(file);
+  } else if (type == 'dir'){
+    var dir  = resolve_path($('#selected_share').val(), $('#selected_dir').val());
+    console.log("SELECTED_DIR: " + dir);
+    var dir_elem = document.getElementById(elem_id);
+    var dir_label_elem = document.getElementById(elem_id + "_label");
+    $(dir_elem).val(dir);
+    $(dir_label_elem).html(dir);
+  }
+  hideMiniBrowser();
+}
+
 // Show the move div
-function showCopyMove(action,elem_id){
+function showCopyMove(action){
   $('#copymove').css('display', "block");
   if (action == "move"){
     $('#copymove_button').attr('value', 'Move');
@@ -272,17 +310,12 @@ function showCopyMove(action,elem_id){
   } else if (action == "copy") {
     $('#copymove_button').attr('value', 'Copy');
     $('#copymove_button').attr('onclick', "startCopyMove('copy',null)");
-  } else if (action == "select"){
-    $('#copymove_button').attr('value', 'Select file...');
-    $('#copymove_button').attr('onclick', "startCopyMove('select','" + elem_id + "')");
-    goToPath("home",'',false);
   }
 }
 
 function hideCopyMove(){
   $('#copymove').css('display', 'none');
 }
-
 
 // polling function to get display progress of file operations
 var op_id = '';
@@ -491,7 +524,7 @@ function goToPath(share, path, divPopup){
       }
     });
   });
-  $("#current_dir").val(share + " => " + path);
+  $("#current_dir").val(resolve_path(share, path));
 }
 
 // Expand tree and navigate based on current selected element
@@ -539,7 +572,7 @@ function collapsibleExpand(elem,divPopup){
     $(dirItems).appendTo(elem);
     if (!divPopup){
       $("#fileContainer").html(fileItems);
-      $("#current_dir").val(share + " => " + path);
+      $("#current_dir").val(resolve_path(share,path));
     }
   });
 }
@@ -558,4 +591,35 @@ function path_components(elem){
     share: share,
     path: path
   };
+}
+
+// Given the share and path/to/something, resolve the full path
+function resolve_path(share,path){
+  var file = "";
+  if (path != null) {
+    switch (share){
+      case "home":
+        file = $('#user_home_dir').val() + "/" + path;
+        break;
+      case "work":
+        file = $('#user_work_dir').val() + "/" + path;
+        break;
+      case "shares":
+        file = "/shares/" + path;
+        break;
+    }
+  } else {
+    switch(share){
+      case "home":
+        file = $('#user_home_dir').val();
+        break;
+      case "work":
+        file = $('#user_work_dir').val();
+        break;
+      case "shares":
+        file = null;
+        break;
+    }
+  }
+  return file;
 }
