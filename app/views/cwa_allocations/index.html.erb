@@ -8,6 +8,7 @@
 <% else %>
  <table class="list"><tr>
    <td><b>Delete?</b></td>
+   <td><b>Type</b></td>
    <td><b>Summary</b></td>
    <td><b>Approved?</b></td>
    <td><b>CPU Hours Requested</b></td>
@@ -21,6 +22,16 @@
      <% else %> 
        <td>n/a</td>
      <% end %>
+     <td>
+       <% case allocation.allocation_type %>
+       <% when 1 %>
+         <%= "Start-up" %>
+       <% when 2 %>
+         <%= "Support Existing Grant" %>
+       <% when 3 %>
+         <%= "Support Grant Proposal" %>
+       <% end %>
+     </td>
      <td><%= allocation.summary %></td>
      <td><%= allocation.approved ? "Yes" : "No" %></td>
      <td><%= allocation.time_in_hours %></td>
