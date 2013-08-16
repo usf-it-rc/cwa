@@ -24,11 +24,11 @@
     </div>
     <!-- Action buttons -->
     <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/newfile.svg');" onclick="showTextEditor()"title="Create File..."></div>
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/delete.svg');" onclick="cwaAction('delete',null, true)" title="Delete File..."></div>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/delete.svg');" onclick="cwaAction('delete',null, true, 'file')" title="Delete File..."></div>
     <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/upload.svg');" onclick="showUploadFile()" title="Upload File..."></div>
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/download.svg');" onclick="cwaAction('download', null, false)" title="Download File..."></div>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/download.svg');" onclick="cwaAction('download', null, false, 'file')" title="Download File..."></div>
     <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/tail.svg');" onclick="showTail()" title="Watch File..."></div>
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/rename.png');" onclick="cwaAction('rename','Enter new name for directory:', false)" title="Rename File..."></div>
+    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/rename.png');" onclick="cwaAction('rename','Enter new name for directory:', false, 'file')" title="Rename File..."></div>
     <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/move.svg');" onclick="showMove()" title="Move File..."></div>
   </div>
 
@@ -37,7 +37,7 @@
       <div id="dirBoxTitle" style="float:left; padding-top: 6px; margin: 8px;">
         <b>Data Stores</b>
       </div>
-      <div class="toolButton" style="float: right; margin: 8px; background-image: url('/plugin_assets/cwa/images/mkdir.svg');" onclick="cwaAction('mkdir','Specify directory name to be created:',false)" title="New Folder...">
+      <div class="toolButton" style="float: right; margin: 8px; background-image: url('/plugin_assets/cwa/images/mkdir.svg');" onclick="cwaAction('mkdir','Specify directory name to be created:',false,'dir')" title="New Folder...">
       </div>
       <hr/>
       <ul class="dir">
@@ -102,18 +102,18 @@
 </div>
 
 <div id="menuDir" class="menu">
-  <div class="menuItem" onclick="cwaAction('download', null, false)">Download as Zip</div>
-  <div class="menuItem" onclick="cwaAction('rename','Enter new name for directory:', false)">Rename...</div>
-  <div class="menuItem" onclick="cwaAction('delete',null, true)">Delete...</div>
+  <div class="menuItem" onclick="cwaAction('download', null, false, 'dir')">Download as Zip</div>
+  <div class="menuItem" onclick="cwaAction('rename','Enter new name for directory:', false, 'dir')">Rename...</div>
+  <div class="menuItem" onclick="cwaAction('delete',null, true, 'dir')">Delete...</div>
   <div class="menuItem" onclick="showCopyMove('move',null)">Move...</div>
   <div class="menuItem" onclick="showCopyMove('copy',null)">Copy...</div>
 </div>
 
 <div id="menuFile" class="menu">
-  <div class="menuItem" onclick="cwaAction('download', null, false)">Download</div>
+  <div class="menuItem" onclick="cwaAction('download', null, false, 'file')">Download</div>
   <div class="menuItem" onclick="showTail()">Tail...</div>
-  <div class="menuItem" onclick="cwaAction('rename', 'Enter new name for file:', false)">Rename...</div>
-  <div class="menuItem" onclick="cwaAction('delete',null, true)">Delete...</div>
+  <div class="menuItem" onclick="cwaAction('rename', 'Enter new name for file:', false, 'file')">Rename...</div>
+  <div class="menuItem" onclick="cwaAction('delete',null, true, 'file')">Delete...</div>
   <div class="menuItem" onclick="showCopyMove('move',null)">Move...</div>
   <div class="menuItem" onclick="showCopyMove('copy',null)">Copy...</div>
 </div>

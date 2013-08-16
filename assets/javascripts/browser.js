@@ -31,18 +31,19 @@ var my_tail_func = function(){
   $("#tail_content").scrollTop($("#tail_content")[0].scrollHeight);
 };
 
-function cwaAction(action, promptString, confirmBool){
+function cwaAction(action, promptString, confirmBool, itemType){
+  
   var item = $('#selected_item').val();
   item = item.split("/");
   item = item[item.length-1];
 
-  var file = $("#selected_file").val();
-  var path = $("#selected_dir").val();
-  var share = $("#selected_share").val();
-  var dir = $("#selected_dir").val();
-  dir = dir.split("/");
-  dir.shift();
-  dir = dir.join('/');
+  if (itemType === "dir"){
+    var path = $("#selected_dir").val();
+    var share = $("#selected_share").val();
+  } else if (itemType === "file"){
+    var share = $("#selected_share").val();
+    var file = $("#selected_file").val();
+  }
   
   var argument;
   var continuation = false;
@@ -90,7 +91,7 @@ function cwaAction(action, promptString, confirmBool){
           }
           window.location.assign("/cwa_browser/" + redmine_project + "/" + method + "/" + data.fid);
         } else {
-          goToPath(share, dir, false);
+          goToPath(share, path, false);
         }
       },
       error: function(data){ alert(errorString); }
@@ -149,6 +150,7 @@ function select_directory(elem, divPopup){
     $("#selected_dir").val(path);
     $("#selected_item").val(share + "/" + path);
   }
+  $("#selected_file").val();
 }
 
 function select_file(elem) {
@@ -173,6 +175,7 @@ function showMenu(event, elementId) {
    *  because different browser (ahem IE) assign different numbers to the keys to
    *  your mouse buttons and different values to the event, you'll have to do some evaluation
    */
+
   var rightclick; //will be set to true or false
   if (event.button) {
     rightclick = (event.button == 2);
@@ -180,11 +183,13 @@ function showMenu(event, elementId) {
  
   if(rightclick) { //if the secondary mouse botton was clicked
     var menu = document.getElementById(elementId);
-    menu.style.display = "block"; //show menu
-
+    if (menu == null){
+      return;
+    }
+    $(menu).css('display', 'block'); //show menu
     var x = event.clientX; //get X and Y coordinance for menu position
     var y = event.clientY;
- 
+
     //This section is necessary if you click on the far right edge or bottom
     //The 200 is arbitrary, choose whatever number you want based on how large your menu is
     if(window.innerWidth) {
