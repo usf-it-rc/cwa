@@ -17,6 +17,7 @@ if (document.addEventListener) {
 
 // This should be set by the application first!
 var redmine_project;
+var submitClickFunction = null;
 
 var tail_handle;
 var my_tail_func = function(){
@@ -516,7 +517,7 @@ function goToPath(share, path, divPopup){
         eid = eid + '/' + comp;
     }
 
-    $.ajaxSetup( { "async": false } ); 
+    //$.ajaxSetup( { "async": false } ); 
 
     $.getJSON('/cwa_browser/' + redmine_project + '/' + dir, function(data){
       $.each(data,function(key,obj){
@@ -553,6 +554,8 @@ function collapsibleExpand(elem,divPopup){
   var path = components.path;
   var dirItems = "";
   var fileItems = "";
+
+  console.log("GO TO: " + share + ':' + path);
 
   if (divPopup){
     $('#target_share').val(share);
@@ -638,3 +641,10 @@ function resolve_path(share,path){
   }
   return file;
 }
+
+function submitClick(submitClickFunction){
+  if (submitClickFunction != null){
+    return submitClickFunction();
+  }
+}
+

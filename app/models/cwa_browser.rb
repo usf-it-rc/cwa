@@ -74,8 +74,6 @@ class CwaBrowser
       } if dirent != nil 
     end
 
-    Rails.logger.debug "DIRECTORIES => #{dirs.to_s}"
-  
     return dirs
   end
 
@@ -95,8 +93,6 @@ class CwaBrowser
         :date => fileent[5]
       } if fileent != nil
     end
-
-    Rails.logger.debug "FILES => #{fs.to_s}"
 
     return fs
   end

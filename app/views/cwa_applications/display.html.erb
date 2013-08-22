@@ -18,7 +18,7 @@
     <%= hidden_field_tag :app_id, @app.id %>
 
     <%= render :inline => @haml, :type => 'haml' %>
-    <%= submit_tag "Submit" %>
+    <%= submit_tag "Submit", :onclick => "submitClick(submitClickFunction)" %>
   <% end %>
 </div>
 

@@ -86,7 +86,7 @@ class CwaJobmanagerController < ApplicationController
      
       i = 1
       job_params[:vars].each do |var|
-        params[:param_code] += "#{var}=$(echo \$params | cut -d',' -f#{i})\n"
+        params[:param_code] += "export #{var}=$(echo \$params | cut -d',' -f#{i})\n"
         i += 1
       end
       params[:param_code] += "var_names=( \"" + job_params[:vars].join('" "') + "\" )\n" 

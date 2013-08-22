@@ -170,7 +170,7 @@ get 'cwa_browser/:project_id/*share/*dir', :to => 'cwa_browser#index',
 
 # Display a path at the base of a share
 get 'cwa_browser/:project_id/*share', :to => 'cwa_browser#index',
-  :share => /(home|shares|work)/
+  :share => /(home|work)/
 
 # Stats browser
 get 'cwa_stats/:project_id', :to => 'cwa_stats#index'

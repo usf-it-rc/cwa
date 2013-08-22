@@ -3,6 +3,19 @@
 
 <script type="text/javascript">
   redmine_project = "<%= @project.identifier %>";
+  $('#wrapper3').css('height','100%');
+
+  // set callback to resize the file and directory view ports when the
+  // browser window changes size
+  var resizeViewPorts = function(){
+    if ($(this).height() >= 564){
+      $('#dirContainer').css('max-height', $(this).height()-380); //set max height
+      $('#files').css('max-height', $(this).height()-380); //set max height
+    }
+  }
+
+  $(window).on('resize', resizeViewPorts);
+  $(window).load(resizeViewPorts);
 </script>
 
 <div style="margin: 18px">
@@ -33,7 +46,7 @@
   </div>
 
   <div class="browserBox">
-    <div class="box dirSelector" id="dirContainer" style="max-height: 700px">
+    <div class="box dirSelector" id="dirContainer">
       <div id="dirBoxTitle" style="float:left; padding-top: 6px; margin: 8px;">
         <b>Data Stores</b>
       </div>
@@ -42,13 +55,13 @@
       <hr/>
       <ul class="dir">
       <% ([["home",nil,"home.svg"],["work",nil,"netshare.svg"]] + @group_list.map {|g| [ "shares", g[:cn], "netshare.svg"]}).each do |store| %>
-        <% id = store[1].nil? ? store[0] + "." : store[0] + "#" + store[1] %>
+        <% id = store[1].nil? ? store[0] + "." : store[0] + "." + store[1] %>
         <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this,false)"><%= store[1].nil? ? store[0] : store[1] %></li>
       <% end %>
       </ul>
     </div>
   
-    <div class="box fileSelector" style="max-height: 700px">
+    <div class="box fileSelector" id="files">
     <table class="fileItem">
       <thead>
       <tr>
