@@ -24,34 +24,42 @@
 
 <!-- hidden div for file and directory selection -->
 <div id="minibrowser" class="floating_browser">
-  <div class="box dirSelector" style="height:100%" id="dirContainer">
-    <div id="dirBoxTitle" style="float:left; padding-top: 6px; margin: 8px;">
-      <b>Data Stores</b>
-    </div>
-    <hr/>
-    <ul class="dir">
-    <% ([["home",nil,"home.svg"],["work",nil,"netshare.svg"]]).each do |store| %>
-      <% id = store[1].nil? ? store[0] + "." : store[0] + "#" + store[1] %>
-      <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this,false)"><%= store[1].nil? ? store[0] : store[1] %></li>
-    <% end %>
-    </ul>
+  <div class="pathBox">
+    <span id="current_dir"></span>
   </div>
 
-  <div class="box fileSelector" style="height:100%">
-    <table class="fileItem">
-      <thead>
-      <tr>
-        <th>Name</th>
-        <th>Owner</th>
-        <th>Group</th>
-        <th>Mode</th>
-        <th>Change Time</th>
-      </tr>
-      </thead>
-      <tbody id="fileContainer">
-      </tbody>
-    </table>
+  <div id="mainBox" class="browserBox" style="height: 90%">
+    <div class="dirSelector" id="dirContainer" style="height:93%">
+      <div id="dirBoxTitle">
+        <b>Shares &amp; Directories</b>
+      </div>
+      <div id="dirContainerDirs" style="height:100%; overflow:auto;">
+        <ul class="dir">
+          <% [["home",nil,"home.svg"],["work",nil,"netshare.svg"]].each do |store| %>
+            <% id = store[1].nil? ? store[0] + "." : store[0] + "." + store[1] %>
+            <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this,false)" oncontextmenu="showMenu(event, 'menuShare'); select_directory(this,false);"><%= store[1].nil? ? store[0] : store[1] %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fileSelector" id="files" style="height:98%">
+      <table class="fileItem">
+        <tr>
+          <th>Name</th>
+          <th>Owner</th>
+          <th>Group</th>
+          <th>Mode</th>
+          <th>Change Time</th>
+        </tr>
+      </table>
+      <div id="fileList" style="height:95%">
+        <table id="fileContainer" class="fileItem">
+        </table>
+      </div>
+    </div>
   </div>
+
   <div style="height: 48px; width: 100%;">
     <%= button_to_function "Select file...", "somefunc()", :id => 'minibrowser_button' %>
     <%= button_to_function "Cancel", "hideMiniBrowser()" %>

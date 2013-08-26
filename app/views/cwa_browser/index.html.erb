@@ -1,26 +1,7 @@
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/cwa.css" %>
 <%= javascript_include_tag "/plugin_assets/cwa/javascripts/browser.js" %>
 
-<script type="text/javascript">
-  redmine_project = "<%= @project.identifier %>";
-  $('#wrapper3').css('height','100%');
-
-  // set callback to resize the file and directory view ports when the
-  // browser window changes size
-  var resizeViewPorts = function(){
-    if ($(this).height() >= 564){
-      $('#dirContainer').css('max-height', $(this).height()-380); //set max height
-      $('#files').css('max-height', $(this).height()-380); //set max height
-    }
-  }
-
-  $(window).on('resize', resizeViewPorts);
-  $(window).load(resizeViewPorts);
-</script>
-
-<div style="margin: 18px">
 <%= form_tag '/cwa_browser', :id => 'app_form', :multipart => true do %>
-
 <%= hidden_field_tag :selected_item, nil %>
 <%= hidden_field_tag :selected_dir, nil %>
 <%= hidden_field_tag :selected_file, nil %>
@@ -30,55 +11,58 @@
 <%= hidden_field_tag :user_home_dir, @ipa_user.homedirectory %>
 <%= hidden_field_tag :user_work_dir, @ipa_user.workdirectory %>
 
-  <div class="actionButtons">
-    <!-- Current directory window -->
-    <div style="float:left; margin-top: 6px;">
-      <b>Current Path:</b> <%= text_field_tag :current_dir, "", :size => 72, :disabled => true %>
-    </div>
-    <!-- Action buttons -->
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/newfile.svg');" onclick="showTextEditor()"title="Create File..."></div>
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/delete.svg');" onclick="cwaAction('delete',null, true, 'file')" title="Delete File..."></div>
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/upload.svg');" onclick="showUploadFile()" title="Upload File..."></div>
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/download.svg');" onclick="cwaAction('download', null, false, 'file')" title="Download File..."></div>
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/tail.svg');" onclick="showTail()" title="Watch File..."></div>
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/rename.png');" onclick="cwaAction('rename','Enter new name for directory:', false, 'file')" title="Rename File..."></div>
-    <div class="toolButton" style="background-image: url('/plugin_assets/cwa/images/move.svg');" onclick="showMove()" title="Move File..."></div>
+<script type="text/javascript">
+  redmine_project = "<%= @project.identifier %>";
+  $('#wrapper3').css('height','100%');
+
+  // set callback to resize the file and directory view ports when the
+  // browser window changes size
+  var resizeViewPorts = function(){
+    if ($(this).height() >= 564){
+      $('#dirContainerDirs').css('height', $(this).height()-240); //set max height
+      $('#fileList').css('height', $(this).height()-240); //set max height
+      //$('#mainBox').css('height', $(this).height()-100);
+    }
+  }
+
+  $(window).on('resize', resizeViewPorts);
+  $(window).load(resizeViewPorts);
+  $().ready(function (){
+    goToPath("<%= params[:share] %>", "<%= params[:dir] %>", false);
+  });
+</script>
+
+<div>
+  <div class="pathBox">
+    <span id="current_dir"></span>
   </div>
 
-  <div class="browserBox">
-    <div class="box dirSelector" id="dirContainer">
-      <div id="dirBoxTitle" style="float:left; padding-top: 6px; margin: 8px;">
-        <b>Data Stores</b>
+  <div id="mainBox" class="browserBox">
+    <div class="dirSelector" id="dirContainer">
+      <div id="dirBoxTitle">
+        <b>Shares &amp; Directories</b>
       </div>
-      <div class="toolButton" style="float: right; margin: 8px; background-image: url('/plugin_assets/cwa/images/mkdir.svg');" onclick="cwaAction('mkdir','Specify directory name to be created:',false,'dir')" title="New Folder...">
+      <div id="dirContainerDirs">
+        <ul class="dir">
+          <% ([["home",nil,"dirEntryHome"],["work",nil,"dirEntryWork"]] + @group_list.map {|g| [ "shares", g[:cn], "dirEntryShare"]}).each do |store| %>
+            <% id = store[1].nil? ? store[0] + "." : store[0] + "." + store[1] %>
+            <li id="<%= id %>" class="<%= store[2] %>" onclick="leftClickShare(event,this,false)" oncontextmenu="rightClickShare(event,this,false)"><%= store[1].nil? ? store[0] : store[1] %></li>
+          <% end %>
+        </ul>
       </div>
-      <hr/>
-      <ul class="dir">
-      <% ([["home",nil,"home.svg"],["work",nil,"netshare.svg"]] + @group_list.map {|g| [ "shares", g[:cn], "netshare.svg"]}).each do |store| %>
-        <% id = store[1].nil? ? store[0] + "." : store[0] + "." + store[1] %>
-        <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this,false)"><%= store[1].nil? ? store[0] : store[1] %></li>
-      <% end %>
-      </ul>
     </div>
   
-    <div class="box fileSelector" id="files">
-    <table class="fileItem">
-      <thead>
-      <tr>
-        <th>Name</th>
-        <th>Owner</th>
-        <th>Group</th>
-        <th>Mode</th>
-        <th>Change Time</th>
-      </tr>
-      </thead>
-      <tbody id="fileContainer">
-      </tbody>
-    </table> 
+    <div class="fileSelector" id="files">
+      
+      <div id="dirBoxTitle">
+        <b>Files</b>
+      </div>
+      <div id="fileList">
+      </div>
     </div>
-  <% end %>
   </div>
 </div>
+<% end %>
 
 <div id="upload">
   <center>
@@ -116,10 +100,17 @@
 
 <div id="menuDir" class="menu">
   <div class="menuItem" onclick="cwaAction('download', null, false, 'dir')">Download as Zip</div>
+  <div class="menuItem" onclick="showUploadFile()">Upload file...</div>
   <div class="menuItem" onclick="cwaAction('rename','Enter new name for directory:', false, 'dir')">Rename...</div>
   <div class="menuItem" onclick="cwaAction('delete',null, true, 'dir')">Delete...</div>
   <div class="menuItem" onclick="showCopyMove('move',null)">Move...</div>
   <div class="menuItem" onclick="showCopyMove('copy',null)">Copy...</div>
+</div>
+
+<div id="menuShare" class="menu">
+  <div class="menuItem" onclick="cwaAction('download', null, false, 'dir')">Download as Zip</div>
+  <div class="menuItem" onclick="showUploadFile()">Upload file...</div>
+  <div class="menuItem" onclick="cwaAction('mkdir','Enter name for new directory:', false, 'dir')">Create directory...</div>
 </div>
 
 <div id="menuFile" class="menu">
@@ -149,7 +140,3 @@
 <!-- We pop up divs in here for the progress of various file operations -->
 <div id="queue_progress" class="browserProgress">
 </div>
-  
-<script>
-  goToPath("<%= params[:share] %>", "<%= params[:dir] %>", false);
-</script>

@@ -1,119 +1,6 @@
-div.browserButtonContainer {
-  float:left;
-}
-
 div#stores {
   display: block;
   margin-top: 20px;
-}
-
-div.browserButton {
-  float:left;
-  color:#444444;
-  background:#BCC2C5;
-  padding: 8px 12px;
-  text-align:center;
-  border:1px solid #444444;
-  z-index:2;
-  -webkit-user-select: none; /* Chrome/Safari */        
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+ */
-
-  /* Rules below not implemented in browsers yet */
-  -o-user-select: none;
-  user-select: none;
-  cursor: default;
-}
-
-div.browserButtonSelected {
-  float:left;
-  background:#DEE4E7;
-  padding: 8px 12px;
-  text-align: center;
-  border:1px solid #444444;
-  z-index:2;
-  -webkit-user-select: none; /* Chrome/Safari */        
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+ */
-
-  /* Rules below not implemented in browsers yet */
-  -o-user-select: none;
-  user-select: none;
-  cursor: default;
-}
-div.browserButtonBack {
-  float:right;
-  position:relative;
-  cursor: default;
-  -moz-box-shadow:inset 0px 1px 0px 0px #f7c5c0;
-  -webkit-box-shadow:inset 0px 1px 0px 0px #f7c5c0;
-  box-shadow:inset 0px 1px 0px 0px #f7c5c0;
-  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fc8d83), color-stop(1, #e4685d) );
-  background:-moz-linear-gradient( center top, #fc8d83 5%, #e4685d 100% );
-  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fc8d83', endColorstr='#e4685d');
-  background-color:#fc8d83;
-  border:1px solid #d83526;
-  display:inline-block;
-  color:#ffffff;
-  font-family:arial;
-  font-size:15px;
-  padding:6px 24px;
-  text-decoration:none;
-  text-shadow:1px 1px 0px #b23e35;
-}.browserButtonBack.hover {
-  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #e4685d), color-stop(1, #fc8d83) );
-  background:-moz-linear-gradient( center top, #e4685d 5%, #fc8d83 100% );
-  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#e4685d', endColorstr='#fc8d83');
-  background-color:#e4685d;
-}.browserButtonBack:active {
-  position:relative;
-  top:1px;
-}
-div.browserButtonBackInactive {
-  float:right;
-  position:relative;
-  cursor: default;
-  -moz-box-shadow:inset 0px 1px 0px 0px #f7c5c0;
-  -webkit-box-shadow:inset 0px 1px 0px 0px #f7c5c0;
-  box-shadow:inset 0px 1px 0px 0px #f7c5c0;
-  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fc8d83), color-stop(1, #e4685d) );
-  background:-moz-linear-gradient( center top, #fc8d83 5%, #e4685d 100% );
-  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fc8d83', endColorstr='#e4685d');
-  background-color:#fc8d83;
-  border:1px solid #d83526;
-  display:inline-block;
-  color:#bbbbbb;
-  font-family:arial;
-  font-size:15px;
-  padding:6px 24px;
-  text-decoration:none;
-}
-div.browserSelector {
-  float:left;
-  position:relative;
-  z-index:1;
-  width: 100%;
-  height: 256px;
-  background: #DEE4E7;
-}
-
-div.browserSelectorFull {
-  float:left;
-  position:relative;
-  width: 100%;
-  padding-top: 18px;
-  padding-bottom: 18px;
-  background: #DEE4E7;
-  z-index: 5;
-  /* border-top: 12px solid #DEE4E7; */
-  min-height: 550px;
-  border:1px solid #444444;
-}
-
-div.actionButtons {
-  width: 100%;
-  height: 42px;
-  margin: 0 auto;
 }
 
 div.browserDirEntry {
@@ -130,49 +17,10 @@ div.browserDirEntrySelected {
   padding: 4px;
 }
 
-div.browserDirEntryIcon {
-  background: url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
-  background-size: 42px 42px;
-  z-index:10;
-  padding: 12px;
-  float: left;
-  height: 82px;
-  width: 82px;
-  /*overflow-wrap: break-word;*/
-  white-space: pre-wrap; /* css-3 */
-  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-  white-space: -pre-wrap; /* Opera 4-6 */
-  white-space: -o-pre-wrap; /* Opera 7 */
-  word-wrap: break-word; /* Internet Explorer 5.5+ */
-}
-
-div.browserDirEntryIconSelected {
-  background: #CDD3D6 url('/plugin_assets/cwa/images/folder.png') no-repeat center top;
-  background-size: 42px 42px;
-  z-index:10;
-  padding: 12px;
-  float: left;
-  height: 82px;
-  width: 82px;
-  /*overflow-wrap: break-word;*/
-  white-space: pre-wrap; /* css-3 */
-  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-  white-space: -pre-wrap; /* Opera 4-6 */
-  white-space: -o-pre-wrap; /* Opera 7 */
-  word-wrap: break-word; /* Internet Explorer 5.5+ */
-}
-
 div.browserContainer {
   height: 100%; 
   position:relative; 
   float:left; 
-}
-
-div.browserContainer {
-  height: 100%; 
-  position:relative; 
-  float:left; 
-  overflow:auto;
 }
 
 p.browserEntry {
@@ -188,92 +36,27 @@ p.browserEntry {
   vertical-align: top;
 }
 
-p.browserEntryIcon {
-  padding-left: 32px;
-  cursor: default;
-  -webkit-user-select: none; /* Chrome/Safari */        
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+ */
-
-  /* Rules below not implemented in browsers yet */
-  -o-user-select: none;
-  user-select: none;
-}
-
-.browserFileEntry {
+div.browserFileEntry, div.browserFileEntrySelected {
+  margin-bottom: 4px;
   z-index: 10;
-  padding: 4px;
-  height: 32px;
-}
-
-div.browserFileEntryDisabled {
-  color: #AAAAAA;
-  z-index:10;
-  padding: 4px;
-}
-
-.browserFileEntrySelected {
-  background: #BCC2C5;
-  color: #000000;
-  z-index:10;
-  padding: 4px;
-  height: 32px;
-}
-
-div.browserFileEntryIcon {
-  background: url('/plugin_assets/cwa/images/file.png') no-repeat center top;
-  background-size: 42px 42px;
-  z-index:10;
-  padding: 12px;
-  vertical-align: top;
-  width: 82px;
-  display: inline-block;
-  overflow-wrap: break-word;
-}
-
-div.browserFileEntryIconSelected {
-  background: #BCC2C5 url('/plugin_assets/cwa/images/file.png') no-repeat center top;
-  background-size: 42px 42px;
-  color: #000000;
-  z-index:10;
-  padding: 12px;
-  display: inline-block;
-  vertical-align: top;
-  width: 82px;
-  overflow-wrap: break-word;
-}
-
-div.browserDirEntry:hover {
-  background: #BCC2C5 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
-  background-size: 24px 24px;
-  z-index:10;
-  padding: 4px;
-}
-
-div.browserDirEntryIcon:hover {
-  background: #BCC2C5 url('/plugin_assets/cwa/images/folder.png') no-repeat left;
-  background-size: 24px 24px;
-  z-index:10;
-  padding: 4px;
-}
-
-div.browserFileEntry:hover {
-  z-index:10;
-  padding: 4px;
-}
-
-table.options {
-  table-layout: fixed;
-  border: 0px solid black;
-}
-
-table.browserTab {
-  background:#DEE4E7;
-  border-collapse: collapse;
-  table-layout: fixed;
-  border: 1px solid;
+  height: 28px;
+  float: left;
+  position: relative;
   width: 100%;
+  background: url('/plugin_assets/cwa/images/file.png') no-repeat left;
+  background-size: 24px 24px;
+  padding-left: 28px;
 }
+
+p.browserEntryText {
+  padding-top: 8px;
+  margin-top: -3px;
+}
+
+div.browserFileEntrySelected {
+  background-color: #CCCCCC;
+}
+
 .descCol {
   width: 25%;
 }
@@ -292,8 +75,8 @@ table.browserTab {
 div.menu {
   position: absolute;
   padding: 8px 8px 8px 8px;
-  border:1px solid #DFDFDF;
-  background: #DEE4E7;
+  border:1px solid #888888;
+  background: #DDDDDD;
   z-index: 15;
   display: none;
   -moz-box-shadow: 3px 3px 4px #333;
@@ -337,31 +120,10 @@ div#upload {
   filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#333333');
 }
 
-div.actionButton {
-  float: right;
-  position: relative;
-  display:inline-block;
-  color:#777777;
-  font-family:arial;
-  font-size:15px;
-  cursor: default;
-  text-decoration:none;
-}
-div.actionButton:hover {
-  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
-  background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
-  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
-  background-color:#dfdfdf;
-}
-div.actionButton:active {
-    position:relative;
-    top:1px;
-}
-
 div.miniapp {
   position: absolute;
   padding: 12px;
-  background: #CDD3D6;
+  background: #DDDDDD;
   border: 4px solid #000000;
   height: 80%;
   width: 80%;
@@ -382,7 +144,7 @@ div.miniapp {
 div.floating_browser {
   position: absolute;
   padding: 12px;
-  background: #CDD3D6;
+  background: #FFFFFF;
   border: 4px solid #000000;
   height: 80%;
   width: 80%;
@@ -424,36 +186,39 @@ table.sortableList th .desc {
 
 div.browserBox {
   width: 100%;
+  overflow: hidden;
 }
 
 div.dirSelector {
   padding-top: 0px;
-  width: 20%;
-  overflow: auto;
+  width: 25%;
   min-height: 256px;
-  max-height: 92%;
   float: left;
 }
 
 div.fileSelector {
-  padding: 8px;
-  min-width: 50%;
-  max-width: 80%;
   min-height: 256px;
-  max-height: 92%;
-  overflow: auto;
+  width:75%;
+  float:left;
+}
+
+span#current_dir {
+  font-weight: bold;
+  font-size: 20px;
 }
 
 .dir, .dirExpanded li, ul {
   padding: 0px;
+  margin: 0px;
 }
 
-.dir li {
+li.dirExpanded, li.dirEntryHome, li.dirEntryWork, li.dirEntryShare, li.dirEntryDir {
   list-style-type: none;
-  background-image: url('/plugin_assets/cwa/images/folder_mini.png');
   background-repeat: no-repeat;
+  background-size: 24px 24px;
   background-position: 0 .4em;
   font-weight: normal;
+  padding-left: 2em;
   padding-left: 2em;
   padding-bottom: .5em;
   padding-top: .5em;
@@ -461,45 +226,106 @@ div.fileSelector {
 }
 
 li.dirExpanded {
-  list-style-type: none;
-  background-image: url('/plugin_assets/cwa/images/folder_mini.png');
-  background-repeat: no-repeat;
-  background-position: 0 .4em;
-  padding-left: 2em;
-  padding-bottom: .5em;
-  padding-top: .5em;
-  cursor: pointer;
+  font-weight: bold;
 }
+
+li.dirEntryHome {
+  background-image: url('/plugin_assets/cwa/images/home.svg');
+}
+li.dirEntryWork {
+  background-image: url('/plugin_assets/cwa/images/netshare.svg');
+}
+li.dirEntryShare {
+  background-image: url('/plugin_assets/cwa/images/netshare.svg');
+}
+li.dirEntryDir {
+  background-image: url('/plugin_assets/cwa/images/folder_mini.png');
+}
+
+div#dirContainerHead {
+  height: 48px;
+  width: 100%;
+  display: block;
+  background-color: #DDDDDD;
+  padding-top: 8px;
+}
+
+div.pathBox {
+  padding: 8px; 
+  padding-bottom: 8px;
+  background-color: #EEEEEE;
+  overflow-wrap: break-word;
+}
+
+div#dirContainerDirs {
+  display: block;
+  min-height: 256px;
+  overflow: auto;
+  background-color: #EEEEEE;
+  margin-top: 2px;
+  padding-left: 4px;
+}
+
+div#dirBoxTitle {
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  padding-left: 4px;
+  padding-bottom: 12px; 
+  padding-top: 9px;
+  background-color: #DDDDDD;
+}
+  
 
 table.fileItem {
   width: 100%;
-  border: 0px;
-  /*padding-left: 20px;*/
-  font-family: mono, courier;
-  font-size: 12px;
 } 
 
-table.fileItem td, th {
-  padding: 4px;
-}
-
 table.fileItem tr td:first-child {
-  width: 60%;
-  text-align: left;
+  width: 54%;
+  font-size: 12px;
   background: url('/plugin_assets/cwa/images/file.png') no-repeat left;
-  font-family: ariel, sans;
   background-size: 24px 24px;
+  overflow: hidden;
 }
 
-table.fileItem tr:first-child th:first-child {
-  width: 60%;
+table.fileItem tr th:first-child {
+  width: 50%;
   text-align: left;
+  padding-left: 4px;
+}
+
+table.fileItem tr th:last-child {
+  width: 300px;
+}
+
+table.fileItem tr td:last-child {
+  width: 300px;
+}
+
+table.fileItem tr th {
+  width: 64px;
+  background-color: #DDDDDD;
+  padding-top:8px;
+}
+
+table.fileItem tr td {
+  width: 64px;
+  font-size: 12px;
+  overflow: hidden;
 }
 
 table.fileItem th {
-  border: 1px solid;
-  font-family: ariel, sans;
-  font-size: 12px;
+  padding-bottom: 13px;
+}
+
+div#fileList {
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height:256px;
+  background-color: #EEEEEE;
+  margin-left: 2px;
 }
 
 .toolButton:hover {
