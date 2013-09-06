@@ -74,8 +74,8 @@ post 'cwa_browser/:project_id/*share/create',
 
 post 'cwa_browser/:project_id/*share/*path/create',
   :to => 'cwa_browser#create',
-  :share => /(home|shares|work)/,
-  :path => /[^\0]+/
+  :share => /(home|shares|work)/
+#  :path => /[^\0]+/
 
 # file move goodness
 # Case where we're moving from a share/path to the root of a share

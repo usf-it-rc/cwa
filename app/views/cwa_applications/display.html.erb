@@ -25,7 +25,7 @@
 <!-- hidden div for file and directory selection -->
 <div id="minibrowser" class="floating_browser">
   <div class="pathBox">
-    <span id="current_dir"></span>
+    <span id="current_dir_popup"></span>
   </div>
 
   <div id="mainBox" class="browserBox" style="height: 90%">
@@ -35,24 +35,18 @@
       </div>
       <div id="dirContainerDirs" style="height:100%; overflow:auto;">
         <ul class="dir">
-          <% [["home",nil,"home.svg"],["work",nil,"netshare.svg"]].each do |store| %>
+          <% [["home",nil,"dirEntryHomePopup"],["work",nil,"dirEntryWorkPopup"]].each do |store| %>
             <% id = store[1].nil? ? store[0] + "." : store[0] + "." + store[1] %>
-            <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this,false)" oncontextmenu="showMenu(event, 'menuShare'); select_directory(this,false);"><%= store[1].nil? ? store[0] : store[1] %></li>
+            <li id="<%= id %>" class="<%= store[2] %>"><div><%= store[1].nil? ? store[0] : store[1] %></div></li>
           <% end %>
         </ul>
       </div>
     </div>
 
     <div class="fileSelector" id="files" style="height:98%">
-      <table class="fileItem">
-        <tr>
-          <th>Name</th>
-          <th>Owner</th>
-          <th>Group</th>
-          <th>Mode</th>
-          <th>Change Time</th>
-        </tr>
-      </table>
+      <div id="dirBoxTitle">
+        <b>Files</b>
+      </div>
       <div id="fileList" style="height:95%">
         <table id="fileContainer" class="fileItem">
         </table>

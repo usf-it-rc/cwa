@@ -17,54 +17,32 @@ module Redmine::CwaBrowserHelper
     end
 
     def rename(file, new_name)
-
-      id = Digest::SHA512.hexdigest("MySaltySurprise" + 
-        (Time.now.to_i+Time.now.tv_usec+Time.now.tv_nsec).to_s +
-        file + new_name)
-
-      op_name = "fileop_rename_#{User.current.login}_#{id}"
-
-      myops = Rails.cache.read("file_operations_#{User.current.login}")
-
-      if myops.nil?
-        myops = [op_name]
-      else
-        myops << op_name
-      end
-
-      Rails.cache.write("file_operations_#{User.current.login}", myops)
-
       result = userexec "rename #{file} -- #{new_name}"
-
-      status = Rails.cache.write(op_name, {
-          :file_name => file,
-          :id => id,
-          :progress => 100,
-          :status => result[2] == 0 ? 'complete' : 'failed',
-          :operation => 'move' 
-        }, expires_in: 30.seconds)
       return result[2] == 0 ? true : false
     end
 
-    def remoteMove(source, target, move_id, user)
-      op_name = "fileop_move_#{user}_#{move_id}"
-      Rails.logger.debug "#{user} => mv #{source} -- #{target}"
+    def localMove(file, new_name)
+      result = userexec "rename #{file} -- #{new_name}"
+      ThreadTracker.current.status_update({
+        :file_name => source,
+        :progress => progress.to_i.nil? ? 0 : progress.to_i,
+        :status => result[2] == 0 ? 'Complete' : 'Failed!',
+        :operation => 'Move' 
+      })
+      return result[2] == 0 ? true : false
+    end
+
+    def remoteMove(source, target)
+      t_self = ThreadTracker.current
+
+      Rails.logger.debug "#{t_self.user} => mv #{source} -- #{target}"
       stdin, stdout, stderr, wait_thr = Open3.popen3(
-        "sudo -u #{user} /usr/bin/cwabrowserhelper.sh mv #{source} -- #{target}"
+        "sudo -u #{t_self.user} /usr/bin/cwabrowserhelper.sh mv #{source} -- #{target}"
         )
 
-      myops = Rails.cache.read("file_operations_#{user}")
-
-      if myops.nil?
-        myops = [op_name]
-      else
-        myops << op_name
-      end
-
-      Rails.cache.write("file_operations_#{user}", myops)
-      Rails.cache.write(op_name, { 
+      # write status info to this thread's cache entry
+      t_self.status_update({ 
         :file_name => source,
-        :id => move_id,
         :progress => 0,
         :status => 'Starting',
         :operation => 'Move' 
@@ -73,22 +51,22 @@ module Redmine::CwaBrowserHelper
       while !stderr.eof?
         progress = stderr.readline
         Rails.logger.debug "remoteMove: #{progress}"
-        Rails.cache.write(op_name, { 
+        ThreadTracker.current.status_update({
             :file_name => source,
-            :id => move_id,
             :progress => progress.to_i.nil? ? 0 : progress.to_i,
             :status => 'In Progress',
             :operation => 'Move' 
           })
       end
-
-      status = Rails.cache.write(op_name, {
+ 
+      t_self.status_update({
           :file_name => source,
-          :id => move_id,
           :progress => 100,
           :status => 'Complete',
           :operation => 'Move' 
-        }, expires_in: 30.seconds)
+        })
+
+      t_self.term
 
       stdout.close
       stdin.close
@@ -97,50 +75,42 @@ module Redmine::CwaBrowserHelper
       return exit_status
     end
       
-    def copy(source, target, copy_id, user)
-      op_name = "fileop_copy_#{user}_#{copy_id}"
-      Rails.logger.debug "#{user} => cp #{source} -- #{target}"
+    def copy(source, target)
+
+      t_self = ThreadTracker.current
+
+      Rails.logger.debug "#{t_self.user} => cp #{source} -- #{target}"
+
       stdin, stdout, stderr, wait_thr = Open3.popen3(
-        "sudo -u #{user} /usr/bin/cwabrowserhelper.sh cp #{source} -- #{target}"
+        "sudo -u #{t_self.user} /usr/bin/cwabrowserhelper.sh cp #{source} -- #{target}"
         )
 
-      myops = Rails.cache.read("file_operations_#{user}")
-
-      if myops.nil?
-        myops = [op_name]
-      else
-        myops << op_name
-      end
-
       # Get our first op data into the cache
-      Rails.cache.write("file_operations_#{user}", myops)
-      Rails.cache.write(op_name, { 
+      t_self.status_update({ 
         :file_name => source,
-        :id => copy_id,
         :progress => 0,
-        :status => 'starting',
+        :status => 'Starting',
         :operation => 'Copy' 
       })
 
       while !stderr.eof?
         progress = stderr.readline
-        Rails.logger.debug "COPY: #{progress}"
-        Rails.cache.write(op_name, { 
+        t_self.status_update({ 
           :file_name => source,
-          :id => copy_id,
           :progress => progress.to_i.nil? ? 0 : progress.to_i,
-          :status => 'in_progress',
+          :status => 'In Progress',
           :operation => 'Copy' 
         })
       end
 
-      status = Rails.cache.write(op_name, {
+      t_self.status_update({
         :file_name => source,
-        :id => copy_id,
         :progress => 100,
-        :status => 'complete',
+        :status => 'Complete',
         :operation => 'Copy' 
-      }, expires_in: 30.seconds)
+      })
+
+      t_self.term
 
       stdout.close
       stdin.close

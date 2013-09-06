@@ -37,20 +37,23 @@ p.browserEntry {
 }
 
 div.browserFileEntry, div.browserFileEntrySelected {
-  margin-bottom: 4px;
   z-index: 10;
-  height: 28px;
-  float: left;
-  position: relative;
-  width: 100%;
-  background: url('/plugin_assets/cwa/images/file.png') no-repeat left;
-  background-size: 24px 24px;
+  width: 78px;
+  background: url('/plugin_assets/cwa/images/file.png') no-repeat center 0.5em;
+  background-size: 48px 48px;
   padding-left: 28px;
+  text-align: center;
+  margin-left: 8px;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: top;
 }
 
 p.browserEntryText {
-  padding-top: 8px;
+  padding-top: 60px;
   margin-top: -3px;
+  margin-left: -24px;
+  word-wrap: break-word;
 }
 
 div.browserFileEntrySelected {
@@ -79,6 +82,7 @@ div.menu {
   background: #DDDDDD;
   z-index: 15;
   display: none;
+  min-width: 160px;
   -moz-box-shadow: 3px 3px 4px #333;
   -webkit-box-shadow: 3px 3px 4px #333;
   box-shadow: 3px 3px 4px #333;
@@ -165,6 +169,7 @@ div.floating_browser {
 textarea#tail_content {
   height: 90%;
   width:  95%;
+  border: 2px solid;
   margin: auto;
   top: 0; left: 0; bottom: 0; right: 0;
   position: absolute;
@@ -191,18 +196,18 @@ div.browserBox {
 
 div.dirSelector {
   padding-top: 0px;
-  width: 25%;
+  width: 33%;
   min-height: 256px;
   float: left;
 }
 
 div.fileSelector {
   min-height: 256px;
-  width:75%;
+  width:67%;
   float:left;
 }
 
-span#current_dir {
+span#current_dir, span#current_dir_popup {
   font-weight: bold;
   font-size: 20px;
 }
@@ -212,33 +217,42 @@ span#current_dir {
   margin: 0px;
 }
 
-li.dirExpanded, li.dirEntryHome, li.dirEntryWork, li.dirEntryShare, li.dirEntryDir {
+ul.dir div {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  margin-left: 12px;
+}
+
+li.dirExpanded, li.dirEntryHome, li.dirEntryWork, li.dirEntryShare, li.dirEntryDir,
+li.dirExpanded, li.dirEntryHomePopup, li.dirEntryWorkPopup, li.dirEntrySharePopup, 
+li.dirEntryDirPopup {
   list-style-type: none;
   background-repeat: no-repeat;
   background-size: 24px 24px;
-  background-position: 0 .4em;
+  background-position: 0 .3em;
   font-weight: normal;
-  padding-left: 2em;
-  padding-left: 2em;
-  padding-bottom: .5em;
-  padding-top: .5em;
+  padding-left: 1em;
   cursor: pointer;
 }
 
-li.dirExpanded {
+li.dirSelected {
   font-weight: bold;
 }
 
-li.dirEntryHome {
+li.dirExpanded {
+  /* place-holder */
+}
+
+li.dirEntryHome, li.dirEntryHomePopup {
   background-image: url('/plugin_assets/cwa/images/home.svg');
 }
-li.dirEntryWork {
+li.dirEntryWork, li.dirEntryWorkPopup {
   background-image: url('/plugin_assets/cwa/images/netshare.svg');
 }
-li.dirEntryShare {
+li.dirEntryShare, li.dirEntrySharePopup {
   background-image: url('/plugin_assets/cwa/images/netshare.svg');
 }
-li.dirEntryDir {
+li.dirEntryDir, li.dirEntryDirPopup {
   background-image: url('/plugin_assets/cwa/images/folder_mini.png');
 }
 
@@ -261,7 +275,6 @@ div#dirContainerDirs {
   display: block;
   min-height: 256px;
   overflow: auto;
-  background-color: #EEEEEE;
   margin-top: 2px;
   padding-left: 4px;
 }
@@ -320,11 +333,9 @@ table.fileItem th {
 }
 
 div#fileList {
-  display: block;
   overflow-y: auto;
   overflow-x: hidden;
   min-height:256px;
-  background-color: #EEEEEE;
   margin-left: 2px;
 }
 
@@ -407,6 +418,10 @@ div.browserProgressElement {
   border: 1px solid;
   background-color: #CCCCCC;
   margin-left: 4px;
+  margin-top:-8px;
+  -moz-border-radius:6px;
+  -webkit-border-radius:6px;
+  border-radius:6px;
 }
 
 .browserProgressElementShader {

@@ -3,70 +3,100 @@ $(document).click(function() {
   clearMenu();
 });
 
-function setClickHandlers(divPopup){
-  // Directory click handlers
-  $('.dirEntryHome,.dirEntryShare').bind('click', function (){
-    leftClickShare(event,this,divPopup);
-  });
-  $('.dirEntryDir').bind('click', function (){
-    leftClickDir(event,this,divPopup);
-  });
-  $('.dirEntryHome,.dirEntryShare').bind('contextmenu', function (){
-    rightClickShare(event,this,divPopup);
-  });
-  $('.dirEntryDir').bind('contextmenu', function (){
-    rightClickDir(event,this,divPopup);
-  });
-  $('.browserFileEntry').bind('click', function (){
-    select_file(this);
-  });
-  $('.browserFileEntry').bind('contextmenu', function (){
-    select_file(this);
+function setPopupClickHandlers(){
+  $('.dirEntryHomePopup,.dirEntrySharePopup,.dirEntryWorkPopup,.dirEntryDirPopup').unbind('click');
+  $('.dirEntryHomePopup,.dirEntrySharePopup,.dirEntryWorkPopup').bind('click', function (event){
+    event = event || window.event;
     event.preventDefault();
-    clearMenu();
-    console.log("rightClickFile()");
-    select_file(this);
-    showMenu(event, 'menuFile');
+    leftClickShare(event,this,true);
     event.stopPropagation();
   });
+  $('.dirEntryDirPopup').bind('click', function (event){
+    event = event || window.event;
+    event.preventDefault();
+    leftClickDir(event,this,true);
+    event.stopPropagation();
+  });
+}
 
+
+function setClickHandlers(){
+  // Unbind everything
+  $('.dirEntryHome,.dirEntryShare,.dirEntryWork,.dirEntryDir').unbind('click');
+  $('.dirEntryHome,.dirEntryShare,.dirEntryWork,.dirEntryDir').unbind('contextmenu');
+  // Directory click handlers
+  $('.dirEntryHome,.dirEntryShare,.dirEntryWork').bind('click', function (event){
+    event = event || window.event;
+    event.preventDefault();
+    leftClickShare(event,this,false);
+    event.stopPropagation();
+  });
+  $('.dirEntryDir').bind('click', function (event){
+    event = event || window.event;
+    event.preventDefault();
+    leftClickDir(event,this,false);
+    event.stopPropagation();
+  });
+  $('.dirEntryHome,.dirEntryShare,.dirEntryWork').bind('contextmenu', function (event){
+    event = event || window.event;
+    event.preventDefault();
+    rightClickShare(event,this,false);
+    event.stopPropagation();
+  });
+  $('.dirEntryDir').bind('contextmenu', function (event){
+    event = event || window.event;
+    event.preventDefault();
+    rightClickDir(event,this,false);
+    event.stopPropagation();
+  });
   // File click handlers
+  $('.browserFileEntry').bind('click', function (event){
+    event = event || window.event;
+    event.preventDefault();
+    leftClickFile(event,this,false);
+    event.stopPropagation();
+  });
+  $('.browserFileEntry').bind('contextmenu', function (event){
+    event = event || window.event;
+    event.preventDefault();
+    rightClickFile(event,this,false);
+    event.stopPropagation();
+  });
 }
 
 function rightClickShare(event, element, divPopup){
-  event.preventDefault();
   clearMenu();
-  console.log("rightClickShare()");
   select_directory(element,divPopup);
   showMenu(event, 'menuShare');
-  event.stopPropagation();
 }
 
 function leftClickShare(event, element, divPopup){
-  event.preventDefault();
   clearMenu();
-  console.log("leftClickShare()");
   select_directory(element,divPopup);
-  collapsibleExpand(element, divPopup);
-  event.stopPropagation();
+  collapsibleExpand(element,divPopup);
 }
 
 function rightClickDir(event, element, divPopup){
-  event.preventDefault();
   clearMenu();
-  console.log("rightClickDir()");
   select_directory(element,divPopup);
   showMenu(event, 'menuDir');
-  event.stopPropagation();
 }
 
 function leftClickDir(event, element, divPopup){
-  event.preventDefault();
   clearMenu();
-  console.log("leftClickDir()");
   select_directory(element,divPopup);
   collapsibleExpand(element, divPopup);
-  event.stopPropagation();
+}
+
+function leftClickFile(event, element, divPopup){
+  clearMenu();
+  select_file(element);
+}
+
+function rightClickFile(event, element, divPopup){
+  clearMenu();
+  select_file(element);
+  showMenu(event, 'menuFile');
 }
 
 // This should be set by the application first!
@@ -134,6 +164,7 @@ function cwaAction(action, promptString, confirmBool, itemType){
 
   if ((promptString && argument && continuation == true) || 
       (!promptString && !argument && continuation == true)){
+    $.ajaxSetup( { "async": true } ); 
     $.ajax({
       type: "POST",
       url: url,
@@ -197,21 +228,29 @@ function select_directory(elem, divPopup){
     $("#target_share").val(share);
     $("#target_path").val(path);
   } else {
+    $("#selected_file").val('');
     $("#selected_share").val(share);
     $("#selected_dir").val(path);
     $("#selected_item").val(share + "/" + path);
   }
 
+  if (divPopup){
+    $('.dirEntryHomePopup,.dirEntrySharePopup,.dirEntryWorkPopup,.dirEntryDirPopup').removeClass('dirSelected');
+  } else {
+    $('.dirEntryHome,.dirEntryShare,.dirEntryWork,.dirEntryDir').removeClass('dirSelected');
+  }
+  $(elem).addClass('dirSelected');
+
   $("#selected_file").val();
   $("#dirInfo").html(function(){
     for (var dirent in dirObj){
-      console.log("SD: " + dirent + " == " + dirName[dirName.length-1]);
       if (dirent == dirName[dirName.length-1]){
         var str = "<b>Name: </b>" + dirent + "<br/>\n";
         str += "<b>Mode: </b>" + dirObj[dirent]['permissions'] + "<br/>\n";
         str += "<b>Owner: </b>" + dirObj[dirent]['user'] + "<br/>\n";
         str += "<b>Group: </b>" + dirObj[dirent]['group'] + "<br/>\n";
         str += "<b>Last change: </b>" + dirObj[dirent]['date'] + "<br/>\n";
+        break;
       }
     }
     return str;
@@ -236,7 +275,6 @@ function select_file(elem) {
   $("#selected_share").val(share);
   $("#fileInfo").html(function(){
     for (var file in fileObj){
-      console.log("SF: " + file + " == " + fileName[fileName.length-1]);
       if (file == fileName[fileName.length-1]){
         var str = "<b>Name: </b>" + file + "<br/>\n";
         str += "<b>Mode: </b>" + fileObj[file]['permissions'] + "<br/>\n";
@@ -244,6 +282,7 @@ function select_file(elem) {
         str += "<b>Group: </b>" + fileObj[file]['group'] + "<br/>\n";
         str += "<b>Size: </b>" + getBytesWithUnit(fileObj[file]['size']) + "<br/>\n";
         str += "<b>Last change: </b>" + fileObj[file]['date'] + "<br/>\n";
+        break;
       }
     }
     return str;
@@ -332,7 +371,6 @@ function hideUploadFile(){
 }
 
 function uploadFile(){
-  console.log("Uploading to " + $('#selected_share').val() + '/' + $('#selected_dir').val());
   if ($('#selected_dir').val() == ''){
     var url = '/cwa_browser/' + redmine_project + '/' + $('#selected_share').val() + '/upload';
   } else {
@@ -343,10 +381,46 @@ function uploadFile(){
 }
 
 // unhide the text editor div.  It will handle the rest
-function showTextEditor(){
-  $('#upload_form').attr('action', '/cwa_browser/' + redmine_project + '/' + $('#selected_share').val() + 
+function showTextEditor(editFile){
+  $('#new_file_form').attr('action', '/cwa_browser/' + redmine_project + '/' + $('#selected_share').val() + 
     "/" + $('#selected_dir').val() + "/create");
-  $('#textEditor').css("display", "block");
+  if (editFile){
+    url = "/cwa_browser/" + redmine_project + "/" + $('#selected_item').val() + '/download';
+    // get file content from download and put into editor
+    $.ajaxSetup( { "async": true } ); 
+    $.ajax({
+      type: "POST",
+      url: url,
+      success: function(data){ 
+        if (!data.type.match(/^text\/.*/)){
+          alert("File is not a text file so we can't edit it here :(");
+        } else if (data.fid != null){
+          $.ajax({
+              type: "GET",
+              url: "/cwa_browser/" + redmine_project + "/download/" + data.fid,
+              success: function(getData){
+                // this is defined by CodeMirror call earlier in the page :)
+                var fileName = $('#selected_file').val().split('/');
+                $('#textEditor').css("display", "block");
+                $('#new_file_name').val(fileName[fileName.length-1]);
+                textEditor.setValue(getData);
+              },
+              error: function(){
+                alert("Problem opening file for editing...");
+              }
+          });
+        } else {
+          alert("Problem opening file for editing...");
+        }
+      },
+      error: function(){
+        alert("Problem opening file for editing...");
+      }
+    });
+    
+  } else {
+    $('#textEditor').css("display", "block");
+  }
 }
 
 // hide and reset the form in the text editor div
@@ -375,14 +449,14 @@ function getSelectedDir(elem_id){
   $('#minibrowser').css('display', 'block');
   $('#minibrowser_button').attr('value', 'Select directory...');
   $('#minibrowser_button').attr('onclick', "miniBrowserSelectItem('dir', '" + elem_id + "',null)");
-  goToPath("home",'',false);
+  goToPath("home",'',true);
 }
 
 function getSelectedFile(elem_id,inferWorkDir){
   $('#minibrowser').css('display', 'block');
   $('#minibrowser_button').attr('value', 'Select file...');
   $('#minibrowser_button').attr('onclick', "miniBrowserSelectItem('file', '" + elem_id + "','" + inferWorkDir + "')");
-  goToPath("home",'',false);
+  goToPath("home",'',true);
 }
 
 function hideMiniBrowser(){
@@ -394,7 +468,6 @@ function miniBrowserSelectItem(type, elem_id, inferWorkdir){
     // We'll be infering the work directory from this.  We'll set the hidden
     // field work_dir
     var file = resolve_path($('#selected_share').val(), $('#selected_file').val());
-    console.log("miniBrowserSelectItem => " + file);
     if (inferWorkdir != '' && inferWorkdir != null){
        var fileArray = file.split('/');
        fileArray.pop();
@@ -407,7 +480,7 @@ function miniBrowserSelectItem(type, elem_id, inferWorkdir){
     $(file_elem).val(file);
     $(file_label_elem).html(file);
   } else if (type == 'dir'){
-    var dir  = resolve_path($('#selected_share').val(), $('#selected_dir').val());
+    var dir = resolve_path($('#selected_share').val(), $('#selected_dir').val());
     var dir_elem = document.getElementById(elem_id);
     var dir_label_elem = document.getElementById(elem_id + "_label");
     $(dir_elem).val(dir);
@@ -418,6 +491,7 @@ function miniBrowserSelectItem(type, elem_id, inferWorkdir){
 
 // Show the move div
 function showCopyMove(action){
+  setPopupClickHandlers();
   $('#copymove').css('display', "block");
   if (action == "move"){
     $('#copymove_button').attr('value', 'Move');
@@ -436,26 +510,23 @@ function hideCopyMove(){
 var op_id = '';
 var op_interval;
 var op_status = function(){
+  console.log("op_status()");
   $.getJSON('/cwa_browser/' + redmine_project + '/op_status/', function(data){
-    $.each(data, function(key,value){
-      if (key == 'operations'){
-        var progress;
-        if (!value.length){
-          clearInterval(op_interval);
-          $('#queue_progress').html('');
-          $('#queue_progress').css('display', 'none');
-          return false;
-        }
-        var op_items = [];
-        $.each(value, function(key,op){
-          // this will add divs and progress bars to a parent div defined
-          // in the main view
-
-          op_items.push('<div id="' + op.id + '" class="browserProgressElement"><div id="shade_' + op.id + '" class="browserProgressElementShader" style="width:' + op.progress + '%"></div>' + op.operation + ' ' + op.file_name + '<br/>Status: ' + op.status + '</div>');
-        });
-        $('#queue_progress').html(op_items.join('\n'));
-      }
-    });
+    console.log("data: " + data);
+    if (data == null){
+      clearInterval(op_interval);
+      $('#queue_progress').html('');
+      $('#queue_progress').css('display', 'none');
+      return false;
+    } else {
+      var op_items = [];
+      $.each(data, function(key,op){
+        console.log("key: " + key + " op: " + op);
+        console.log(JSON.stringify(op));
+        op_items.push('<div id="' + key + '" class="browserProgressElement"><div id="shade_' + key + '" class="browserProgressElementShader" style="width:' + op.progress + '%"></div>' + op.operation + ' ' + op.file_name + '<br/>Status: ' + op.status + '</div>');
+      });
+      $('#queue_progress').html(op_items.join('\n'));
+    }
   }); 
 };
 
@@ -463,12 +534,10 @@ var op_status = function(){
 function startCopyMove(action, elem_id){
   $('#copymove').css('display', 'none');
   if (action == "select"){
-    console.log("SELECTED_FILE: " + $('#selected_file').val());
     var file_elem = document.getElementById(elem_id);
     var file_label_elem = document.getElementById(elem_id + "_selected");
     $(file_elem).html($('#selected_file').val());
     $(file_label_elem).html('[ ' +$('#selected_share').val() + ' ] / ' + $('#selected_file').val());
-    
     return;
   }
 
@@ -476,15 +545,12 @@ function startCopyMove(action, elem_id){
 
   if (url_action){
     $.post('/cwa_browser/' + redmine_project + '/' + url_action, null, function(data){
-      $.each(data, function(key,value){
-        if (key == 'move_id'){
-          move_id = value;
-        }
-        if (key == 'status'){
+      $.each(data, function(key, value){
+        if (key == 'code'){
           $('#queue_progress').css('display', 'block');
           op_status();
           op_interval = setInterval(op_status, 5000);
-          goToPath($('#target_share').val(),$('#target_path').val(),false); 
+          goToPath($('#target_share').val(),$('#target_path').val(),false);
         }
       });
     }, 'json');
@@ -499,10 +565,6 @@ function copyMoveUrlAction(action){
   var target_share = $('#target_share').val();
   var target_path = $('#target_path').val();
   var url = false;
-
-  console.log("sd:" + selected_dir + " sf:" + selected_file +
-        " ts:" + target_share + " tp:" + target_path);
-
   if (!selected_share || (!selected_file && !selected_dir) || !target_share){
     alert("Source and/or Target not properly set!");
   } else if (selected_file && target_share && !target_path){
@@ -516,8 +578,6 @@ function copyMoveUrlAction(action){
   } else {
     alert("Invalid " + action + " request");
   }
-
-  console.log(url);
   return url; 
 }
 
@@ -542,12 +602,13 @@ function getJSONfileItems(obj,share,path){
 function getJSONdirItems(obj,share,path,divPopup){
   var dirItems = [];
   dirItems.push('<ul>');
+  var entryClass = divPopup ? 'dirEntryDirPopup' : 'dirEntryDir';
 
   for (var dir in obj){
     if (!path){
-      dirItems.push('<li class="dirEntryDir" id="' + share + "." + dir + '">' + dir + '</li>' );
+      dirItems.push('<li class="' + entryClass + '" id="' + share + "." + dir + '"><div>' + dir + '</div></li>' );
     } else {
-      dirItems.push('<li class="dirEntryDir" id="' + share + "." + path + "/" + dir + '">' + dir + '</li>' );
+      dirItems.push('<li class="' + entryClass + '" id="' + share + "." + path + "/" + dir + '"><div>' + dir + '</div></li>' );
     }
   }
   dirItems.push('</ul>');
@@ -603,15 +664,14 @@ function goToPath(share, path, divPopup){
         eid = eid + '/' + comp;
     }
 
-    //$.ajaxSetup( { "async": false } ); 
-
+    $.ajaxSetup( { "async": false } ); 
     $.getJSON('/cwa_browser/' + redmine_project + '/' + dir, function(data){
       $.each(data,function(key,obj){
         if (key == 'directories'){
           dirObj = obj;
-          dirItems = getJSONdirItems(obj,share,dir_path,false);
+          dirItems = getJSONdirItems(obj,share,dir_path,divPopup);
         }
-        if (key == 'files' && !divPopup){
+        if (key == 'files'){
           fileObj = obj;
           fileItems = getJSONfileItems(obj,share,dir_path);
         }
@@ -622,14 +682,23 @@ function goToPath(share, path, divPopup){
       $(elem).addClass('dirExpanded');
       $(elem).find('ul li').remove();
       $(dirItems).appendTo(elem);
+      select_directory(elem,divPopup);
+      $("#fileList").html(fileItems);
+
       if (!divPopup){
-        $("#fileList").html(fileItems);
+        setClickHandlers();
+      } else {
+        setPopupClickHandlers();
       }
-      setClickHandlers(divPopup);
     });
   });
   var dispDir = resolve_path(share,path);
-  $("#current_dir").html(dispDir);
+  if (!divPopup){
+    $("#current_dir").html(dispDir);
+  }else{
+    $("#current_dir_popup").html(dispDir);
+  }
+
 }
 
 // Expand tree and navigate based on current selected element
@@ -643,6 +712,7 @@ function collapsibleExpand(elem,divPopup){
   var path = components.path;
   var dirItems = "";
   var fileItems = "";
+
   if (divPopup){
     $('#target_share').val(share);
     $('#target_path').val(path);
@@ -650,29 +720,36 @@ function collapsibleExpand(elem,divPopup){
     $('#selected_share').val(share);
     $('#selected_dir').val(path);
   }
+  $.ajaxSetup( { "async": true } ); 
   $.getJSON('/cwa_browser/' + redmine_project + '/' + share + "/" + path, function(data){
-    $(elem).find('ul').remove();
+    if($(elem).hasClass('dirExpanded')){
+      $(elem).find('ul').remove();
+     }
     $.each(data, function(key,obj){
-      if (key == 'directories' && !$(elem).hasClass('dirExpaned')){
+      if (key == 'directories' && !$(elem).hasClass('dirExpanded')){
         dirItems = getJSONdirItems(obj,share,path,divPopup);
         dirObj = obj;
+        $(dirItems).appendTo(elem);
       }
-      if (key == 'files' && !divPopup){
+      if (key == 'files'){
         fileItems = getJSONfileItems(obj,share,path);
         fileObj = obj;
-        if (!divPopup){
-          $("#fileList").html(fileItems);
-        }
+        $("#fileList").html(fileItems);
       }
     });
-    if ($(elem).hasClass('dirExpanded')){
-      $(dirItems).appendTo(elem);
-    }
     var dispDir = resolve_path(share,path);
-    $("#current_dir").html(dispDir);
-    $('.dirEntryHome,.dirEntryShare,.dirEntryWork,.dirEntryDir').removeClass('dirExpanded');
-    $(elem).addClass('dirExpanded');
-    setClickHandlers(divPopup);
+    if (!divPopup){
+      $("#current_dir").html(dispDir);
+      setClickHandlers(divPopup);
+    }else{
+      $("#current_dir_popup").html(dispDir);
+      setPopupClickHandlers(divPopup);
+    }
+    if($(elem).hasClass('dirExpanded')){
+      $(elem).removeClass('dirExpanded');
+    } else {
+      $(elem).addClass('dirExpanded');
+    }
   });
 }
 
@@ -684,8 +761,6 @@ function path_components(elem){
   parts.shift();
   var path = parts.join('.');
 
-  console.log("Share: " + share + " Path: " + path);
-  
   return {
     share: share,
     path: path

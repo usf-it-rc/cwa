@@ -20,3 +20,6 @@ en:
   settings_ldap_tab: "LDAP/FreeIPA"
   settings_trust_tab: "Domain Trusts"
   settings_scheduler_tab: "Scheduler"
+  cwa_application_haml_tab: "HAML/End-User Form"
+  cwa_application_basic_tab: "Basic Settings"
+  cwa_application_exec_tab: "Shell/Execution Code"

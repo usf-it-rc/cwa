@@ -1,39 +1,42 @@
+<%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/codemirror.css" %>
+<%= stylesheet_link_tag "/plugin_assets/cwa/codemirror/elegant.css" %>
+<%= javascript_include_tag "/plugin_assets/cwa/javascripts/codemirror.js" %>
+<%= javascript_include_tag "/plugin_assets/cwa/codemirror/shell/shell.js" %>
+<%= javascript_include_tag "/plugin_assets/cwa/codemirror/htmlmixed/htmlmixed.js" %>
+<%= javascript_include_tag "/plugin_assets/cwa/codemirror/xml/xml.js" %>
+<%= javascript_include_tag "/plugin_assets/cwa/codemirror/javascript/javascript.js" %>
+<%= javascript_include_tag "/plugin_assets/cwa/codemirror/css/css.js" %>
+<%= javascript_include_tag "/plugin_assets/cwa/codemirror/ruby/ruby.js" %>
+<%= javascript_include_tag "/plugin_assets/cwa/codemirror/haml/haml.js" %>
+
 <h2>App Manager</h2>
-<center>
 <%= form_for @app, :url => { :project_id => @project.identifier } do |a| %>
- <%= a.hidden_field :project_id, :value => @project.id %>
- <div class="box" style="width:90%; text-align:left;">
-  <h3>Basic Information</h3>
-  <table>
-  <tr>
-   <td><%= a.label :name %></td>
-   <td><%= a.text_field :name, :size => 25 %></td>
-  </tr>
-  <tr>
-    <td><%= a.label :version %></td>
-    <td><%= a.text_field :version, :size => 25 %></td>
-  </tr>
-  </table>
-  </p>
- </div>
- <div class="box" style="width:90%; text-align:left;">
-  <h3>Job Execution Code</h3>
-  <p>
-    <center>
-    <%= a.text_area :exec, :rows => 32, :cols => 120 %>
-    </center>
-  </p>
- </div>
-  <div class="box"style="width:90%; text-align:left;">
-  <h3>End-user Submit Form</h3>
-  <p>
-    <center>
-    <%= a.text_area :haml_form, :rows => 32, :cols => 120 %>
-    </center>
-  </p>
-  <p>
-    <%= a.submit %>
-  </p>
-  </div>
+  <% @form_var = a %>
+  <%= a.hidden_field :project_id, :value => @project.id %>
+  <%= render_tabs Redmine::CwaApplicationHelper::cwa_applications_tabs %>
+  <%= a.submit %>
 <% end %>
-</center>
+
+
+<!-- <script type="text/javascript">
+  var myHAMLCM = null;
+  var myExecCM = null;
+  $('#tab-exec_code').bind('click', function(){
+    if (myHAMLCM == null){
+      myHAMLCM = CodeMirror.fromTextArea(
+        document.getElementById('cwa_application_haml_form'),
+        { lineNumbers: true, mode: "haml" }
+      );
+    }
+  });
+
+  $('#tab-haml_code').bind('click', function(){
+    if (myExecCM == null){
+      myExecCM = CodeMirror.fromTextArea(
+        document.getElementById('cwa_application_exec'),
+        { lineNumbers: true, mode: "shell" }
+      );
+    }
+  });
+
+</script> -->

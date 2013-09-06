@@ -1,5 +1,11 @@
 <%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/cwa.css" %>
+<%= stylesheet_link_tag "/plugin_assets/cwa/stylesheets/codemirror.css" %>
+<%= stylesheet_link_tag "/plugin_assets/cwa/codemirror/elegant.css" %>
 <%= javascript_include_tag "/plugin_assets/cwa/javascripts/browser.js" %>
+<%= javascript_include_tag "/plugin_assets/cwa/javascripts/codemirror.js" %>
+<%= javascript_include_tag "/plugin_assets/cwa/codemirror/javascript/javascript.js" %>
+
+<h2 id="current_dir"></h2>
 
 <%= form_tag '/cwa_browser', :id => 'app_form', :multipart => true do %>
 <%= hidden_field_tag :selected_item, nil %>
@@ -13,14 +19,15 @@
 
 <script type="text/javascript">
   redmine_project = "<%= @project.identifier %>";
+  var textEditor;
   $('#wrapper3').css('height','100%');
 
   // set callback to resize the file and directory view ports when the
   // browser window changes size
   var resizeViewPorts = function(){
     if ($(this).height() >= 564){
-      $('#dirContainerDirs').css('height', $(this).height()-240); //set max height
-      $('#fileList').css('height', $(this).height()-240); //set max height
+      $('#dirContainerDirs').css('height', $(this).height()-265); //set max height
+      $('#fileList').css('height', $(this).height()-265); //set max height
       //$('#mainBox').css('height', $(this).height()-100);
     }
   }
@@ -29,14 +36,14 @@
   $(window).load(resizeViewPorts);
   $().ready(function (){
     goToPath("<%= params[:share] %>", "<%= params[:dir] %>", false);
+    textEditor = CodeMirror.fromTextArea(document.getElementById('new_file_content'), { 
+      lineNumbers: true,
+      lineWrapping: true
+    });
   });
 </script>
 
-<div>
-  <div class="pathBox">
-    <span id="current_dir"></span>
-  </div>
-
+<div style="margin: -10px;">
   <div id="mainBox" class="browserBox">
     <div class="dirSelector" id="dirContainer">
       <div id="dirBoxTitle">
@@ -46,7 +53,7 @@
         <ul class="dir">
           <% ([["home",nil,"dirEntryHome"],["work",nil,"dirEntryWork"]] + @group_list.map {|g| [ "shares", g[:cn], "dirEntryShare"]}).each do |store| %>
             <% id = store[1].nil? ? store[0] + "." : store[0] + "." + store[1] %>
-            <li id="<%= id %>" class="<%= store[2] %>" onclick="leftClickShare(event,this,false)" oncontextmenu="rightClickShare(event,this,false)"><%= store[1].nil? ? store[0] : store[1] %></li>
+            <li id="<%= id %>" class="<%= store[2] %>"><div><%= store[1].nil? ? store[0] : store[1] %></div></li>
           <% end %>
         </ul>
       </div>
@@ -85,20 +92,24 @@
 </div>
 
 <div id="textEditor" class="miniapp">
-  <center>
   <%= form_tag "STUB", :id => 'new_file_form', :multipart => true do %>
-    <%= label_tag :new_file_name, "New Text File Name" %>
-    <%= hidden_field_tag :dir, @browser.current_dir %>
-    <%= text_field_tag :new_file_name, nil, :length => 128 %>
-    <br/>
-    <%= text_area_tag :new_file_content, nil, { :rows => "28", :cols => "96" } %>
-    <br/>
-    <%= submit_tag "Create" %><%= button_to_function "Cancel", "hideTextEditor()"%>
+    <div>
+    <%= label_tag :new_file_name, "File Name" %>
+    <%= hidden_field_tag :dir %>
+    <%= text_field_tag :new_file_name %>
+    <div style="float:right">
+    <%= submit_tag "Save" %><%= button_to_function "Discard", "hideTextEditor()"%>
+    </div>
+    </div>
+    <hr/>
+    <%= text_area_tag :new_file_content, nil %>
   <% end %>
-  </center>
 </div>
 
 <div id="menuDir" class="menu">
+  <center><b>Menu</b></center>
+  <hr/>
+  <div class="menuItem" onclick="showTextEditor(false)">Create new text file...</div>
   <div class="menuItem" onclick="cwaAction('download', null, false, 'dir')">Download as Zip</div>
   <div class="menuItem" onclick="showUploadFile()">Upload file...</div>
   <div class="menuItem" onclick="cwaAction('rename','Enter new name for directory:', false, 'dir')">Rename...</div>
@@ -108,12 +119,18 @@
 </div>
 
 <div id="menuShare" class="menu">
+  <center><b>Menu</b></center>
+  <hr/>
+  <div class="menuItem" onclick="showTextEditor(false)">Create new text file...</div>
   <div class="menuItem" onclick="cwaAction('download', null, false, 'dir')">Download as Zip</div>
   <div class="menuItem" onclick="showUploadFile()">Upload file...</div>
   <div class="menuItem" onclick="cwaAction('mkdir','Enter name for new directory:', false, 'dir')">Create directory...</div>
 </div>
 
 <div id="menuFile" class="menu">
+  <center><b>Menu</b></center>
+  <hr/>
+  <div class="menuItem" onclick="showTextEditor(true)">Edit...</div>
   <div class="menuItem" onclick="cwaAction('download', null, false, 'file')">Download</div>
   <div class="menuItem" onclick="showTail()">Tail...</div>
   <div class="menuItem" onclick="cwaAction('rename', 'Enter new name for file:', false, 'file')">Rename...</div>
@@ -122,14 +139,14 @@
   <div class="menuItem" onclick="showCopyMove('copy',null)">Copy...</div>
 </div>
 
-<div id="copymove" class="miniapp" style="width: 25%; height: 75%;">
-  <div class="box dirSelector" id="dirContainerSelector" style="width:95%; height:90%; max-height: 90%; padding-right: 0px;">
-    <div id="dirBoxTitle"><b>Select Destination...</b></div>
-    <hr/>
+<div id="copymove" class="miniapp" style="width: 33%; height: 60%;">
+  <h2 id="current_dir_popup"></h2>
+  <div id="dirBoxTitle"><b>Select Destination...</b></div>
+  <div class="dirSelector" id="dirContainerSelector" style="position: relative; width:95%; height:80%; padding-right: 0px; overflow:scroll;">
     <ul class="dir">
-      <% ([["home",nil,"home.svg"],["work",nil,"netshare.svg"]] + @group_list.map {|g| [ "shares", g[:cn], "netshare.svg"]}).each do |store| %>
+      <% ([["home",nil,"dirEntryHomePopup"],["work",nil,"dirEntryWorkPopup"]] + @group_list.map {|g| [ "shares", g[:cn], "dirEntrySharePopup"]}).each do |store| %>
         <% id = store[1].nil? ? store[0] + "." : store[0] + "#" + store[1] %>
-        <li id="<%= id %>" style="background-image: url('/plugin_assets/cwa/images/<%= store[2] %>'); background-size: 24px;" onclick="collapsibleExpand(this,true)"><%= store[1].nil? ? store[0] : store[1] %></li>
+        <li id="<%= id %>" class="<%= store[2] %>"><div><%= store[1].nil? ? store[0] : store[1] %></div></li>
       <% end %>
     </ul>
   </div>

@@ -9,6 +9,8 @@ require 'cwa_ipa_authorize'
 require_dependency 'cwa/hooks'
 require 'googlecharts'
 require 'cwa_settings_helper'
+require 'cwa_application_helper'
+require 'thread_tracker'
 
 Redmine::MenuManager.map :project_menu do |menu|
   menu.delete :wiki if menu.exists? :wiki
@@ -49,7 +51,7 @@ Redmine::Plugin.register :cwa do
     permission :job_manager, :cwa_jobmanager => [:index, :alljobs, :current_jobs, :job_history, :delete, :submit, :queue_status]
     permission :allocations, { :cwa_allocations => [:index] }
     permission :web_apps, { :cwa_applications => [:index] }
-    permission :file_browser, { :cwa_browser => [:index, :mkdir, :rename, :delete, :download, :get, :tail, :upload, :move, :op_status, :copy] }
+    permission :file_browser, { :cwa_browser => [:index, :mkdir, :rename, :delete, :download, :get, :tail, :upload, :move, :op_status, :copy, :create, :get_zip] }
     permission :user_stats, { :cwa_stats => [:index] }
     permission :applications, { :cwa_applications => [:index, :show, :display, :update, :delete, :new] }
   end

@@ -251,21 +251,14 @@ class CwaBrowserController < ApplicationController
     else
       # Now we have to kick off an asynchronous task that feeds data to a cache
       # based on the hash of the transfer components
-      move_id = Digest::SHA512.hexdigest("MySaltySurprise" + (Time.now.to_i+Time.now.tv_usec+Time.now.tv_nsec).to_s +
-        path + target_path)
-      Thread.new do
-        Rails.logger.debug("IM IN A THREAD BIATCH!")
-        begin
-          Redmine::CwaBrowserHelper.remoteMove(path, target_path, move_id, user)
-        ensure
-          Rails.logger.flush
-        end
+      t = ThreadTracker.new do
+        Redmine::CwaBrowserHelper.remoteMove(path, target_path)
       end
       
       # Then we have to send back a JSON response to signal the beginning of the transfer
       response[:status] = "started"
       response[:code] = 200
-      response[:move_id] = move_id
+      response[:move_id] = t.opid
     end
   
     respond_to do |format|
@@ -276,27 +269,17 @@ class CwaBrowserController < ApplicationController
   def copy
     path = resolve_path(params[:share], params[:path])
     target_path = resolve_path(params[:target_share], params[:target_path])
-    user = User.current.login
     response = {}
 
-    # Now we have to kick off an asynchronous task that feeds data to a cache
-    # based on the hash of the transfer components
-
-    copy_id = Digest::SHA512.hexdigest("MySaltySurprise" + (Time.now.to_i+Time.now.tv_usec+Time.now.tv_nsec).to_s +
-              path + target_path)
-    Thread.new do
-      Rails.logger.debug("IM IN A THREAD BIATCH!")
-      begin
-        Redmine::CwaBrowserHelper.copy(path, target_path, copy_id, user)
-      ensure
-        Rails.logger.flush
-      end
+    # pop this in the background and track it
+    t = ThreadTracker.new do
+      Redmine::CwaBrowserHelper.copy(path, target_path)
     end
       
     # Then we have to send back a JSON response to signal the beginning of the transfer
     response[:status] = "started"
     response[:code] = 200
-    response[:copy_id] = copy_id
+    response[:copy_id] = t.opid
   
     respond_to do |format|
       format.json { render :json => response }
@@ -305,21 +288,18 @@ class CwaBrowserController < ApplicationController
 
   # That's pretty easy.  Just check the status of the thread from the cache
   def op_status
-    move_id = params[:move_id]
-    op_hash = { :operations => [] }
+    # invoke the threadtracker garbage collector
+    ThreadTracker.gc
+    op_hash = {}
+    ops = ThreadTracker.my_threads
 
-    ops = Rails.cache.fetch("file_operations_#{User.current.login}")
-    
-    ops.each do |op|
-      item = Rails.cache.fetch(op)
-      if item.nil?
-        ops.delete(item) 
-      else
-        op_hash[:operations] << item
-      end
+    Rails.logger.debug "OP_STATUS: #{ops.to_s}"
+
+    if !ops.nil? && ops.length > 0
+      ops.each { |op| op_hash.merge!({ op.opid => op.status }) }
+    else
+      op_hash = nil
     end
-
-    Rails.cache.write("file_operations_#{User.current.login}", ops)
 
     respond_to do |format|
       format.json { render :json => op_hash }
