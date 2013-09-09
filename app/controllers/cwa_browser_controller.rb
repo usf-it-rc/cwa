@@ -11,10 +11,10 @@ class CwaBrowserController < ApplicationController
     @group_list = @groups.that_i_manage + @groups.member_of
 
     begin 
-      @browser = CwaBrowser.new params[:share], params[:dir]
+      @browser = CwaBrowser.new params[:share], params[:dir], @ipa_user
     rescue Exception => e
       flash[:error] = e.message
-      @browser = CwaBrowser.new "home", nil
+      @browser = CwaBrowser.new "home", nil, @ipa_user
     end 
 
     respond_to do |format|
@@ -233,7 +233,6 @@ class CwaBrowserController < ApplicationController
   end
 
   def move
-    user = User.current.login
     path = resolve_path(params[:share], params[:path])
     target_path = resolve_path(params[:target_share], params[:target_path])
     response = {}
@@ -291,12 +290,12 @@ class CwaBrowserController < ApplicationController
     # invoke the threadtracker garbage collector
     ThreadTracker.gc
     op_hash = {}
-    ops = ThreadTracker.my_threads
+    ops = ThreadTracker.my_ops
 
     Rails.logger.debug "OP_STATUS: #{ops.to_s}"
 
     if !ops.nil? && ops.length > 0
-      ops.each { |op| op_hash.merge!({ op.opid => op.status }) }
+      ops.each { |op| op_hash.merge!(ThreadTracker.cache_status(op)) }
     else
       op_hash = nil
     end

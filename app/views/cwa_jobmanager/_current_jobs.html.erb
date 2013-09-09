@@ -12,7 +12,7 @@
   <% @jobs.each do |job| %>
     <% jobs_hist = CwaJobHistory.find_by_jobid(job.jobid) %>
     <% workdir = jobs_hist.workdir if jobs_hist != nil %>
-    <% browser = CwaBrowser.new workdir, nil %>
+    <% browser = CwaBrowser.new workdir, nil, @ipa_user %>
 
     <% if job.state == "r" %>
       <% host = RsgeHost.new(job.queue_name.to_s.split("@")[1]) %>

@@ -9,34 +9,62 @@ class CwaIpaUser
   def initialize
     self.user = User.current
 
-    Rails.cache.fetch("cached_user_fields_#{self.user.login}", :expires_in => 60.seconds) do
+    # We implement two levels of cache.  One allows us to reduce the penalty of
+    # repeated queries to the IPA server and Redmine custom fields table by 
+    # utilizing a configured Rails cache mechanism (CWA requires memcache via
+    # dallia to handle user threads spawned by the Browser front-end)
+    #
+    # The second level (the below instance variables) allow us to avoid repeated
+    # memcached hits when we know the data hasn't been modified.  Its very easy for 
+    # a controller to instantiate a CwaIpaUser object and call multiple methods,
+    # each of which would translate into a memcached hit
+
+    @fields_pre_cache = { :ttl => Time.now, :result => nil, :dirty => true }
+    @ipa_pre_cache = { :ttl => Time.now, :result => nil, :dirty => true }
+
+    @fields_pre_cache[:result] = Rails.cache.fetch("cached_user_fields_#{self.user.login}", :expires_in => 60.seconds) do
       make_user_fields
     end
+    @fields_pre_cache[:ttl] = Time.now + 5.seconds
+    @fields_pre_cache[:dirty] = false
 
-    Rails.cache.fetch("cached_ipa_result_#{self.user.login}", :expires_in => 60.seconds) do
+    @ipa_pre_cache[:result] = Rails.cache.fetch("cached_ipa_result_#{self.user.login}", :expires_in => 60.seconds) do
       ipa_query
     end
+    @ipa_pre_cache[:ttl] = Time.now + 5.seconds
+    @ipa_pre_cache[:dirty] = false
   end
 
   # this exposes ldap attributes and custom fields as methods
   def method_missing(name, *args, &blk)
     # If its an option in the fields hash, return it
     if args.empty? && blk.nil?
-      fields = Rails.cache.fetch("cached_user_fields_#{self.user.login}", :expires_in => 60.seconds) do
-        make_user_fields
+      Rails.logger.debug("IPA_MM lookup #{name}")
+
+      if @fields_pre_cache[:ttl] <= Time.now or @fields_pre_cache[:dirty]
+        @fields_pre_cache[:result] = Rails.cache.fetch("cached_user_fields_#{self.user.login}", :expires_in => 60.seconds) do
+          make_user_fields
+        end
+
+        @fields_pre_cache[:ttl] = Time.now + 5.seconds 
+        @fields_pre_cache[:dirty] = false
       end
 
-      if fields != nil && fields.has_key?(name)
-        return fields[name.to_sym]
+      if !@fields_pre_cache[:result].nil? and @fields_pre_cache[:result].has_key?(name)
+        return @fields_pre_cache[:result][name.to_sym]
       end
 
       # Query IPA server or return cached values
-      result = Rails.cache.fetch("cached_ipa_result_#{self.user.login}", :expires_in => 60.seconds) do
-        ipa_query
+      if @ipa_pre_cache[:ttl] <= Time.now or @ipa_pre_cache[:dirty]
+        @ipa_pre_cache[:result] = Rails.cache.fetch("cached_ipa_result_#{self.user.login}", :expires_in => 60.seconds) do
+          ipa_query
+        end
+        @ipa_pre_cache[:ttl] = Time.now + 5.seconds 
+        @ipa_pre_cache[:dirty] = false
       end
 
-      if result != nil && result.has_key?(name.to_s)
-        return result[name.to_s].first
+      if @ipa_pre_cache[:result] != nil and @ipa_pre_cache[:result].has_key?(name.to_s)
+        return @ipa_pre_cache[:result][name.to_s].first
       end
       super
     else
@@ -58,6 +86,8 @@ class CwaIpaUser
 
   # Force a full query on the next ipa_query run
   def refresh
+    @fields_pre_cache[:dirty] = true
+    @ipa_pre_cache[:dirty] = true
     Rails.cache.clear("cached_ipa_result_#{self.user.login}") and 
       Rails.cache.clear("cached_user_fields_#{self.user.login}")
   end

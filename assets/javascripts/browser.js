@@ -500,6 +500,7 @@ function showCopyMove(action){
     $('#copymove_button').attr('value', 'Copy');
     $('#copymove_button').attr('onclick', "startCopyMove('copy',null)");
   }
+  goToPath('home',null,true)
 }
 
 function hideCopyMove(){
@@ -508,21 +509,19 @@ function hideCopyMove(){
 
 // polling function to get display progress of file operations
 var op_id = '';
-var op_interval;
+var op_interval = null;
 var op_status = function(){
-  console.log("op_status()");
   $.getJSON('/cwa_browser/' + redmine_project + '/op_status/', function(data){
-    console.log("data: " + data);
+    console.log("op_status() " + JSON.stringify(data));
     if (data == null){
       clearInterval(op_interval);
+      op_interval = null;
       $('#queue_progress').html('');
       $('#queue_progress').css('display', 'none');
       return false;
     } else {
       var op_items = [];
       $.each(data, function(key,op){
-        console.log("key: " + key + " op: " + op);
-        console.log(JSON.stringify(op));
         op_items.push('<div id="' + key + '" class="browserProgressElement"><div id="shade_' + key + '" class="browserProgressElementShader" style="width:' + op.progress + '%"></div>' + op.operation + ' ' + op.file_name + '<br/>Status: ' + op.status + '</div>');
       });
       $('#queue_progress').html(op_items.join('\n'));
@@ -549,7 +548,9 @@ function startCopyMove(action, elem_id){
         if (key == 'code'){
           $('#queue_progress').css('display', 'block');
           op_status();
-          op_interval = setInterval(op_status, 5000);
+          if (op_interval == null){
+            op_interval = setInterval(op_status, 5000);
+          }
           goToPath($('#target_share').val(),$('#target_path').val(),false);
         }
       });
@@ -671,7 +672,7 @@ function goToPath(share, path, divPopup){
           dirObj = obj;
           dirItems = getJSONdirItems(obj,share,dir_path,divPopup);
         }
-        if (key == 'files'){
+        if (key == 'files' && (!divPopup || $("#fileList_popup").length > 0)){
           fileObj = obj;
           fileItems = getJSONfileItems(obj,share,dir_path);
         }
@@ -683,7 +684,12 @@ function goToPath(share, path, divPopup){
       $(elem).find('ul li').remove();
       $(dirItems).appendTo(elem);
       select_directory(elem,divPopup);
-      $("#fileList").html(fileItems);
+
+      if (divPopup && $("#fileList_popup").length > 0){
+        $("#fileList_popup").html(fileItems);
+      } else {
+        $("#fileList").html(fileItems);
+      }
 
       if (!divPopup){
         setClickHandlers();
@@ -731,19 +737,23 @@ function collapsibleExpand(elem,divPopup){
         dirObj = obj;
         $(dirItems).appendTo(elem);
       }
-      if (key == 'files'){
+      if (key == 'files' && (!divPopup || $("#fileList_popup").length > 0)){
         fileItems = getJSONfileItems(obj,share,path);
         fileObj = obj;
-        $("#fileList").html(fileItems);
+        if (divPopup && $("#fileList_popup").length > 0){
+          $("#fileList_popup").html(fileItems);
+        } else {
+          $("#fileList").html(fileItems);
+        }
       }
     });
     var dispDir = resolve_path(share,path);
     if (!divPopup){
       $("#current_dir").html(dispDir);
-      setClickHandlers(divPopup);
+      setClickHandlers();
     }else{
       $("#current_dir_popup").html(dispDir);
-      setPopupClickHandlers(divPopup);
+      setPopupClickHandlers();
     }
     if($(elem).hasClass('dirExpanded')){
       $(elem).removeClass('dirExpanded');

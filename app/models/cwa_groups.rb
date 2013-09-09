@@ -19,20 +19,12 @@ class CwaGroups
 
   # Get list of groups I manage from JSON-RPC
   def that_i_manage
-    group_list = Array.new
-    user_groups.each do |g|
-      group_list << g if g[:owner] == self.user.login.downcase
-    end
-    group_list
+    user_groups.select {|g| g[:owner] == self.user.login.downcase }
   end 
 
   # Get list of groups I belong to from JSON-RPC, not groups I manage
   def member_of
-    group_list = Array.new
-    user_groups.each do |g|
-      group_list << g if g[:owner] != self.user.login.downcase
-    end
-    group_list
+    user_groups.select {|g| g[:owner] != self.user.login.downcase }
   end
 
   # Get group by name

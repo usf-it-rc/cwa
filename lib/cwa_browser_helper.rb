@@ -23,12 +23,12 @@ module Redmine::CwaBrowserHelper
 
     def localMove(file, new_name)
       result = userexec "rename #{file} -- #{new_name}"
-      ThreadTracker.current.status_update({
+      ThreadTracker.current.status = {
         :file_name => source,
         :progress => progress.to_i.nil? ? 0 : progress.to_i,
         :status => result[2] == 0 ? 'Complete' : 'Failed!',
         :operation => 'Move' 
-      })
+      }
       return result[2] == 0 ? true : false
     end
 
@@ -41,32 +41,32 @@ module Redmine::CwaBrowserHelper
         )
 
       # write status info to this thread's cache entry
-      t_self.status_update({ 
+      t_self.status = { 
         :file_name => source,
         :progress => 0,
         :status => 'Starting',
         :operation => 'Move' 
-      })
+      }
 
       while !stderr.eof?
         progress = stderr.readline
         Rails.logger.debug "remoteMove: #{progress}"
-        ThreadTracker.current.status_update({
+        t_self.status = {
             :file_name => source,
             :progress => progress.to_i.nil? ? 0 : progress.to_i,
             :status => 'In Progress',
             :operation => 'Move' 
-          })
+          }
       end
  
-      t_self.status_update({
+      t_self.status = {
           :file_name => source,
           :progress => 100,
           :status => 'Complete',
           :operation => 'Move' 
-        })
+        }
 
-      t_self.term
+      t_self.expire
 
       stdout.close
       stdin.close
@@ -86,31 +86,31 @@ module Redmine::CwaBrowserHelper
         )
 
       # Get our first op data into the cache
-      t_self.status_update({ 
+      t_self.status = { 
         :file_name => source,
         :progress => 0,
         :status => 'Starting',
         :operation => 'Copy' 
-      })
+      }
 
       while !stderr.eof?
         progress = stderr.readline
-        t_self.status_update({ 
+        t_self.status = { 
           :file_name => source,
           :progress => progress.to_i.nil? ? 0 : progress.to_i,
           :status => 'In Progress',
           :operation => 'Copy' 
-        })
+        }
       end
 
-      t_self.status_update({
+      t_self.status = {
         :file_name => source,
         :progress => 100,
         :status => 'Complete',
         :operation => 'Copy' 
-      })
+      }
 
-      t_self.term
+      t_self.expire
 
       stdout.close
       stdin.close

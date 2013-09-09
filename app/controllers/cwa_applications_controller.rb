@@ -99,7 +99,7 @@ class CwaApplicationsController < ApplicationController
     end
 
     begin 
-      @browser = CwaBrowser.new params[:selected_share], params[:selected_dir]
+      @browser = CwaBrowser.new params[:selected_share], params[:selected_dir], @ipa_user
     rescue Exception => e
       flash[:error] = e.message
       redirect_to :action => 'display', :project_id => params[:project_id]

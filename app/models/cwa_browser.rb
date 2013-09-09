@@ -1,7 +1,7 @@
 class CwaBrowser
   attr_accessor :current_dir, :current_share, :current_path, :user, :home, :work
-  def initialize(share, dir)
-    @user = CwaIpaUser.new
+  def initialize(share, dir, user)
+    @user = user
 
     @home = user.homedirectory
     @work = user.workdirectory

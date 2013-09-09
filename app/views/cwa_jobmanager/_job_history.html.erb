@@ -11,7 +11,7 @@
   </tr>
 <% hist_jobs.each do |h| %>
   <% if h.workdir != nil %>
-    <% browser = CwaBrowser.new h.workdir, nil %>
+    <% browser = CwaBrowser.new h.workdir, nil, @ipa_user %>
   <% end %>
   <% if @jobs.where_id_is(h.jobid) == nil %>
     <tr>
