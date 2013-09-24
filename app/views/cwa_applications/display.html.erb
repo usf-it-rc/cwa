@@ -13,6 +13,8 @@
     <%= hidden_field_tag :selected_dir, params[:selected_dir] %>
     <%= hidden_field_tag :selected_file, params[:selected_file] %>
     <%= hidden_field_tag :selected_share, params[:selected_share] %>
+    <%= hidden_field_tag :target_share, params[:target_share] %>
+    <%= hidden_field_tag :target_path, params[:target_path] %>
     <%= hidden_field_tag :user_home_dir, @ipa_user.homedirectory %>
     <%= hidden_field_tag :user_work_dir, @ipa_user.workdirectory %>
     <%= hidden_field_tag :app_id, @app.id %>
@@ -33,7 +35,7 @@
       <div id="dirBoxTitle">
         <b>Shares &amp; Directories</b>
       </div>
-      <div id="dirContainerDirs" style="height:100%; overflow:auto;">
+      <div id="dirContainerDirs" style="height:93%; overflow:auto;">
         <ul class="dir">
           <% [["home",nil,"dirEntryHomePopup"],["work",nil,"dirEntryWorkPopup"]].each do |store| %>
             <% id = store[1].nil? ? store[0] + "." : store[0] + "." + store[1] %>
@@ -43,16 +45,16 @@
       </div>
     </div>
 
-    <div class="fileSelector" id="files" style="height:98%">
+    <div class="fileSelector" id="files" style="height:86%">
       <div id="dirBoxTitle">
         <b>Files</b>
       </div>
-      <div id="fileList_popup" style="height:95%">
+      <div id="fileList_popup" style="height:100%; overflow-x: auto; overflow-y: scroll;">
       </div>
     </div>
   </div>
 
-  <div style="height: 48px; width: 100%;">
+  <div style="position: relative; bottom: 12px; width: 100%;">
     <%= button_to_function "Select file...", "somefunc()", :id => 'minibrowser_button' %>
     <%= button_to_function "Cancel", "hideMiniBrowser()" %>
   </div>

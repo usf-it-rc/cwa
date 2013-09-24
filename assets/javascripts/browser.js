@@ -486,7 +486,7 @@ function miniBrowserSelectItem(type, elem_id, inferWorkdir){
     $(file_elem).val(file);
     $(file_label_elem).html(file);
   } else if (type == 'dir'){
-    var dir = resolve_path($('#selected_share').val(), $('#selected_dir').val());
+    var dir = resolve_path($('#target_share').val(), $('#target_path').val());
     var dir_elem = document.getElementById(elem_id);
     var dir_label_elem = document.getElementById(elem_id + "_label");
     $(dir_elem).val(dir);
