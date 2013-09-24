@@ -5,8 +5,8 @@
   redmine_project = "<%= @project.identifier %>";
 </script>
 
-<div class="box">
-  <h3>Submit <%= @app.name %> <%= @app.version %> job...</h3>
+<h2>Submit <%= @app.name %> <%= @app.version %> job...</h2>
+<div>
   <%= form_tag "/cwa_jobmanager/#{@project.identifier}/submit", :id => 'app_form', :multipart => true do %>
 
     <%= hidden_field_tag :selected_item, params[:selected_item] %>

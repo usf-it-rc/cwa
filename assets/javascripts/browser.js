@@ -17,6 +17,12 @@ function setPopupClickHandlers(){
     leftClickDir(event,this,true);
     event.stopPropagation();
   });
+ $('.browserFileEntry').bind('click', function (event){
+   event = event || window.event;
+   event.preventDefault();
+   leftClickFile(event,this,true);
+   event.stopPropagation();
+  });
 }
 
 
@@ -595,6 +601,9 @@ function getJSONfileItems(obj,share,path){
         share + '.' + path + '/' + file + '"><p class="browserEntryText">' + 
         file + '</p></div>'); 
     }
+  }
+  if (fileItems.length < 1){
+    fileItems.push('<div style="padding: 18px">There are no files in this directory.</div>');
   }
   return fileItems.join('\n');
 }

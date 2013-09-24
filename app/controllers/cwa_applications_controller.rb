@@ -125,13 +125,11 @@ class CwaApplicationsController < ApplicationController
 
   # Provide HAML code to generate necessary bits for a file selector
   def file_browser(param_name, infer_work_dir)
-    render_to_string :partial => 'cwa_applications/file_browser', :locals => { :param_name => param_name, :infer_work_dir => infer_work_dir }, :layout => false
+    render_to_string(:partial => 'cwa_applications/file_browser', :locals => { :param_name => param_name, :infer_work_dir => infer_work_dir }, :layout => false).html_safe
   end
 
   # Provide HAML code to generate necessary bits for a directory selector
   def dir_browser(param_name)
-    render_to_string :partial => 'cwa_applications/dir_browser', :locals => { :param_name => param_name }, :layout => false
+    render_to_string(:partial => 'cwa_applications/dir_browser', :locals => { :param_name => param_name }, :layout => false).html_safe
   end
-
-
 end

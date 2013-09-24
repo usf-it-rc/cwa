@@ -1,5 +1,5 @@
 <h3>Job History</h3>
-<% hist_jobs = CwaJobHistory.find_all_by_owner(User.current.login).last(25).reverse %>
+<% hist_jobs = CwaJobHistory.find_all_by_owner(@user.login).last(25).reverse %>
 <% if hist_jobs.count > 0 %>
 <table class="list">
   <tr>
@@ -10,9 +10,7 @@
     <td><b>Job Directory</b></td>
   </tr>
 <% hist_jobs.each do |h| %>
-  <% if h.workdir != nil %>
-    <% browser = CwaBrowser.new h.workdir, nil, @ipa_user %>
-  <% end %>
+  <% (share,dir) = CwaBrowser.resolve_path_from_s(h.workdir,@ipa_user) %>
   <% if @jobs.where_id_is(h.jobid) == nil %>
     <tr>
       <td><%= h.job_name %></td>
@@ -30,10 +28,10 @@
         <td>N/A</td>
       <% end %>
       <td>
-        <% if browser.current_dir != "" %>
-          <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => browser.current_share, :dir => browser.current_dir %>
+        <% if dir != "" %>
+          <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => share, :dir => dir %>
         <% else %> 
-          <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => browser.current_share %>
+          <%= link_to "View", :controller => 'cwa_browser', :action => 'index', :share => share %>
         <% end %>
       </td>
     </tr>

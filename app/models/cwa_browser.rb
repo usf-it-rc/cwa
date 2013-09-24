@@ -7,7 +7,7 @@ class CwaBrowser
     @work = user.workdirectory
 
     if share =~ /^(\/[^\0]+\/)+/
-      (share,dir) = self.resolve_path_from_string(share)
+      (share,dir) = CwaBrowser.resolve_path_from_s(share, user)
     end
 
     if dir != nil
@@ -120,17 +120,19 @@ class CwaBrowser
     file
   end
 
-  def resolve_path_from_string(str)
-    share_paths = { home: home, work: work, shares: "/shares/" }
-    share = ""
+  class << self
+    def resolve_path_from_s(str, user)
+      share_paths = { home: user.homedirectory, work: user.workdirectory, shares: "/shares/" }
+      share = ""
     
-    share_paths.keys.each do |path|
-      share = path if str.match(share_paths[path])
-    end
+      share_paths.keys.each do |path|
+        share = path if str.match(share_paths[path])
+      end
  
-    dir = str.gsub(share_paths[share], "")
-    dir.gsub!(/^\//,'')
+      dir = str.gsub(share_paths[share], "")
+      dir.gsub!(/^\//,'')
 
-    return [ share.to_s, dir ]
+      return [ share.to_s, dir ]
+    end
   end
 end
