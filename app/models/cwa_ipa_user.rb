@@ -158,7 +158,7 @@ class CwaIpaUser
         :password => Redmine::Cwa.ipa_password,
         :json => {
           'method' => 'user_show',
-          'params' => [ [], { 'uid' => self.user.login } ]
+          'params' => [ [], { 'uid' => self.user.login.downcase } ]
         }
       })
     rescue Exception => e
