@@ -75,7 +75,7 @@ class CwaJobmanagerController < ApplicationController
       @job.job_name = params[:job_name]
     end
 
-    if params.has_key?(:param_file) and !params[:param_file].nil?
+    if params.has_key?(:param_file) and params[:param_file] != ""
       # read the parameterization file, get column and row lengths
       param_data = []
       job_params = Redmine::CwaBrowserHelper.paramfile_parser(params[:param_file])
