@@ -57,6 +57,7 @@ class CwaJobmanagerController < ApplicationController
 
   def submit
     @job = RsgeJob.new
+    @app = nil
     script = ""
 
     if params.has_key?(:app_id)
