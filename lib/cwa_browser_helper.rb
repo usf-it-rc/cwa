@@ -154,6 +154,7 @@ module Redmine::CwaBrowserHelper
       # get first line, so we can parse our variable names
       file = Redmine::CwaBrowserHelper::Retrieve.new(file)
       vars = file.readline.strip
+      vars.gsub!(/\r\n/,"")
       vars.gsub!(/\r/,"")
       file.done
 
