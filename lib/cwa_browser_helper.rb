@@ -153,10 +153,10 @@ module Redmine::CwaBrowserHelper
 
       # get first line, so we can parse our variable names
       file = Redmine::CwaBrowserHelper::Retrieve.new(file)
-      vars = file.readline.strip.gsub("\r","")
+      vars = file.readline.strip
       file.done
 
-      { :count => size-1, :vars => vars.split(",") }
+      { :count => size-1, :vars => vars.split(",").map{|i| i.gsub!("\r","") } }
     end
     
     # Wicked cool privileged file writer 
