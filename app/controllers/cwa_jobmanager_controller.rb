@@ -66,6 +66,13 @@ class CwaJobmanagerController < ApplicationController
 
     Rails.logger.debug "CwaJobmanager.submit() => " + params.to_s
 
+    # Verify that there is a working directory
+    if !params.has_key?(:work_dir) or params[:work_dir] !~ /^\/.*$/ 
+      flash[:error] = "A valid working directory was not specified!  Please select an input file or directory!"
+      redirect_to :controller => 'cwa_applications', :action => 'display', :id => params[:app_id], :project_id => params[:project_id]
+      return
+    end
+
     # Sanitize the job name
     if params.has_key?(:job_name)
       if params[:job_name] !~ ::CwaConstants::JOBNAME_REGEX
