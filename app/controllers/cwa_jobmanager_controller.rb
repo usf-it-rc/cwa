@@ -99,6 +99,8 @@ class CwaJobmanagerController < ApplicationController
       end
       params[:param_code] += "var_names=( \"" + job_params[:vars].join('" "') + "\" )\n" 
  
+    else
+      params[:param_code] = ""
     end
 
     if !@app.nil?
