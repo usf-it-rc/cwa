@@ -88,6 +88,7 @@ class CwaJobmanagerController < ApplicationController
       param_data = []
       job_params = Redmine::CwaBrowserHelper.paramfile_parser(params[:param_file])
       script += "\#\$ -t 1-#{job_params[:count]}\n"
+      script += "\#\$ -tc 25\n"
       
       # retrieve entry line from param_file
       params[:param_code] = "params=\$(sed -e \"s/\r//g\" -e \"\$((SGE_TASK_ID+1))q;d\" #{params[:param_file]})\n"
